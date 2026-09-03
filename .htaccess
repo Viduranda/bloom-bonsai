@@ -1,0 +1,22 @@
+# 🌿 BLOOM & BONSAI — Production .htaccess Configuration
+DirectoryIndex index.html index.php
+
+# Prevent directory indexing
+Options -Indexes +FollowSymLinks
+
+# Set default charset
+AddDefaultCharset UTF-8
+
+# Enable CORS for REST API endpoints
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+</IfModule>
+
+# Handle HTTP Authorization Header on Shared Hosting
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP:Authorization} ^(.*)
+    RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+</IfModule>
