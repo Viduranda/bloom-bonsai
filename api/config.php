@@ -67,10 +67,10 @@ $connected = false;
 $host = getEnvVar('DB_HOST', 'mysql-bloom-bonsai.alwaysdata.net');
 $db   = getEnvVar('DB_NAME', 'bloom-bonsai_db');
 $user = getEnvVar('DB_USER', 'bloom-bonsai');
-$pass = getEnvVar('DB_PASSWORD', '');
+$pass = getEnvVar('DB_PASSWORD', '12345slA@#');
 
 // List of potential passwords to try on AlwaysData
-$possiblePasses = array_filter([$pass, getenv('ALWAYSDATA_PASSWORD'), '12345slA']);
+$possiblePasses = array_filter([$pass, '12345slA@#', '12345slA', getenv('ALWAYSDATA_PASSWORD')]);
 
 foreach ($possiblePasses as $p) {
     if ($connected) break;
@@ -127,7 +127,7 @@ if (!$connected) {
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'error' => 'Database connection failed: Please set DB_PASSWORD in .env file or api/config.php with your AlwaysData password.'
+        'error' => 'Database connection failed: Unable to connect to MySQL database server.'
     ]);
     exit;
 }
