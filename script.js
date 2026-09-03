@@ -2074,9 +2074,12 @@ function safeInitApp() {
   updateCartCount();
 
   if (localStorage.getItem('token')) {
-    apiFetch('auth/me.php').then(u => {
-      localStorage.setItem('user', JSON.stringify(u));
-      updateAuthUI(u);
+    apiFetch('auth/me.php').then(res => {
+      const userData = (res && res.user) ? res.user : res;
+      if (userData && userData.name) {
+        localStorage.setItem('user', JSON.stringify(userData));
+        updateAuthUI(userData);
+      }
     }).catch(_ => {});
   }
 
