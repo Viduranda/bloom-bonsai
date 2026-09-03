@@ -66,3 +66,69 @@ try {
             $discountVal = min($total, floatval($cData['discount_amount']));
         }
     }
+
+    // Auto-migrate orders table schema if coupon columns are missing
+    try {
+        $chk = $pdo->query("SHOW COLUMNS FROM orders LIKE 'coupon_code'")->fetch();
+        if (!$chk) {
+            $pdo->exec("ALTER TABLE orders ADD COLUMN coupon_code VARCHAR(50) DEFAULT NULL, ADD COLUMN discount_amount DECIMAL(10,2) DEFAULT 0.00;");
+        }
+    } catch (Exception $e) {}
+
+    $hasCouponCol = true;
+
+    if ($couponCode && $hasCouponCol) {
+        $usedStmt = $pdo->prepare("SELECT COUNT(*) FROM orders WHERE user_id = ? AND UPPER(coupon_code) = ? AND status != 'cancelled'");
+        $usedStmt->execute([$user['user_id'], $couponCode]);
+        if ((int)$usedStmt->fetchColumn() > 0) {
+            throw new RuntimeException("You have already redeemed promo code '$couponCode'. Each coupon can only be used once per account.");
+        }
+    }
+
+    $shipping = calcShipping($total);
+    $grand = max(0, $total + $shipping - $discountVal);
+
+    if ($hasCouponCol) {
+        $stmt = $pdo->prepare('INSERT INTO orders
+            (user_id, total, coupon_code, discount_amount, status, shipping_address, customer_name, phone, city, pincode,
+             payment_method, expected_delivery, status_updated_at, created_at)
+            VALUES (?, ?, ?, ?, "confirmed", ?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 5 DAY), NOW(), NOW())');
+        $stmt->execute([$user['user_id'], $grand, $couponCode, $discountVal, "$name, $address, $city - $pincode",
+                        $name, $phone, $city, $pincode, $payment]);
+    } else {
+        $stmt = $pdo->prepare('INSERT INTO orders
+            (user_id, total, status, shipping_address, customer_name, phone, city, pincode,
+             payment_method, expected_delivery, status_updated_at, created_at)
+            VALUES (?, ?, "confirmed", ?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 5 DAY), NOW(), NOW())');
+        $stmt->execute([$user['user_id'], $grand, "$name, $address, $city - $pincode",
+                        $name, $phone, $city, $pincode, $payment]);
+    }
+    $orderId = $pdo->lastInsertId();
+
+    $stmt  = $pdo->prepare('INSERT INTO order_items (order_id, product_id, quantity, price_at_purchase) VALUES (?, ?, ?, ?)');
+    $stock = $pdo->prepare('UPDATE products SET stock = stock - ? WHERE id = ?');
+    $plantStmt = $pdo->prepare('INSERT INTO user_plants (user_id, plant_name, species, image_url, health_status) VALUES (?, ?, ?, ?, "healthy")');
+
+    foreach ($validated as $v) {
+        $stmt->execute([$orderId, $v['product_id'], $v['quantity'], $v['price']]);
+        $stock->execute([$v['quantity'], $v['product_id']]);
+
+        // Auto-add plant to customer's user_plants (ONLY for living plants, NOT accessories/soil/tools)
+        $pInfo = $pdo->prepare('SELECT p.name, p.scientific_name, p.image, c.slug AS cat_slug, c.name AS cat_name
+                                FROM products p
+                                LEFT JOIN categories c ON c.id = p.category_id
+                                WHERE p.id = ?');
+        $pInfo->execute([$v['product_id']]);
+        $prod = $pInfo->fetch();
+        if ($prod) {
+            $catSlug = strtolower($prod['cat_slug'] ?? '');
+            $catName = strtolower($prod['cat_name'] ?? '');
+            $isAccessory = ($catSlug === 'accessories') ||
+                           (strpos($catName, 'accessori') !== false) ||
+                           (strpos($catName, 'tool') !== false) ||
+                           (strpos($catName, 'soil') !== false);
+            if (!$isAccessory) {
+                $plantStmt->execute([$user['user_id'], $prod['name'], $prod['scientific_name'] ?? '', $prod['image']]);
+            }
+        }
+    }
