@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../auth.php';
 requireAdmin();
 
 // Auto-migrate missing columns in products table schema if they don't exist yet

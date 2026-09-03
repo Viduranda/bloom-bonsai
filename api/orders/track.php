@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../auth.php';
 $user = requireAuth();
 
 $orderId = (int)($body['order_id'] ?? $_GET['order_id'] ?? 0);

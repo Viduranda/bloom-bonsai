@@ -1,6 +1,7 @@
 <?php
 // api/coupons/validate.php — Validate a promo coupon code against cart subtotal, expiry, and single-use limit
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../auth.php';
 
 $code = strtoupper(trim($body['code'] ?? $_GET['code'] ?? ''));
 $subtotal = floatval($body['subtotal'] ?? $_GET['subtotal'] ?? 0);

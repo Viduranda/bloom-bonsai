@@ -3,6 +3,7 @@
 // api/orders/invoice.php — Printable Order Invoice Generator
 // ============================================================
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../auth.php';
 $user = requireAuth();
 header('Content-Type: text/html; charset=utf-8');
 

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../auth.php';
 $user = requireAuth();
 
 $stmt = $pdo->prepare('SELECT ci.id, ci.product_id, ci.quantity, p.name, p.price, p.image, p.stock
