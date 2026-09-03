@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saved Plants & Wishlist · Bloom & Bonsai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="style.css?v=43.0">
+<style>
+  .wishlist-page { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+  .wishlist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
+  .wishlist-card {
+    background: #fff; border: 1px solid #e7e2d3; border-radius: 18px; overflow: hidden;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+    box-shadow: 0 6px 20px rgba(14, 42, 26, 0.05); display: flex; flex-direction: column;
+  }
+  .wishlist-card:hover {
+    transform: translateY(-5px); box-shadow: 0 14px 30px rgba(14, 42, 26, 0.12); border-color: #52B788;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══ -->
+<header class="navbar premium">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Bloom <span>&amp;</span> Bonsai</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="mygarden.html">My Garden</a></li>
+      <li><a href="gardendesigner.html">Garden AI</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="wishlist.html" class="cart-link active" style="color:#17482f;font-weight:700;">
+        ❤️ Wishlist <span class="cart-badge wishlist-count-badge" id="wishlistCount" style="background:#e74c3c;">0</span>
+      </a>
+      <a href="cart.html" class="cart-link">Cart <span class="cart-badge" id="cartCount">0</span></a>
+      <a href="login.html" class="btn-login" id="loginBtn">Login</a>
+      <a href="register.html" class="btn-signup" id="signupBtn">Sign Up</a>
+      <div class="user-menu" id="userMenu" style="display:none;align-items:center;gap:10px;">
+        <i class="fas fa-user-circle"></i>
+        <span id="userName">User</span>
+        <a href="#" id="logoutBtn" class="btn-mini" style="font-size:0.8rem;">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<main class="wishlist-page">
+  <!-- HEADER & REAL-TIME DATE TRACKING WIDGET -->
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;background:#ffffff;border:1px solid #e7e2d3;padding:22px 28px;border-radius:20px;margin-bottom:28px;box-shadow:0 6px 20px rgba(14,42,26,0.04);">
+    <div>
+      <h1 style="font-family:'Playfair Display',serif;color:#17482f;margin:0;font-size:2.2rem;">❤️ Saved Plants &amp; Wishlist</h1>
+      <div id="wishlistRealtimeClock" style="color:#2e7d4f;font-size:0.92rem;font-weight:600;margin-top:6px;display:flex;align-items:center;gap:6px;">
+        <i class="far fa-clock"></i> <span id="wishlistClockText">Loading live date &amp; time...</span>
+      </div>
+    </div>
+    <div>
+      <a href="shop.html" class="btn-primary" style="background:#17482f;color:#fff;padding:10px 22px;border-radius:999px;font-weight:600;text-decoration:none;">
+        <i class="fas fa-search"></i> Discover More Plants
+      </a>
+    </div>
+  </div>
+
+  <!-- WISHLIST GRID CONTAINER -->
+  <div id="wishlistGrid" class="wishlist-grid">
+    <div style="grid-column:1/-1;text-align:center;padding:4rem 1rem;color:#7c8878;background:#fff;border-radius:20px;border:1px solid #e7e2d3;">
+      <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:#17482f;margin-bottom:12px;"></i>
+      <p style="font-size:1.05rem;">Loading your saved wishlist items...</p>
+    </div>
+  </div>
+</main>
+
+<script src="script.js?v=43.0"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  startWishlistRealtimeClock();
+  loadWishlistPage();
+});
+
+function startWishlistRealtimeClock() {
+  function update() {
+    const el = document.getElementById('wishlistClockText');
+    if (!el) return;
+    const now = new Date();
+    const options = { 
+      weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', 
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
+    };
+    el.textContent = '📅 ' + now.toLocaleString('en-US', options) + ' (Real-time Live)';
+  }
+  update();
+  setInterval(update, 1000);
+}
+
+window.loadWishlistPage = async function() {
+  const container = document.getElementById('wishlistGrid');
+  if (!container) return;
+
+  await loadWishlistState();
+
+  try {
+    let items = [];
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    
+    if (token) {
+      try {
+        const res = await apiFetch('wishlist/list.php');
+        const dbItems = (res && res.items) ? res.items : (res && res.data && res.data.items ? res.data.items : []);
+        if (dbItems && dbItems.length) {
+          items = dbItems;
+        }
+      } catch(e) {}
+    }
+
+    // If no DB items or guest user, load all products and filter by window.userWishlistSet
+    if (!items.length && window.userWishlistSet && window.userWishlistSet.size > 0) {
+      const allRes = await apiFetch('products/list.php');
+      const allProducts = Array.isArray(allRes) ? allRes : (allRes && allRes.data ? allRes.data : []);
+      items = allProducts.filter(p => window.userWishlistSet.has(Number(p.id)));
+    }
+    
+    if (!items.length) {
+      container.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:3.5rem 1rem;color:#7c8878;background:#fff;border-radius:20px;border:1px solid #e7e2d3;">
+          <div style="font-size:3.5rem;margin-bottom:1rem;">🪴</div>
+          <h2 style="font-family:'Playfair Display',serif;color:#17482f;margin-bottom:8px;">Your Wishlist is Empty</h2>
+          <p style="margin-bottom:1.5rem;color:#666;">Click the heart icon (❤️) on any plant to save it here for later!</p>
+          <a href="shop.html" class="btn-primary" style="background:#17482f;color:#fff;padding:10px 26px;border-radius:999px;text-decoration:none;font-weight:600;">Browse Plant Collection</a>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = items.map(p => `
+      <article class="wishlist-card">
+        <div style="height:170px;overflow:hidden;background:#f6f4ee;position:relative;">
+          <img src="${esc(p.image || 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400')}" alt="${esc(p.name)}" style="width:100%;height:100%;object-fit:cover;">
+          <span style="position:absolute;top:10px;left:10px;background:#17482f;color:#fff;padding:3px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;">
+            ${esc(p.category_name || p.category || 'Botanical')}
+          </span>
+          <button onclick="toggleWishlist(${p.id}, event)" title="Remove from Wishlist" style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.92);border:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.15);">
+            <i class="fas fa-heart" style="color:#e74c3c;font-size:1.05rem;"></i>
+          </button>
+        </div>
+        <div style="padding:1.2rem;display:flex;flex-direction:column;flex-grow:1;justify-content:space-between;">
+          <div>
+            <b style="font-family:'Playfair Display',serif;font-size:1.15rem;color:#17482f;display:block;margin-bottom:2px;">${esc(p.name)}</b>
+            <span style="color:#52B788;font-size:.84em;font-style:italic;display:block;margin-bottom:8px;">🌿 ${esc(p.scientific_name || 'Botanical Specimen')}</span>
+            <div style="font-size:1.2rem;font-weight:700;color:#17482f;margin-bottom:12px;">
+              ${formatINR(p.price)}
+              ${p.old_price ? `<s style="color:#999;font-size:.85rem;font-weight:400;margin-left:6px;">${formatINR(p.old_price)}</s>` : ''}
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:auto;">
+            <button onclick="addToCart(${p.id})" style="background:#17482f;color:#fff;border:none;padding:10px;border-radius:10px;font-weight:700;font-size:0.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+              <i class="fas fa-shopping-cart"></i> Move to Cart
+            </button>
+            <button onclick="toggleWishlist(${p.id}, event)" style="background:#fff0f0;color:#c0392b;border:1px solid #f5c6cb;padding:8px;border-radius:10px;font-weight:600;font-size:0.8rem;cursor:pointer;">
+              <i class="fas fa-trash-alt"></i> Remove Item
+            </button>
+          </div>
+        </div>
+      </article>
+    `).join('');
+  } catch(err) {
+    container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#c0392b;">Could not load wishlist: ${esc(err.message)}</div>`;
+  }
+};
+</script>
+</body>
+</html>

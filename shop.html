@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Botanical Shop — Bloom &amp; Bonsai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=44.0">
+    <style>
+        .shop-page-wrapper {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 30px 24px 70px;
+        }
+
+        .luxury-shop-hero {
+            background: linear-gradient(135deg, rgba(10, 26, 16, 0.88) 0%, rgba(23, 72, 47, 0.82) 100%), 
+                        url('https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=1600') center/cover no-repeat;
+            color: #ffffff;
+            padding: 55px 24px;
+            text-align: center;
+            border-radius: 24px;
+            margin-bottom: 35px;
+            box-shadow: 0 16px 40px rgba(14, 42, 26, 0.15);
+        }
+
+        .luxury-shop-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.7rem;
+            margin: 8px 0 10px;
+            color: #ffffff;
+        }
+
+        .luxury-shop-hero p {
+            font-size: 1.05rem;
+            color: #d8e8dc;
+            max-width: 650px;
+            margin: 0 auto 20px;
+            line-height: 1.6;
+        }
+
+        .hero-feature-tags {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hero-tag {
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #ffffff;
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .shop-layout-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) {
+            .shop-layout-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .side-widget {
+            background: #ffffff;
+            border: 1px solid #e7e2d3;
+            border-radius: 20px;
+            padding: 22px;
+            margin-bottom: 22px;
+            box-shadow: 0 6px 20px rgba(14, 42, 26, 0.04);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .side-widget:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 26px rgba(14, 42, 26, 0.08);
+        }
+
+        .side-widget-title {
+            font-family: 'Playfair Display', serif;
+            color: #17482f;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .side-highlight-img {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+            border-radius: 14px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<header class="navbar premium">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Bloom <span>&amp;</span> Bonsai</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html" class="active">Shop</a></li>
+      <li><a href="mygarden.html">My Garden</a></li>
+      <li><a href="gardendesigner.html">Garden AI</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="wishlist.html" class="cart-link" style="margin-right:10px;">Wishlist <span class="cart-badge wishlist-count-badge" id="wishlistCount" style="background:#e74c3c;">0</span></a>
+      <a href="cart.html" class="cart-link">Cart <span class="cart-badge" id="cartCount">0</span></a>
+      <a href="login.html" class="btn-login" id="loginBtn">Login</a>
+      <a href="register.html" class="btn-signup" id="signupBtn">Sign Up</a>
+      <div class="user-menu" id="userMenu" style="display:none;align-items:center;gap:10px;">
+        <i class="fas fa-user-circle"></i>
+        <span id="userName">User</span>
+        <a href="#" id="logoutBtn" class="btn-mini" style="font-size:0.8rem;">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<div class="shop-page-wrapper">
+    <!-- Luxury Hero Header Banner -->
+    <div class="luxury-shop-hero">
+        <span style="color:#c9a227;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:0.82rem;">🌸 Luxury Botanical Collection</span>
+        <h1>Exotic Plants &amp; Artisanal Bonsai</h1>
+        <p>Handpicked specimens paired with custom 4-week AI care guides, health guarantee, and insured local delivery.</p>
+        <div class="hero-feature-tags">
+            <span class="hero-tag">✨ 100% Organically Grown</span>
+            <span class="hero-tag">🚚 Free Shipping over Rs. 10,000 (Within 50 KM)</span>
+            <span class="hero-tag">🤖 AI Care Plan Included</span>
+        </div>
+    </div>
+
+    <!-- 2-Column Responsive Layout -->
+    <div class="shop-layout-grid">
+        <!-- LEFT SIDEBAR PANEL -->
+        <aside class="shop-left-panel">
+            <!-- Free Shipping Badge Widget -->
+            <div class="side-widget" style="background:#f4f8f5;border-color:#d4e4d6;">
+                <h3 class="side-widget-title" style="color:#2e7d4f;"><i class="fas fa-truck-fast"></i> Delivery Guarantee</h3>
+                <p style="color:#3d4a3a;font-size:0.88rem;line-height:1.55;margin-bottom:12px;">
+                    Orders over <strong>Rs. 10,000.00</strong> within a <strong>50 KM radius</strong> qualify for <strong>FREE insured delivery</strong> across Sri Lanka!
+                </p>
+                <div style="background:#e0eae3;height:8px;border-radius:999px;overflow:hidden;">
+                    <div style="background:linear-gradient(90deg, #17482f 0%, #52B788 100%);width:100%;height:100%;border-radius:999px;"></div>
+                </div>
+            </div>
+
+            <!-- Plant of the Month Widget -->
+            <div class="side-widget">
+                <span style="background:#c9a227;color:#fff;padding:2px 8px;border-radius:6px;font-size:0.7rem;font-weight:bold;text-transform:uppercase;">FEATURED</span>
+                <h3 class="side-widget-title" style="margin-top:6px;">🌟 Plant of the Month</h3>
+                <img src="https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=400" class="side-highlight-img" alt="Ficus Bonsai">
+                <h4 style="color:#17482f;font-weight:700;margin-bottom:2px;font-size:1.05rem;">Ficus Ginseng Bonsai</h4>
+                <p style="color:#52B788;font-size:0.82rem;font-style:italic;margin-bottom:8px;">Ficus microcarpa</p>
+                <div style="font-size:1.15rem;font-weight:700;color:#17482f;margin-bottom:12px;">Rs. 1,799.00</div>
+                <button onclick="openProductModal(3)" style="width:100%;background:#17482f;color:#fff;border:none;padding:10px 14px;border-radius:12px;font-size:0.85rem;font-weight:700;cursor:pointer;">
+                    <i class="fas fa-eye"></i> Quick View Details
+                </button>
+            </div>
+
+            <!-- AI Garden Planner Widget -->
+            <div class="side-widget" style="background:#faf5e8;border-color:#ebd8ad;">
+                <h3 class="side-widget-title" style="color:#8a6a11;"><i class="fas fa-sparkles"></i> AI Room Planner</h3>
+                <p style="color:#5c4a16;font-size:0.85rem;line-height:1.55;margin-bottom:12px;">
+                    Not sure which plant fits your room sunlight or balcony? Use our AI Garden Planner to get instant recommendations!
+                </p>
+                <a href="gardendesigner.html" style="display:block;text-align:center;background:#c9a227;color:#fff;text-decoration:none;padding:10px 14px;border-radius:12px;font-weight:700;font-size:0.85rem;">
+                    Try AI Planner →
+                </a>
+            </div>
+
+            <!-- Gardener's Tip -->
+            <div class="side-widget" style="background:#faf8f2;border-color:#e7e2d3;">
+                <h3 class="side-widget-title">💡 Gardener's Tip</h3>
+                <p style="color:#4a5746;font-size:0.88rem;line-height:1.55;">
+                    "Always test soil moisture 2 inches down before watering your bonsai. Over-watering is the #1 mistake beginner plant owners make!"
+                </p>
+                <small style="color:#c9a227;font-weight:700;display:block;margin-top:8px;">— Bloom &amp; Bonsai AI Specialist</small>
+            </div>
+        </aside>
+
+        <!-- MAIN COLUMN: Category Pills, Filters & Product Grid -->
+        <main class="shop-main-content">
+            <section class="shop-filters" style="margin-bottom:28px;">
+                <div class="filter-container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;background:#fff;border:1px solid #e7e2d3;padding:16px 22px;border-radius:20px;box-shadow:0 6px 20px rgba(0,0,0,0.03);">
+                    <div class="filter-buttons" style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <button class="filter-btn active" onclick="filterShop('')" style="padding:9px 20px;border-radius:999px;cursor:pointer;font-weight:600;font-size:0.88rem;">🏷️ All Items</button>
+                        <button class="filter-btn" data-cat="flowers" onclick="filterShop('flowers')" style="padding:9px 20px;border-radius:999px;cursor:pointer;font-weight:600;font-size:0.88rem;">🌸 Flowers</button>
+                        <button class="filter-btn" data-cat="bonsai" onclick="filterShop('bonsai')" style="padding:9px 20px;border-radius:999px;cursor:pointer;font-weight:600;font-size:0.88rem;">🌲 Bonsai Trees</button>
+                        <button class="filter-btn" data-cat="accessories" onclick="filterShop('accessories')" style="padding:9px 20px;border-radius:999px;cursor:pointer;font-weight:600;font-size:0.88rem;">🪴 Accessories</button>
+                    </div>
+                    <div class="filter-search" style="position:relative;min-width:240px;">
+                        <input type="text" id="searchInput" placeholder="Search plant names..." oninput="searchShop()" style="width:100%;padding:10px 16px 10px 38px;border-radius:999px;border:1px solid #d4e4d6;font-size:0.88rem;outline:none;">
+                        <i class="fas fa-search" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#888;font-size:0.85rem;"></i>
+                    </div>
+                </div>
+
+                <!-- Advanced Plant Attribute Filters -->
+                <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:14px;padding:12px 20px;background:#faf8f3;border:1px solid #e7e2d3;border-radius:14px;font-size:0.85rem;">
+                    <span style="font-weight:700;color:#17482f;"><i class="fas fa-filter"></i> Filters:</span>
+                    
+                    <select id="filterSunlight" onchange="applyAdvancedFilters()" style="padding:6px 12px;border-radius:8px;border:1px solid #c9a227;font-size:0.82rem;background:#fff;cursor:pointer;">
+                        <option value="">☀️ All Light Levels</option>
+                        <option value="Direct Sun">☀️ Direct Sun</option>
+                        <option value="Indirect Light">🌤️ Indirect Light</option>
+                        <option value="Low Light">🌥️ Low Light</option>
+                    </select>
+
+                    <select id="filterDifficulty" onchange="applyAdvancedFilters()" style="padding:6px 12px;border-radius:8px;border:1px solid #c9a227;font-size:0.82rem;background:#fff;cursor:pointer;">
+                        <option value="">🌱 All Care Levels</option>
+                        <option value="Beginner">🌱 Beginner Friendly</option>
+                        <option value="Intermediate">🪴 Intermediate</option>
+                    </select>
+
+                    <select id="filterPetSafe" onchange="applyAdvancedFilters()" style="padding:6px 12px;border-radius:8px;border:1px solid #c9a227;font-size:0.82rem;background:#fff;cursor:pointer;">
+                        <option value="">🐶 All Safety</option>
+                        <option value="1">🐶 Pet Safe Only</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Product Grid Container -->
+            <div class="product-grid" id="shopGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:24px;"></div>
+        </main>
+    </div>
+</div>
+
+<!-- Product Detail Modal Overlay -->
+<div class="modal-overlay" id="productModal" onclick="if(event.target===this) closeProductModal();">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeProductModal()">✕</button>
+    <div id="productModalBody"></div>
+  </div>
+</div>
+
+<script src="script.js?v=43.0"></script>
+</body>
+</html>

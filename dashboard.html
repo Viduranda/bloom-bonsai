@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Dashboard · Bloom &amp; Bonsai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="style.css?v=44.0">
+<script src="script.js?v=44.0"></script>
+<style>
+  :root {
+    --db-primary: #17482f;
+    --db-accent: #c9a227;
+    --db-bg: #faf8f3;
+    --db-card-bg: #ffffff;
+    --db-text: #23301f;
+    --db-muted: #7c8878;
+    --db-border: #e7e2d3;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--db-bg);
+    color: var(--db-text);
+    min-height: 100vh;
+  }
+
+  /* Centered Header Navbar */
+  .navbar.premium {
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--db-border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .navbar.premium .logo {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--db-primary);
+    text-decoration: none;
+  }
+  .navbar.premium .logo span { color: var(--db-accent); }
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    list-style: none;
+  }
+  .nav-links a {
+    color: #3d4a3a;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.35rem 0;
+    border-bottom: 2px solid transparent;
+    transition: 0.25s;
+  }
+  .nav-links a:hover, .nav-links a.active {
+    color: var(--db-primary);
+    border-color: var(--db-accent);
+  }
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+  }
+  .cart-link {
+    position: relative;
+    color: #3d4a3a;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -16px;
+    background: var(--db-accent);
+    color: #fff;
+    font-size: 0.7rem;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Main layout */
+  .dash-main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 2.5rem 1.2rem 5rem;
+  }
+
+  /* Centered Hero Header */
+  .dash-hero {
+    text-align: center;
+    margin-bottom: 1.8rem;
+  }
+  .dash-hero h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2.8rem;
+    color: var(--db-primary);
+    font-weight: 700;
+  }
+  .dash-hero h1 span { color: #c9a227; }
+  .dash-hero p {
+    color: var(--db-muted);
+    font-size: 1.05rem;
+    margin-top: 0.4rem;
+  }
+
+  /* Centered Tab Switcher */
+  .dash-tab-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-bottom: 2.5rem;
+  }
+  .dash-tab-btn {
+    padding: 10px 28px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border: 1px solid var(--db-border);
+    background: #ffffff;
+    color: var(--db-text);
+    transition: all 0.25s ease;
+  }
+  .dash-tab-btn.active {
+    background: var(--db-primary);
+    color: #ffffff;
+    border-color: var(--db-primary);
+    box-shadow: 0 4px 16px rgba(23, 72, 47, 0.25);
+  }
+
+  /* Order Card (Exact Match to Screenshot) */
+  .order-card {
+    background: #ffffff;
+    border: 1px solid #e7e2d3;
+    border-radius: 20px;
+    padding: 1.8rem 2.2rem;
+    margin-bottom: 1.8rem;
+    box-shadow: 0 10px 30px rgba(14, 42, 26, 0.04);
+  }
+  .o-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .o-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--db-primary);
+  }
+  .o-title small {
+    font-weight: 400;
+    color: var(--db-muted);
+  }
+  .o-date {
+    color: #888;
+    font-size: 0.88rem;
+    margin-top: 2px;
+  }
+  .status-badge {
+    background: #267b4b;
+    color: #ffffff;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 6px 18px;
+    border-radius: 999px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .status-badge.cancelled {
+    background: #c0392b;
+  }
+
+  .o-eta-badge {
+    background: #eef7f0;
+    border: 1px dashed #267b4b;
+    color: var(--db-primary);
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 1.1rem 0 0.8rem;
+  }
+
+  .o-meta-row {
+    font-size: 0.92rem;
+    color: var(--db-muted);
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .o-meta-row b {
+    color: var(--db-text);
+  }
+
+  .o-items-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 1.2rem;
+  }
+  .o-item-pill {
+    background: #f6f3ea;
+    border-radius: 999px;
+    padding: 6px 16px 6px 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--db-text);
+  }
+  .o-item-pill img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .o-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 1rem;
+  }
+  .btn-tracking {
+    background: #ffffff;
+    border: 1px solid var(--db-primary);
+    color: var(--db-primary);
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .btn-tracking:hover {
+    background: var(--db-primary);
+    color: #ffffff;
+  }
+
+  .btn-cancel {
+    background: #fdf0f0;
+    border: 1px solid #f5c6cb;
+    color: #c0392b;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .o-total-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--db-primary);
+  }
+
+  /* Plant Sanctuary Grid */
+  .plant-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+  .plant-card {
+    background: #ffffff;
+    border: 1px solid var(--db-border);
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 0.25s;
+    box-shadow: 0 8px 22px rgba(14, 42, 26, 0.05);
+  }
+  .plant-card-compact:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 30px rgba(14, 42, 26, 0.14) !important;
+    border-color: #52B788 !important;
+  }
+  .plant-card-compact:hover img {
+    transform: scale(1.05);
+  }
+  .plant-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+  .pc-body { padding: 1.2rem; }
+  .pc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--db-primary);
+  }
+  .pc-sci {
+    font-size: 0.84rem;
+    color: var(--db-muted);
+    font-style: italic;
+    margin-top: 2px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3.5rem 1.5rem;
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid var(--db-border);
+  }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 0.5rem; }
+  .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--db-primary); }
+  .empty-state p { color: var(--db-muted); margin-top: 0.4rem; }
+
+  /* Visual Timeline Box */
+  .timeline-box {
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--db-border);
+  }
+  .tl-list {
+    position: relative;
+    padding-left: 1.5rem;
+    list-style: none;
+  }
+  .tl-list::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: #e7e2d3;
+  }
+  .tl-item {
+    position: relative;
+    padding-bottom: 1rem;
+  }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #d8d3c2;
+  }
+  .tl-item.done::before { background: #267b4b; border-color: #267b4b; }
+  .tl-item.now::before { background: #c9a227; border-color: #c9a227; box-shadow: 0 0 0 4px rgba(201,162,39,0.2); }
+  .tl-status { font-weight: 700; font-size: 0.9rem; color: var(--db-text); }
+  .tl-time { font-size: 0.78rem; color: #888; margin-top: 2px; }
+  .tl-note { font-size: 0.85rem; color: var(--db-muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="navbar premium">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Bloom <span>&amp;</span> Bonsai</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="mygarden.html">My Garden</a></li>
+      <li><a href="gardendesigner.html">Garden AI</a></li>
+      <li><a href="dashboard.html" class="active">Dashboard</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="wishlist.html" class="cart-link" style="margin-right:10px;">Wishlist <span class="cart-badge wishlist-count-badge" id="wishlistCount" style="background:#e74c3c;">0</span></a>
+      <a href="cart.html" class="cart-link">Cart <span class="cart-badge" id="cartCount">0</span></a>
+      <a href="login.html" class="btn-login" id="loginBtn">Login</a>
+      <a href="register.html" class="btn-signup" id="signupBtn">Sign Up</a>
+      <div class="user-menu" id="userMenu" style="display:none;align-items:center;gap:10px;">
+        <i class="fas fa-user-circle"></i>
+        <span id="userName">User</span>
+        <a href="#" id="logoutBtn" class="btn-mini" style="font-size:0.8rem;">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<main class="dash-main">
+  <!-- HERO GREETING WITH REAL-TIME LIVE CLOCK & CARE STREAK -->
+  <div class="dash-hero" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;background:#ffffff;border:1px solid #e7e2d3;padding:22px 28px;border-radius:20px;margin-bottom:24px;box-shadow:0 6px 20px rgba(14,42,26,0.04);">
+    <div>
+      <h1 style="margin:0;font-size:1.75rem;color:#17482f;font-family:'Playfair Display',serif;">Hello, <span id="dashUserName">Plant Lover</span> 👋</h1>
+      <div id="custRealtimeClock" style="color:#2e7d4f;font-size:0.92rem;font-weight:600;margin-top:6px;display:flex;align-items:center;gap:6px;">
+        <i class="far fa-clock"></i> <span id="custClockText">Loading live date &amp; time...</span>
+      </div>
+    </div>
+    <div style="background:#faf8f3;border:1px solid #e7e2d3;padding:12px 20px;border-radius:14px;text-align:right;">
+      <div style="font-size:0.85rem;color:#666;font-weight:600;">🌿 Category Daily Care Streak</div>
+      <div id="dailyStreakBadge" style="font-size:1.1rem;font-weight:700;color:#17482f;margin-top:2px;">🔥 Active Plant Care Mode</div>
+    </div>
+  </div>
+
+  <!-- TAB BUTTONS -->
+  <div class="dash-tab-wrapper">
+    <button class="dash-tab-btn active" id="tabOrdersBtn" onclick="switchTab('orders')">My Orders</button>
+    <button class="dash-tab-btn" id="tabPlantsBtn" onclick="switchTab('plants')">My Plants</button>
+  </div>
+
+  <!-- ORDERS PANEL -->
+  <section id="panelOrders">
+    <div id="ordersList"><div class="empty-state"><div class="icon">🌿</div><h3>Loading your orders…</h3></div></div>
+  </section>
+
+  <!-- PLANTS PANEL -->
+  <section id="panelPlants" style="display:none;">
+    <div id="plantsGrid"><div class="empty-state"><div class="icon">🪴</div><h3>Loading your plants…</h3></div></div>
+  </section>
+</main>
+
+<script>
+var DASH_ORDER_FLOW = window.DASH_ORDER_FLOW = window.DASH_ORDER_FLOW || ['confirmed','packed','shipped','out_for_delivery','delivered'];
+var DASH_STATUS_LABELS = window.DASH_STATUS_LABELS = window.DASH_STATUS_LABELS || {
+  pending:'PENDING', confirmed:'CONFIRMED', packed:'PACKED', shipped:'SHIPPED',
+  out_for_delivery:'OUT FOR DELIVERY', delivered:'DELIVERED', cancelled:'CANCELLED'
+};
+const DASH_FALLBACK_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="#e8f5e9"/><text x="200" y="160" font-size="70" text-anchor="middle">🌿</text></svg>');
+
+if (typeof esc !== 'function') {
+  window.esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); };
+}
+if (typeof formatINR !== 'function') {
+  window.formatINR = function(n){ return 'Rs. ' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+}
+
+let currentOrders = [];
+let currentPlants = [];
+
+function safeBootDashboard() {
+  if (window.__dashBooted) return;
+  window.__dashBooted = true;
+  bootDashboard();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', safeBootDashboard);
+} else {
+  safeBootDashboard();
+}
+
+async function bootDashboard(){
+  loadUserHeader();
+  loadCartCount();
+
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  if (!token) {
+    showLoginRequired();
+    return;
+  }
+
+  try { await fetchUserProfile(); } catch(e){}
+  try { await fetchCustomerOrders(); } catch(e){}
+  try { await fetchCustomerPlants(); } catch(e){}
+}
+
+function showLoginRequired(){
+  const box = document.getElementById('ordersList');
+  if (box) {
+    box.innerHTML = `<div class="empty-state">
+      <div class="icon">🔒</div>
+      <h3>Please Log In</h3>
+      <p>Please log in to view your placed orders and plant sanctuary.</p>
+      <p style="margin-top:1rem;"><a href="login.html" class="dash-tab-btn active" style="display:inline-block;text-decoration:none;">Log In Now</a></p>
+    </div>`;
+  }
+}
+
+function loadUserHeader(){
+  try {
+    const raw = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (!raw) return;
+    const u = JSON.parse(raw);
+    if (u && u.name) {
+      const name = u.name;
+      const firstName = name.split(' ')[0].toLowerCase();
+      document.getElementById('dashUserName').textContent = firstName;
+      document.getElementById('userName').textContent = firstName;
+    }
+  } catch(_){}
+}
+
+async function fetchUserProfile(){
+  try {
+    const u = await apiFetch('auth/me.php');
+    if (u && u.name) {
+      const firstName = u.name.split(' ')[0].toLowerCase();
+      document.getElementById('dashUserName').textContent = firstName;
+      document.getElementById('userName').textContent = firstName;
+    }
+  } catch(_){}
+}
+
+function switchTab(tab){
+  const ordersBtn = document.getElementById('tabOrdersBtn');
+  const plantsBtn = document.getElementById('tabPlantsBtn');
+  const panelOrders = document.getElementById('panelOrders');
+  const panelPlants = document.getElementById('panelPlants');
+
+  if (tab === 'orders') {
+    ordersBtn.classList.add('active');
+    plantsBtn.classList.remove('active');
+    panelOrders.style.display = 'block';
+    panelPlants.style.display = 'none';
+  } else {
+    plantsBtn.classList.add('active');
+    ordersBtn.classList.remove('active');
+    panelPlants.style.display = 'block';
+    panelOrders.style.display = 'none';
+  }
+}
+
+async function fetchCustomerOrders(){
+  const container = document.getElementById('ordersList');
+  try {
+    const res = await apiFetch('orders/my-orders.php');
+    currentOrders = Array.isArray(res) ? res : [];
+    renderOrdersUI();
+  } catch(err){
+    container.innerHTML = `<div class="empty-state"><div class="icon">🌿</div>
+      <h3>Could not load orders</h3><p>${esc(err.message || 'Server error')}</p></div>`;
+  }
+}
+
+function renderOrdersUI(){
+  const container = document.getElementById('ordersList');
+  if (!currentOrders || !currentOrders.length){
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">🛍️</div>
+        <h3>No Orders Placed Yet</h3>
+        <p>Welcome to Bloom & Bonsai! Your account is active, but you haven't placed an order yet.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:1.2rem;">
+          <a href="shop.html" class="dash-tab-btn active" style="display:inline-block;text-decoration:none;padding:10px 24px;">
+            <i class="fas fa-shopping-bag"></i> Browse Botanical Shop
+          </a>
+          <button onclick="loadDemoPreviewOrders()" class="dash-tab-btn" style="background:#fff;border:1px solid #17482f;color:#17482f;padding:10px 20px;cursor:pointer;">
+            <i class="fas fa-eye"></i> Load Sample Orders Preview
+          </button>
+        </div>
+      </div>`;
+    return;
+  }
+  container.innerHTML = currentOrders.map(buildOrderCardHtml).join('');
+}
+
+function loadDemoPreviewOrders(){
+  currentOrders = [
+    {
+      id: 7,
+      created_at: '2026-08-14 20:13:00',
+      status: 'confirmed',
+      payment_method: 'cod',
+      city: 'gampaha',
+      pincode: '123456',
+      total: 740.00,
+      expected_delivery: '2026-08-19',
+      items: [
+        { product_id: 15, product_name: 'Anthurium Plant', quantity: 2, image: 'https://images.unsplash.com/photo-1446071103084-c257b5f70672?w=100' }
+      ]
+    },
+    {
+      id: 4,
+      created_at: '2026-08-10 14:20:00',
+      status: 'delivered',
+      payment_method: 'card',
+      city: 'colombo',
+      pincode: '00700',
+      total: 1299.00,
+      expected_delivery: '2026-08-13',
+      items: [
+        { product_id: 4, product_name: 'Indoor Bonsai (Ficus)', quantity: 1, image: 'https://images.unsplash.com/photo-1562408590-e32931084e23?w=100' }
+      ]
+    }
+  ];
+  renderOrdersUI();
+  showToast('Loaded sample orders preview! 🌿');
+}
+
+function buildOrderCardHtml(o){
+  const isCancelled = o.status === 'cancelled';
+  const isDelivered = o.status === 'delivered';
+  const items = o.items || [];
+  
+  // Format dates e.g. "Placed 14 Aug, 08:13 pm"
+  const createdDate = formatOrderDate(o.created_at);
+  const deliveryDate = o.expected_delivery ? formatDeliveryDate(o.expected_delivery) : '19 Aug 2026';
+
+  const etaBadge = isCancelled
+    ? '<div class="o-eta-badge" style="background:#fdf0f0;border-color:#f5c6cb;color:#c0392b;">Order Cancelled</div>'
+    : isDelivered
+      ? `<div class="o-eta-badge">✅ Delivered</div>`
+      : `<div class="o-eta-badge">🚚 Arrives by <b>${deliveryDate}</b></div>`;
+
+  // Item Pills
+  const itemsHtml = items.map(it => {
+    const pName = esc(it.product_name || it.name || 'Plant');
+    return `<div class="o-item-pill">
+      <img src="${it.image || DASH_FALLBACK_IMG}" alt="${pName}">
+      <span>${pName} ×${it.quantity}</span>
+    </div>`;
+  }).join('');
+
+  // Address parsing
+  const cityPin = (o.city ? o.city : '') + (o.pincode ? ' - ' + o.pincode : '');
+
+  // 24h Cancel Check
+  const orderTime = new Date(String(o.created_at).replace(' ', 'T')).getTime();
+  const nowTime = new Date().getTime();
+  const hoursPassed = isNaN(orderTime) ? 0 : (nowTime - orderTime) / (1000 * 60 * 60);
+  const canCancel = !isCancelled && !['shipped', 'out_for_delivery', 'delivered'].includes(o.status) && hoursPassed <= 24;
+  const hoursLeft = Math.max(1, Math.ceil(24 - hoursPassed));
+
+  const cancelBtn = canCancel ? `
+    <button class="btn-cancel" onclick="cancelOrder(${o.id})">
+      <span>🚫 Cancel Order</span> <small style="color:#777;">(${hoursLeft}h left)</small>
+    </button>
+  ` : '';
+
+  const statusClass = isCancelled ? 'status-badge cancelled' : 'status-badge';
+
+  return `
+  <article class="order-card">
+    <div class="o-header">
+      <div>
+        <div class="o-title">Order <small>#${o.id}</small></div>
+        <div class="o-date">Placed ${createdDate}</div>
+      </div>
+      <span class="${statusClass}">${DASH_STATUS_LABELS[o.status] || o.status}</span>
+    </div>
+    
+    ${etaBadge}
+
+    <div class="o-meta-row">
+      <span>Payment: <b>${esc(o.payment_method || 'cod')}</b></span>
+      <span>Ship to: <b>${esc(cityPin || 'gampaga - 123456')}</b></span>
+      <span>Items: <b>${items.length}</b></span>
+    </div>
+
+    <div class="o-items-wrap">${itemsHtml}</div>
+
+    <div class="o-footer">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <button class="btn-tracking" id="trbtn-${o.id}" onclick="toggleTimeline(${o.id})">View tracking ▼</button>
+        <button class="btn-tracking" onclick="openPdfInvoice(${o.id})" style="background:#faf8f3;border-color:#c9a227;color:#17482f;"><i class="fas fa-file-invoice"></i> PDF Invoice</button>
+        ${cancelBtn}
+      </div>
+      <div class="o-total-price">${formatINR(o.total || o.total_amount)}</div>
+    </div>
+
+    <div class="timeline-box" id="tlbox-${o.id}" style="display:none;"></div>
+  </article>`;
+}
+
+async function cancelOrder(id){
+  if (!confirm('Cancel Order #' + id + '?')) return;
+  try {
+    await apiFetch('orders/cancel.php', { method: 'POST', body: { order_id: Number(id) } });
+    showToast('Order #' + id + ' cancelled');
+    fetchCustomerOrders();
+  } catch(e){
+    alert(e.message || 'Could not cancel order');
+  }
+}
+
+function toggleTimeline(id){
+  const box = document.getElementById('tlbox-' + id);
+  const btn = document.getElementById('trbtn-' + id);
+  if (!box) return;
+  if (box.style.display === 'none'){
+    const o = currentOrders.find(x => x.id === id);
+    if (o) box.innerHTML = buildTimelineHtml(o);
+    box.style.display = 'block';
+    btn.innerHTML = 'Hide tracking ▲';
+  } else {
+    box.style.display = 'none';
+    btn.innerHTML = 'View tracking ▼';
+  }
+}
+
+function buildTimelineHtml(o){
+  if (o.status === 'cancelled') {
+    return `<div style="color:#c0392b;font-weight:600;padding:8px 0;">This order was cancelled.</div>`;
+  }
+  const history = (o.history || []).reduce((acc, h) => { acc[h.status] = h; return acc; }, {});
+  const currentIdx = DASH_ORDER_FLOW.indexOf(o.status);
+
+  const steps = DASH_ORDER_FLOW.map((step, i) => {
+    const h = history[step];
+    const cls = i < currentIdx ? 'done' : (i === currentIdx ? 'now' : '');
+    return `<li class="tl-item ${cls}">
+      <div class="tl-status">${DASH_STATUS_LABELS[step] || step}</div>
+      ${h && h.created_at ? `<div class="tl-time">${formatOrderDate(h.created_at)}</div>` : ''}
+      ${h && h.note ? `<div class="tl-note">${esc(h.note)}</div>` : ''}
+    </li>`;
+  }).join('');
+
+  return `<ul class="tl-list">${steps}</ul>`;
+}
+
+async function fetchCustomerPlants(){
+  const container = document.getElementById('plantsGrid');
+  try {
+    const res = await apiFetch('garden/purchases.php');
+    currentPlants = Array.isArray(res) ? res : [];
+    
+    // Fallback: If purchases endpoint returned empty array, build from currentOrders
+    if (!currentPlants.length && currentOrders.length) {
+      const fallbackList = [];
+      const seenPids = new Set();
+      currentOrders.filter(o => o.status !== 'cancelled').forEach(o => {
+        (o.items || []).forEach(it => {
+          const pid = it.product_id || it.id;
+          if (pid && !seenPids.has(pid)) {
+            seenPids.add(pid);
+            fallbackList.push({
+              id: pid,
+              name: it.product_name || it.name,
+              scientific_name: it.scientific_name || 'Botanical Specimen',
+              image: it.image || DASH_FALLBACK_IMG,
+              purchased_on: o.created_at
+            });
+          }
+        });
+      });
+      if (fallbackList.length) currentPlants = fallbackList;
+    }
+
+    renderPlantsUI();
+  } catch(err){
+    container.innerHTML = `<div class="empty-state"><div class="icon">🪴</div>
+      <h3>Could not load plants</h3><p>${esc(err.message || 'Server error')}</p></div>`;
+  }
+}
+
+function renderPlantsUI(){
+  const container = document.getElementById('plantsGrid');
+  if (!currentPlants || !currentPlants.length){
+    container.innerHTML = `<div class="empty-state">
+      <div class="icon">🪴</div>
+      <h3>Your Plant Sanctuary is Empty</h3>
+      <p>Your purchased plants from all active orders will appear here once you place an order.</p>
+      <p style="margin-top:1.2rem;">
+        <a href="shop.html" class="dash-tab-btn active" style="display:inline-block;text-decoration:none;padding:10px 24px;">
+          <i class="fas fa-seedling"></i> Browse Plant Collection
+        </a>
+      </p>
+    </div>`;
+    return;
+  }
+  window.currentPlants = currentPlants;
+  container.className = 'plant-grid';
+  container.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.4rem;width:100%;';
+  
+  container.innerHTML = currentPlants.map((p, idx) => `
+    <article class="plant-card-compact" onclick="openPlantCareModal(${idx})" style="background:#fff;border:1px solid #e7e2d3;border-radius:16px;overflow:hidden;cursor:pointer;transition:transform 0.25s ease,box-shadow 0.25s ease;box-shadow:0 6px 18px rgba(14,42,26,0.05);display:flex;flex-direction:column;">
+      <div style="height:150px;overflow:hidden;background:#f6f4ee;position:relative;">
+        <img src="${p.image || DASH_FALLBACK_IMG}" alt="${esc(p.name)}" style="width:100%;height:100%;object-fit:cover;">
+        <span style="position:absolute;top:10px;right:10px;background:#17482f;color:#fff;padding:3px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,0.15);">
+          ${esc(p.category_name || p.category || 'Botanical')}
+        </span>
+      </div>
+      <div style="padding:1.1rem;display:flex;flex-direction:column;flex-grow:1;justify-content:space-between;">
+        <div>
+          <b style="font-family:'Playfair Display',serif;font-size:1.05rem;color:#17482f;display:block;margin-bottom:2px;">${esc(p.name)}</b>
+          <span style="color:#52B788;font-size:.82em;font-style:italic;display:block;margin-bottom:8px;">🌿 ${esc(p.scientific_name || 'Botanical Specimen')}</span>
+          <span style="color:#7c8878;font-size:.8em;">📅 Purchased ${formatOrderDate(p.purchased_on || p.created_at)}</span>
+        </div>
+        <div style="margin-top:12px;">
+          <span style="display:inline-block;width:100%;text-align:center;background:#e8f5e9;color:#2e7d4f;padding:6px 12px;border-radius:999px;font-size:0.78rem;font-weight:700;border:1px solid #c8e6c9;">
+            ✨ 4-Week Care Plan
+          </span>
+        </div>
+      </div>
+    </article>`).join('');
+}
+
+window.openPlantCareModal = function(index, plantObj) {
+  const list = window.currentPlants || currentPlants || [];
+  const p = plantObj || list[index];
+  if (!p) {
+    console.error("Plant record not found at index:", index);
+    return;
+  }
+
+  let modal = document.getElementById('plantCareModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'plantCareModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;';
+    document.body.appendChild(modal);
+  }
+
+  const pName = esc(p.name || 'Botanical Plant');
+  const pSci = esc(p.scientific_name || 'Botanical Specimen');
+  const pImg = esc(p.image || DASH_FALLBACK_IMG);
+  const pCat = esc(p.category_name || p.category || 'Botanical');
+  const pDate = formatOrderDate(p.purchased_on || p.created_at || 'Recently');
+
+  // Automatic Real-Time Date Progression Calculation
+  const purDate = new Date(p.purchased_on || p.created_at || Date.now());
+  const now = new Date();
+  const diffTime = Math.abs(now - purDate);
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  
+  let autoWeekIdx = 0;
+  if (diffDays >= 21) autoWeekIdx = 3;
+  else if (diffDays >= 14) autoWeekIdx = 2;
+  else if (diffDays >= 7) autoWeekIdx = 1;
+  else autoWeekIdx = 0;
+
+  // Care Plan Weeks parsing
+  let carePlan = p.care_plan;
+  if (typeof carePlan === 'string') {
+    try { carePlan = JSON.parse(carePlan); } catch(e){}
+  }
+  if (!Array.isArray(carePlan) || !carePlan.length) {
+    carePlan = [
+      { week: "Week 1", title: "Acclimation & Initial Hydration", tasks: "Keep in bright indirect sunlight. Water thoroughly until water drains from the bottom. Do not repot during the first week to prevent root shock." },
+      { week: "Week 2", title: "Root Stabilization & Misting", tasks: "Check soil moisture 2 inches deep before watering. Mist foliage 3 times per week to maintain optimal humidity. Rotate plant 90 degrees for even light distribution." },
+      { week: "Week 3", title: "Nutrient Boosting & Pruning", tasks: "Apply organic liquid fertilizer diluted to half-strength. Prune any yellowing or damaged lower leaves with clean botanical shears." },
+      { week: "Week 4", title: "Full Growth & Maintenance", tasks: "Plant is fully acclimated! Establish a regular weekly watering schedule. Inspect leaf undersides for pests and wipe clean with a damp cloth." }
+    ];
+  }
+
+  const weeksTabsHtml = carePlan.map((w, i) => `
+    <button class="care-week-btn ${i===autoWeekIdx?'active':''}" onclick="switchCareWeek(${i})" id="careWeekBtn-${i}" 
+            style="padding:8px 16px;border-radius:999px;border:none;background:${i===autoWeekIdx?'#17482f':'#f4f8f5'};color:${i===autoWeekIdx?'#fff':'#17482f'};font-weight:700;font-size:0.85rem;cursor:pointer;transition:.2s;">
+      ${esc(w.week || 'Week ' + (i+1))} ${i===autoWeekIdx?'★':''}
+    </button>
+  `).join('');
+
+  const weeksContentHtml = carePlan.map((w, i) => `
+    <div class="care-week-content" id="careWeekContent-${i}" style="display:${i===autoWeekIdx?'block':'none'};animation:fadeIn 0.3s ease;">
+      <h4 style="color:#17482f;font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:6px;">
+        📌 ${esc(w.week)}: ${esc(w.title || 'Care Focus')}
+      </h4>
+      <p style="color:#4a5746;line-height:1.6;font-size:0.92rem;background:#faf8f3;padding:14px 18px;border-radius:12px;border:1px solid #e7e2d3;margin:0;">
+        ${esc(w.tasks || w.description || 'Follow standard botanical care guidelines.')}
+      </p>
+    </div>
+  `).join('');
+
+  // Daily Checklist for Category
+  const todayKey = now.toISOString().slice(0,10);
+  const checklistKey = `bb_chk_${p.id || pName.replace(/\s+/g,'_')}_${todayKey}`;
+  const savedState = JSON.parse(localStorage.getItem(checklistKey) || '{}');
+
+  const catLower = pCat.toLowerCase();
+  let checklistTasks = [
+    { id: 'c1', label: '🌤️ Verify Filtered Indirect Light Exposure' },
+    { id: 'c2', label: '💧 Check Soil Moisture (2 inches deep)' },
+    { id: 'c3', label: '🚿 Soft Foliage Wipe / Misting' },
+    { id: 'c4', label: '🔄 Rotate Pot 90° for Balanced Sunlight' }
+  ];
+  if (catLower.includes('bonsai')) {
+    checklistTasks = [
+      { id: 'c1', label: '🌲 Check Soil Dampness Daily (Water if top 1 cm dry)' },
+      { id: 'c2', label: '🚿 Morning Foliage Misting (High Humidity)' },
+      { id: 'c3', label: '🔄 Rotate Pot 90° for Even Canopy Growth' },
+      { id: 'c4', label: '✂️ Inspect Shoot Extensions & Pests' }
+    ];
+  } else if (catLower.includes('flower') || catLower.includes('rose')) {
+    checklistTasks = [
+      { id: 'c1', label: '☀️ 4-6 Hours Sunlight Check' },
+      { id: 'c2', label: '💧 Deep Morning Root Soak (Keep leaves dry)' },
+      { id: 'c3', label: '🌸 Snip & Deadhead Faded Blooms' },
+      { id: 'c4', label: '🌿 Inspect Under Leaves for Mites' }
+    ];
+  }
+
+  const checklistHtml = checklistTasks.map(t => {
+    const isDone = !!savedState[t.id];
+    return `
+      <label style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${isDone?'#e8f5e9':'#faf8f3'};border:1px solid ${isDone?'#a5d6a7':'#e7e2d3'};border-radius:12px;cursor:pointer;font-size:0.88rem;color:${isDone?'#1b5e20':'#333'};transition:all 0.2s ease;">
+        <input type="checkbox" onchange="toggleDailyTask('${checklistKey}', '${t.id}', this.checked)" ${isDone?'checked':''} style="width:18px;height:18px;accent-color:#17482f;cursor:pointer;">
+        <span style="${isDone?'text-decoration:line-through;opacity:0.85;font-weight:600;':''}">${t.label}</span>
+      </label>
+    `;
+  }).join('');
+
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:24px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;padding:28px;position:relative;box-shadow:0 20px 50px rgba(0,0,0,0.3);">
+      <button onclick="document.getElementById('plantCareModal').style.display='none'" style="position:absolute;top:18px;right:18px;background:#f0f0f0;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.2rem;font-weight:bold;color:#333;">&times;</button>
+      
+      <div style="display:grid;grid-template-columns:180px 1fr;gap:20px;margin-bottom:20px;align-items:center;">
+        <img src="${pImg}" alt="${pName}" style="width:100%;height:180px;object-fit:cover;border-radius:16px;border:1px solid #e7e2d3;">
+        <div>
+          <span style="background:#17482f;color:#fff;padding:3px 12px;border-radius:999px;font-size:0.75rem;font-weight:700;text-transform:uppercase;">${pCat}</span>
+          <h2 style="font-family:'Playfair Display',serif;color:#17482f;margin:8px 0 4px;font-size:1.6rem;">${pName}</h2>
+          <div style="color:#2e7d4f;font-style:italic;font-size:0.9rem;margin-bottom:10px;">🌿 ${pSci}</div>
+          <div style="font-size:0.85rem;color:#666;line-height:1.5;">
+            <b>Purchased:</b> ${pDate}<br>
+            <b>Health Status:</b> <span style="color:#2e7d32;font-weight:700;">Thriving 🌱</span><br>
+            <b>Auto Care Tracking:</b> <span style="color:#c9a227;font-weight:700;">Day ${diffDays + 1} Active</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Date Progression Alert -->
+      <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:14px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px;font-size:0.88rem;color:#1b5e20;">
+        <i class="fas fa-calendar-check" style="font-size:1.3rem;color:#2e7d32;"></i>
+        <div style="flex:1;">
+          <div style="font-weight:700;">📍 Day ${diffDays + 1} of Care — Week ${autoWeekIdx + 1} is Active Today!</div>
+          <div style="font-size:0.78rem;color:#388e3c;margin-top:2px;">Care plan automatically progressed based on purchase date (${pDate}).</div>
+        </div>
+      </div>
+
+      <!-- Quick Specs -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;background:#f4f8f5;padding:14px;border-radius:14px;border:1px solid #d4e4d6;text-align:center;font-size:0.82rem;">
+        <div><strong style="color:#17482f;display:block;">☀️ Sunlight</strong>${esc(p.sunlight || 'Indirect Light')}</div>
+        <div><strong style="color:#17482f;display:block;">💧 Water Needs</strong>${esc(p.water_needs || 'Weekly')}</div>
+        <div><strong style="color:#17482f;display:block;">🌱 Difficulty</strong>${esc(p.difficulty || 'Beginner')}</div>
+      </div>
+
+      <!-- Category Daily Plant Care Checklist -->
+      <div style="background:#faf8f3;border:1px solid #e7e2d3;border-radius:16px;padding:18px;margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h4 style="font-family:'Playfair Display',serif;color:#17482f;margin:0;font-size:1.1rem;">📝 Today's Category Care Checklist (${pCat})</h4>
+          <span style="font-size:0.75rem;color:#7c8878;font-weight:600;">Updated for ${todayKey}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          ${checklistHtml}
+        </div>
+      </div>
+
+      <!-- 4-Week Care Plan Tabs -->
+      <div style="border-top:1px solid #eee;padding-top:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <h3 style="font-family:'Playfair Display',serif;color:#17482f;margin:0;font-size:1.25rem;">📅 4-Week Personal Care Guide</h3>
+          <button onclick="openSproutChatForPlant('${pName.replace(/'/g, "\\'")}')" style="background:#c9a227;color:#fff;border:none;padding:6px 14px;border-radius:999px;font-size:0.78rem;font-weight:700;cursor:pointer;">
+            🤖 Ask Sprout AI
+          </button>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+          ${weeksTabsHtml}
+        </div>
+
+        <div>
+          ${weeksContentHtml}
+        </div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'flex';
+};
+
+window.toggleDailyTask = function(key, taskId, isChecked) {
+  const current = JSON.parse(localStorage.getItem(key) || '{}');
+  current[taskId] = isChecked;
+  localStorage.setItem(key, JSON.stringify(current));
+};
+
+window.switchCareWeek = function(idx) {
+  document.querySelectorAll('.care-week-btn').forEach((btn, i) => {
+    btn.style.background = (i === idx) ? '#17482f' : '#f4f8f5';
+    btn.style.color = (i === idx) ? '#fff' : '#17482f';
+  });
+  document.querySelectorAll('.care-week-content').forEach((c, i) => {
+    c.style.display = (i === idx) ? 'block' : 'none';
+  });
+};
+
+window.openSproutChatForPlant = function(plantName) {
+  const modal = document.getElementById('plantCareModal');
+  if (modal) modal.style.display = 'none';
+  if (typeof toggleSproutChat === 'function') toggleSproutChat();
+  const input = document.getElementById('sproutInput');
+  if (input) {
+    input.value = 'How do I care for my ' + plantName + '?';
+    if (typeof handleSproutSubmit === 'function') handleSproutSubmit();
+  }
+};
+
+function formatOrderDate(d){
+  if (!d) return '';
+  const dt = new Date(String(d).replace(' ', 'T'));
+  if (isNaN(dt)) return d;
+  const day = dt.getDate();
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const month = monthNames[dt.getMonth()];
+  let hours = dt.getHours();
+  const minutes = String(dt.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12 || 12;
+  return `${day} ${month}, ${String(hours).padStart(2,'0')}:${minutes} ${ampm}`;
+}
+
+function formatDeliveryDate(d){
+  if (!d) return '19 Aug 2026';
+  const dt = new Date(String(d).replace(' ', 'T'));
+  if (isNaN(dt)) return d;
+  const day = dt.getDate();
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const month = monthNames[dt.getMonth()];
+  const year = dt.getFullYear();
+  return `${day} ${month} ${year}`;
+}
+
+function startCustomerRealtimeClock() {
+  function update() {
+    const el = document.getElementById('custClockText');
+    if (!el) return;
+    const now = new Date();
+    const options = { 
+      weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', 
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
+    };
+    el.textContent = '📅 ' + now.toLocaleString('en-US', options) + ' (Real-time Live)';
+  }
+  update();
+  setInterval(update, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  startCustomerRealtimeClock();
+  if (typeof initDashboard === 'function') initDashboard();
+});
+</script>
+</body>
+</html>

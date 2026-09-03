@@ -1,0 +1,24 @@
+[2026-08-15 05:29:14] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'bloom_bonsai.cart' doesn't exist in C:\Users\HP\.gemini\antigravity\brain\9d498433-275d-4069-af87-969023caed5b\scratch\test_cart_api.php:5
+Stack Trace:
+#0 C:\Users\HP\.gemini\antigravity\brain\9d498433-275d-4069-af87-969023caed5b\scratch\test_cart_api.php(5): PDO->query('SELECT * FROM c...')
+#1 {main}
+[2026-08-15 08:48:52] SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`bloom_bonsai`.`order_items`, CONSTRAINT `fk_orderitems_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON UPDATE CASCADE) in D:\xampp\htdocs\bloom-bonsai\api\products\admin.php:104
+Stack Trace:
+#0 D:\xampp\htdocs\bloom-bonsai\api\products\admin.php(104): PDOStatement->execute(Array)
+#1 {main}
+[2026-08-15 08:49:30] SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`bloom_bonsai`.`order_items`, CONSTRAINT `fk_orderitems_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON UPDATE CASCADE) in D:\xampp\htdocs\bloom-bonsai\api\products\admin.php:104
+Stack Trace:
+#0 D:\xampp\htdocs\bloom-bonsai\api\products\admin.php(104): PDOStatement->execute(Array)
+#1 {main}
+[2026-08-15 08:49:36] SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`bloom_bonsai`.`order_items`, CONSTRAINT `fk_orderitems_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON UPDATE CASCADE) in D:\xampp\htdocs\bloom-bonsai\api\products\admin.php:104
+Stack Trace:
+#0 D:\xampp\htdocs\bloom-bonsai\api\products\admin.php(104): PDOStatement->execute(Array)
+#1 {main}
+[2026-08-15 08:49:44] SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`bloom_bonsai`.`order_items`, CONSTRAINT `fk_orderitems_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON UPDATE CASCADE) in D:\xampp\htdocs\bloom-bonsai\api\products\admin.php:104
+Stack Trace:
+#0 D:\xampp\htdocs\bloom-bonsai\api\products\admin.php(104): PDOStatement->execute(Array)
+#1 {main}
+[2026-08-15 18:56:22] Call to undefined function callGemini15Flash() in D:\xampp\htdocs\bloom-bonsai\api\ai\diagnose.php:100
+Stack Trace:
+#0 C:\Users\HP\.gemini\antigravity\brain\9d498433-275d-4069-af87-969023caed5b\scratch\test_php_diagnose_local.php(10): require()
+#1 {main}

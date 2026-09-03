@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Garden & Plant Care Tracker · Bloom & Bonsai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="style.css?v=44.0">
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; }
+body{ font-family:'Inter',sans-serif; background:#faf8f2; color:#23301f; min-height:100vh; }
+
+.btn-primary{ background:#17482f; color:#fff; padding:.7rem 1.5rem; border-radius:999px; text-decoration:none; font-weight:600; font-size:.9rem; display:inline-flex; align-items:center; gap:8px; transition:.25s; box-shadow:0 4px 15px rgba(23,72,47,.2); }
+.btn-primary:hover{ background:#0e2a1a; transform:translateY(-2px); }
+
+.garden-page{ max-width:1100px; margin:0 auto; padding:2.5rem 1.5rem 4rem; }
+.garden-header{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:2rem; }
+.garden-header h1{ font-family:'Playfair Display',Georgia,serif; font-size:2.4rem; color:#17482f; display:flex; align-items:center; gap:10px; }
+.my-plants-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:1.5rem; margin-bottom:3rem; }
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #faf8f2;
+  border: 1px solid #e7e2d3;
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 10px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+.task-item:hover {
+  background: #f4f8f5;
+  border-color: #2e7d4f;
+  transform: translateX(4px);
+}
+.task-item.completed {
+  background: #f0f7f2;
+  border-color: #a8d5b5;
+  opacity: 0.85;
+}
+.task-item.completed .task-text {
+  text-decoration: line-through;
+  color: #7c8878;
+}
+.task-checkbox {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid #2e7d4f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  transition: 0.2s;
+}
+.task-item.completed .task-checkbox {
+  background: #2e7d4f;
+  border-color: #2e7d4f;
+  color: #fff;
+}
+
+.ai-card{ background:#fff; border:1px solid #e7e2d3; border-radius:24px; padding:2.5rem 2rem; text-align:center; box-shadow:0 12px 35px rgba(14,42,26,.06); max-width:800px; margin:0 auto; }
+.ai-card h2{ font-family:'Playfair Display',Georgia,serif; font-size:1.8rem; color:#17482f; margin-bottom:.5rem; display:flex; align-items:center; justify-content:center; gap:10px; }
+.ai-card p{ color:#7c8878; font-size:.95rem; margin-bottom:1.5rem; }
+.upload-area{ border:2px dashed #17482f; border-radius:18px; background:#f6f9f6; padding:2.5rem 1.5rem; cursor:pointer; transition:.25s; }
+.upload-area:hover{ background:#edf4ee; border-color:#c9a227; }
+.upload-area i{ font-size:2.8rem; color:#17482f; margin-bottom:.8rem; }
+.upload-area p{ color:#23301f; font-weight:600; margin-bottom:.3rem; font-size:1.05rem; }
+.upload-area span{ color:#7c8878; font-size:.82rem; }
+#fileInput{ display:none; }
+.ai-result{ margin-top:1.5rem; text-align:left; background:#faf8f2; border:1px solid #e7e2d3; border-radius:16px; padding:1.5rem; display:none; }
+
+/* Plant Detail Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.modal-overlay.show { opacity: 1; pointer-events: auto; }
+.modal-card { background: #fff; border-radius: 20px; max-width: 680px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 30px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.25); }
+.modal-close { position: absolute; top: 18px; right: 18px; background: #f0f0f0; border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+.detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+.care-tabs { display: flex; gap: 10px; margin: 15px 0; overflow-x: auto; }
+.care-tab { padding: 8px 16px; background: #f4f8f5; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #17482f; white-space: nowrap; }
+.care-tab.active { background: #17482f; color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- ═══ CENTERED PREMIUM NAVBAR ═══ -->
+<header class="navbar premium">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Bloom <span>&amp;</span> Bonsai</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="mygarden.html" class="active">My Garden</a></li>
+      <li><a href="gardendesigner.html">Garden AI</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="wishlist.html" class="cart-link" style="margin-right:10px;">Wishlist <span class="cart-badge wishlist-count-badge" id="wishlistCount" style="background:#e74c3c;">0</span></a>
+      <a href="cart.html" class="cart-link">Cart <span class="cart-badge" id="cartCount">0</span></a>
+      <a href="login.html" class="btn-login" id="loginBtn">Login</a>
+      <a href="register.html" class="btn-signup" id="signupBtn">Sign Up</a>
+      <div class="user-menu" id="userMenu" style="display:none;align-items:center;gap:10px;">
+        <i class="fas fa-user-circle"></i>
+        <span id="userName">User</span>
+        <a href="#" id="logoutBtn" class="btn-mini" style="font-size:0.8rem;">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<main class="garden-page">
+  <div class="garden-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;background:#fff;padding:20px 26px;border-radius:20px;border:1px solid #e7e2d3;box-shadow:0 6px 20px rgba(14,42,26,0.04);">
+    <div>
+      <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:2.1rem;color:#17482f;display:flex;align-items:center;gap:10px;margin:0;">🌱 My Garden Sanctuary</h1>
+      <div id="gardenRealtimeClock" style="color:#2e7d4f;font-size:0.92rem;font-weight:600;margin-top:6px;display:flex;align-items:center;gap:6px;">
+        <i class="far fa-clock"></i> <span id="gardenClockText">Loading live date &amp; time...</span>
+      </div>
+    </div>
+    <a href="shop.html" class="btn-primary"><i class="fas fa-plus"></i> Explore Plant Shop</a>
+  </div>
+
+  <!-- 🌿 LIVE GARDEN HEALTH METER HERO CARD -->
+  <div class="garden-health-card" id="gardenHealthCard" style="background:linear-gradient(135deg, #17482f 0%, #0e2a1a 100%);border-radius:24px;padding:2rem 2.2rem;color:#fff;margin-bottom:2.5rem;box-shadow:0 15px 45px rgba(23,72,47,0.25);position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(201,162,39,0.12);border-radius:50%;pointer-events:none;"></div>
+    
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;margin-bottom:1.5rem;">
+      <div>
+        <span style="background:rgba(201,162,39,0.25);color:#ffd866;border:1px solid rgba(201,162,39,0.4);padding:4px 14px;border-radius:999px;font-size:0.78rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;display:inline-block;margin-bottom:8px;">
+          🪴 Smart Botanical Health Meter
+        </span>
+        <h2 style="font-family:'Playfair Display',Georgia,serif;font-size:1.85rem;color:#fff;margin:0 0 4px;">Garden Health Score</h2>
+        <p style="color:#d0e0d5;font-size:0.92rem;margin:0;" id="healthSubtext">Complete your daily care duties to maintain 100% garden health!</p>
+      </div>
+      
+      <div style="text-align:right;">
+        <span id="healthBadge" style="background:#2e7d4f;color:#fff;padding:8px 18px;border-radius:999px;font-size:0.95rem;font-weight:700;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+          <i class="fas fa-heartbeat"></i> <span id="healthBadgeText">100% Thriving 🌿</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Health Progress Bar -->
+    <div style="background:rgba(255,255,255,0.15);border-radius:999px;height:14px;overflow:hidden;margin-bottom:1rem;position:relative;">
+      <div id="healthMeterBar" style="width:100%;height:100%;background:linear-gradient(90deg, #ffd866 0%, #4caf50 100%);border-radius:999px;transition:width 0.6s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;font-size:0.88rem;color:#d0e0d5;">
+      <span>Daily Tasks: <strong id="completedTaskCount" style="color:#ffd866;">0</strong> of <strong id="totalTaskCount" style="color:#fff;">0</strong> Completed</span>
+      <span id="meterPercentText" style="font-weight:700;color:#ffd866;">100% Thriving</span>
+    </div>
+  </div>
+
+  <!-- 📋 CATEGORY-BASED DAILY PLANT CARE CHECKLIST -->
+  <div class="care-checklist-section" style="background:#ffffff;border:1px solid #e7e2d3;border-radius:24px;padding:2rem;margin-bottom:2.5rem;box-shadow:0 10px 30px rgba(14,42,26,0.05);">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;border-bottom:1px solid #f0eae0;padding-bottom:1rem;">
+      <div>
+        <h3 style="font-family:'Playfair Display',Georgia,serif;font-size:1.5rem;color:#17482f;display:flex;align-items:center;gap:10px;">
+          <i class="fas fa-calendar-check" style="color:#c9a227;"></i> Category Daily Plant Care Checklist
+        </h3>
+        <p style="color:#7c8878;font-size:0.88rem;margin-top:2px;">Automated tasks generated specifically for your purchased botanical species</p>
+      </div>
+      <button onclick="resetDailyCareTasks()" class="btn-mini" style="background:#f4f8f5;color:#17482f;border:1px solid #cce3d2;font-weight:600;font-size:0.82rem;">
+        <i class="fas fa-sync-alt"></i> Reset Today's Tasks
+      </button>
+    </div>
+
+    <!-- Task List Container -->
+    <div id="careTaskListContainer">
+      <div style="text-align:center;padding:2rem;color:#7c8878;">
+        <i class="fas fa-spinner fa-spin" style="font-size:1.8rem;color:#17482f;margin-bottom:10px;"></i>
+        <p>Loading your personalized garden care tasks...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🪴 OWNED PLANTS COLLECTION GRID -->
+  <div style="margin-bottom:1rem;">
+    <h3 style="font-family:'Playfair Display',Georgia,serif;font-size:1.5rem;color:#17482f;margin-bottom:1rem;">
+      🌿 Your Purchased Plants Collection
+    </h3>
+  </div>
+
+  <div class="my-plants-grid" id="myPlantsList">
+    <div style="grid-column:1/-1;text-align:center;padding:3rem;color:#7c8878;" class="premium-card">
+      <p style="font-size:1.1rem;margin-bottom:1rem;">No plants in your garden yet — buy a plant from the shop!</p>
+      <a href="shop.html" class="btn-primary">Browse Shop Collection</a>
+    </div>
+  </div>
+
+  <!-- 🤖 AI SCANNER CARD -->
+  <div class="ai-card">
+    <h2><i class="fas fa-microscope" style="color:#c9a227;"></i> Live AI Plant Disease &amp; Species Detector</h2>
+    <p>Upload a leaf photo — Powered by your <strong>Custom 97.79% Fine-Tuned 25-Class Model</strong> &amp; Gemini AI Vision to identify plant species, detect disease symptoms, and prescribe organic remedies.</p>
+    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+      <i class="fas fa-cloud-upload-alt"></i>
+      <p>Click or Drop Plant Leaf Photo Here</p>
+      <span>Supports JPG, PNG, WEBP — Max 5MB</span>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)">
+    <div style="margin-top:1.5rem;text-align:center;">
+      <img id="uploadPreview" style="max-width:320px;max-height:260px;border-radius:16px;box-shadow:0 8px 25px rgba(0,0,0,.1);display:none;margin:0 auto;">
+    </div>
+    <div class="ai-result" id="aiResult"></div>
+  </div>
+</main>
+
+<!-- PLANT CARE DETAIL MODAL -->
+<div class="modal-overlay" id="plantModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closePlantModal()">✕</button>
+    <div id="plantModalBody"></div>
+  </div>
+</div>
+
+<script src="script.js?v=44.0"></script>
+<script>
+function startGardenRealtimeClock() {
+  function update() {
+    const el = document.getElementById('gardenClockText');
+    if (!el) return;
+    const now = new Date();
+    const options = { 
+      weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', 
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
+    };
+    el.textContent = '📅 ' + now.toLocaleString('en-US', options) + ' (Real-time Live)';
+  }
+  update();
+  setInterval(update, 1000);
+}
+document.addEventListener('DOMContentLoaded', startGardenRealtimeClock);
+</script>
+</body>
+</html>

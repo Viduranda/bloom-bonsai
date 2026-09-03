@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloom & Bonsai — Your Premium Plant Shop & AI Garden Planner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=44.0">
+</head>
+<body>
+
+<!-- ========== HEADER / NAVBAR (CENTERED PREMIUM NAVBAR) ========== -->
+<header class="navbar premium">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Bloom <span>&amp;</span> Bonsai</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="mygarden.html">My Garden</a></li>
+      <li><a href="gardendesigner.html">Garden AI</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="wishlist.html" class="cart-link" style="margin-right:10px;">Wishlist <span class="cart-badge wishlist-count-badge" id="wishlistCount" style="background:#e74c3c;">0</span></a>
+      <a href="cart.html" class="cart-link">Cart <span class="cart-badge" id="cartCount">0</span></a>
+      <a href="login.html" class="btn-login" id="loginBtn">Login</a>
+      <a href="register.html" class="btn-signup" id="signupBtn">Sign Up</a>
+      <div class="user-menu" id="userMenu" style="display:none;align-items:center;gap:10px;">
+        <i class="fas fa-user-circle"></i>
+        <span id="userName">User</span>
+        <a href="#" id="logoutBtn" class="btn-mini" style="font-size:0.8rem;">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<!-- ========== HERO SECTION WITH LUXURY VIDEO BACKGROUND ========== -->
+<section class="hero">
+    <!-- Background Video -->
+    <video autoplay muted loop playsinline id="hero-video">
+        <source src="A_breathtaking_luxury_botanica.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Emerald-Gold Dark Overlay -->
+    <div class="hero-overlay"></div>
+
+    <div class="container hero-content">
+        <div class="hero-text">
+            <span class="hero-badge"><i class="fas fa-sparkles"></i> Luxury Botanicals 🌸</span>
+            <h1>Bring Nature<br>Into Your <span class="highlight">Home</span></h1>
+            <p>Explore our handpicked collection of exotic flowers and artisanal bonsai trees. Every plant includes a personalized 4-week AI care guide.</p>
+            <div class="hero-buttons">
+                <a href="shop.html" class="btn-primary shimmer-btn"><i class="fas fa-shopping-bag"></i> Explore Shop</a>
+                <a href="gardendesigner.html" class="btn-secondary"><i class="fas fa-magic"></i> AI Garden Planner</a>
+            </div>
+            <div class="hero-stats">
+                <div><strong>50+</strong> Happy Customers</div>
+                <div><strong>10+</strong> Plant Varieties</div>
+                <div><strong>100%</strong> Satisfaction Guarantee</div>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="hero-img-wrapper">
+                <!-- Auto-Sliding Image Slides -->
+                <div class="hero-slider-container">
+                    <div class="hero-slide active">
+                        <img src="1000_F_533251804_g4BNF4jHRNAUqi2lBX12xUjSmZERIUp7.jpg?w=600" alt="Sculpted Juniper Bonsai">
+                    </div>
+                    <div class="hero-slide">
+                        <img src="https://images.unsplash.com/photo-1562408590-e32931084e23?w=800" alt="Ficus Ginseng Bonsai">
+                    </div>
+                    <div class="hero-slide">
+                        <img src="https://images.unsplash.com/photo-1496062031456-07b8f162a322?w=800" alt="Blooming Red Rose">
+                    </div>
+                    <div class="hero-slide">
+                        <img src="https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=800" alt="Japanese Evergreen Bonsai">
+                    </div>
+                    <div class="hero-slide">
+                        <img src="https://images.unsplash.com/photo-1446071103084-c257b5f70672?w=800" alt="Tropical Anthurium">
+                    </div>
+                </div>
+
+                <!-- Slider Navigation Dots -->
+                <div class="hero-slider-dots">
+                    <span class="hero-dot active" onclick="setHeroSlide(0)"></span>
+                    <span class="hero-dot" onclick="setHeroSlide(1)"></span>
+                    <span class="hero-dot" onclick="setHeroSlide(2)"></span>
+                    <span class="hero-dot" onclick="setHeroSlide(3)"></span>
+                    <span class="hero-dot" onclick="setHeroSlide(4)"></span>
+                </div>
+
+                <!-- Floating Accent Badges -->
+                <div class="floating-card card-1">
+                    <i class="fas fa-leaf" style="color:#c9a227;"></i> True Elegance
+                </div>
+                <div class="floating-card card-2">
+                    <i class="fas fa-palette" style="color:#52B788;"></i> Dream Garden AI
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== CATEGORIES SECTION ========== -->
+<section class="categories" id="categories">
+    <div class="container">
+        <div class="section-header">
+            <h2>Shop by <span class="highlight">Category</span></h2>
+            <p>Find the perfect green companion for every corner of your home</p>
+        </div>
+        <div class="category-grid">
+            <a href="shop.html?cat=flowers" class="category-card">
+                <div class="category-img">
+                    <img src="flowers.jpg?w=400" alt="Flowers">
+                    <span class="cat-badge">15+ Species</span>
+                </div>
+                <div class="category-info">
+                    <h3>🌸 Exotic Flowers</h3>
+                    <p>Roses, Anthuriums, Lilies & Blooming Flora</p>
+                    <span class="shop-link">Explore Collection →</span>
+                </div>
+            </a>
+            <a href="shop.html?cat=bonsai" class="category-card">
+                <div class="category-img">
+                    <img src="bonsayi.avif?w=500" alt="Bonsai Trees">
+                    <span class="cat-badge">Artisanal</span>
+                </div>
+                <div class="category-info">
+                    <h3>⛩️ Bonsai Trees</h3>
+                    <p>Ficus, Juniper, Sakura & Miniature Masterpieces</p>
+                    <span class="shop-link">Explore Collection →</span>
+                </div>
+            </a>
+            <a href="shop.html?cat=accessories" class="category-card">
+                <div class="category-img">
+                    <img src="gardenitems.jpg?w=400" alt="Accessories">
+                    <span class="cat-badge">Essentials</span>
+                </div>
+                <div class="category-info">
+                    <h3>🪴 Garden Essentials</h3>
+                    <p>Ceramic Pots, Organic Soil & Care Tools</p>
+                    <span class="shop-link">Explore Collection →</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ========== FEATURED PLANTS (BEST SELLERS) ========== -->
+<section class="featured">
+    <div class="container">
+        <div class="section-header">
+            <h2>Best <span class="highlight">Sellers</span></h2>
+            <p>Handpicked customer favorites with instant AI Care Plans</p>
+        </div>
+        <div class="product-grid" id="featuredProducts">
+            <!-- Products loaded via JS -->
+        </div>
+        <div class="view-all" style="margin-top:40px;text-align:center;">
+            <a href="shop.html" class="btn-primary shimmer-btn">View All Plants <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- ========== FEATURES SECTION ========== -->
+<section class="features">
+    <div class="container">
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-search-plus"></i></div>
+                <h3>AI Disease Detector</h3>
+                <p>Snap a photo to instantly identify plant species and diagnose health conditions</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-calendar-check"></i></div>
+                <h3>4-Week Care Plans</h3>
+                <p>Personalized watering, sunlight & fertilizing schedules tailored for your plant</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-drafting-compass"></i></div>
+                <h3>AI Garden Planner</h3>
+                <p>Upload a room or balcony photo and let AI design a customized plant arrangement</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>Plant Safe Guarantee</h3>
+                <p>Free delivery on orders above Rs.5000 with specialized eco-friendly protection</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== AI TOOLS PREVIEW SECTION ========== -->
+<section class="ai-tools">
+    <div class="container">
+        <div class="section-header">
+            <h2>AI-Powered <span class="highlight">Smart Garden Tools</span></h2>
+            <p>Smart technology to help your garden thrive effortlessly</p>
+        </div>
+        <div class="ai-tools-grid">
+            <div class="ai-tool-card">
+                <div class="ai-tool-img">
+                    <i class="fas fa-camera-retro"></i>
+                </div>
+                <h3>🌿 Plant Disease & Health Detector</h3>
+                <p>Upload a photo of your plant. Our AI identifies species, checks for leaf spots or pests, and gives instant treatment advice.</p>
+                <a href="mygarden.html" class="btn-secondary">Try Detector Now →</a>
+            </div>
+            <div class="ai-tool-card">
+                <div class="ai-tool-img">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <h3>🎨 Garden AI Landscape Planner</h3>
+                <p>Upload your balcony, patio, or living room photo. Choose your aesthetic style and receive a 3D layout plan with ideal plant placements.</p>
+                <a href="gardendesigner.html" class="btn-secondary">Design My Space →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== PRODUCT DETAIL MODAL (CUSTOMER VIEW) ========== -->
+<div class="modal-overlay" id="productModal" onclick="if(event.target===this)closeProductModal();">
+    <div class="modal-card" style="max-width:800px;position:relative;">
+        <button class="modal-close" onclick="closeProductModal()">✕</button>
+        <div id="productModalBody"><p style="text-align:center;padding:40px;">Loading plant details...</p></div>
+    </div>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-about">
+                <h3><i class="fas fa-leaf" style="color:#c9a227;"></i> Bloom & Bonsai</h3>
+                <p>Your trusted partner for premium plants, AI-powered care, and landscape architecture. We bring nature into your home.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="shop.html">Shop Plants</a></li>
+                    <li><a href="mygarden.html">My Garden</a></li>
+                    <li><a href="gardendesigner.html">Garden Designer</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Shipping Info</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-newsletter">
+                <h4>Stay Connected</h4>
+                <p>Get plant care tips & new arrivals</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Your email" required>
+                    <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Bloom & Bonsai. All rights reserved. Built with ❤️ by Campus Innovators</p>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js?v=44.0"></script>
+</body>
+</html>
