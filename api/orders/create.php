@@ -137,3 +137,8 @@ try {
     $stmt->execute([$orderId]);
 
     $pdo->commit();
+} catch (Exception $e) {
+    if ($pdo->inTransaction()) $pdo->rollBack();
+    $message = $e instanceof RuntimeException ? $e->getMessage() : 'Could not place order';
+    respond(['success' => false, 'error' => $message], $e instanceof RuntimeException ? 400 : 500);
+}
