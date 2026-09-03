@@ -132,3 +132,8 @@ try {
             }
         }
     }
+
+    $stmt = $pdo->prepare('INSERT INTO order_status_history (order_id, status, note) VALUES (?, "confirmed", "Order placed successfully")');
+    $stmt->execute([$orderId]);
+
+    $pdo->commit();
