@@ -1,6 +1,7 @@
 <?php
 // api/admin/coupons/toggle.php — Toggle active status of a promo code
 require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../auth.php';
 requireAdmin();
 
 $id = intval($body['id'] ?? $_POST['id'] ?? 0);

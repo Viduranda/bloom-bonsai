@@ -1,6 +1,7 @@
 <?php
 // api/admin/coupons/save.php — Create or edit a promo coupon code
 require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../auth.php';
 requireAdmin();
 
 $id              = isset($body['id']) ? intval($body['id']) : 0;

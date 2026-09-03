@@ -1,6 +1,7 @@
 <?php
 // api/admin/coupons/list.php — List all promo coupons for admin dashboard
 require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../auth.php';
 requireAdmin();
 
 // Auto-create coupons table if it does not exist yet in database

@@ -3,6 +3,7 @@
 // api/admin/users.php — Manage Registered Customers
 // ============================================================
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../auth.php';
 $admin = requireAdmin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {

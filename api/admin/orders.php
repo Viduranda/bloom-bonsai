@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../auth.php';
 requireAdmin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
