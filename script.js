@@ -11,11 +11,9 @@
 
 /* ─────────────────────────── 1. CONSTANTS & HELPERS ────────────────────────── */
 
-const API_BASE = (window.location.hostname.includes('vercel.app'))
-  ? 'http://bloom-bonsai.infinityfreeapp.com/api/'
-  : (window.location.protocol === 'file:')
-    ? 'api/'
-    : window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1) + 'api/';
+const API_BASE = (window.location.protocol === 'file:')
+  ? 'api/'
+  : window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1) + 'api/';
 
 // Generic fetch wrapper: adds JWT header, parses JSON, throws on API error
 async function apiFetch(endpoint, options = {}) {
