@@ -638,10 +638,11 @@
 
     async function loadAdminData() {
         try {
-            const me = await apiFetch('auth/me.php');
-            if (me.role !== 'admin') throw new Error('Admin access required');
+            const res = await apiFetch('auth/me.php');
+            const me = (res && res.user) ? res.user : res;
+            if (!me || me.role !== 'admin') throw new Error('Admin access required');
             currentUser = me; 
-            document.getElementById('adminName').textContent = me.name;
+            document.getElementById('adminName').textContent = me.name || 'Admin';
 
             const [stats, products, orders] = await Promise.all([
                 apiFetch('admin/stats.php'),
