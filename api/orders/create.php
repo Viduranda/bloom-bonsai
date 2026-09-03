@@ -142,3 +142,23 @@ try {
     $message = $e instanceof RuntimeException ? $e->getMessage() : 'Could not place order';
     respond(['success' => false, 'error' => $message], $e instanceof RuntimeException ? 400 : 500);
 }
+
+// Send automated confirmation email
+sendOrderEmail([
+    'id' => $orderId,
+    'email' => $email,
+    'customer_name' => $name,
+    'status' => 'confirmed',
+    'payment_method' => $payment,
+    'payment_status' => $paymentStatus,
+    'transaction_id' => $txnId,
+    'total_amount' => $grand,
+    'address' => "$name, $address, $city - $pincode",
+    'items' => $validated
+], 'confirmation');
+
+respond(['success' => true, 'data' => [
+    'order_id' => $orderId, 'total' => $grand, 'status' => 'confirmed',
+    'payment_method' => $payment, 'payment_status' => $paymentStatus, 'transaction_id' => $txnId,
+    'expected_delivery' => date('Y-m-d', strtotime('+5 days')),
+]], 201);
