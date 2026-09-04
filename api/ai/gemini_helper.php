@@ -12,7 +12,12 @@ function callGemini15Flash($prompt, $systemInstruction = '', $base64Image = null
         return null;
     }
 
-    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . urlencode($apiKey);
+    $modelsToTry = [
+        'gemini-1.5-flash',
+        'gemini-2.5-flash',
+        'gemini-2.0-flash',
+        'gemini-flash-latest'
+    ];
 
     $parts = [];
     if (!empty($prompt)) {
@@ -46,27 +51,31 @@ function callGemini15Flash($prompt, $systemInstruction = '', $base64Image = null
         ];
     }
 
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-        CURLOPT_POSTFIELDS => json_encode($payload),
-        CURLOPT_TIMEOUT => 25,
-        CURLOPT_SSL_VERIFYPEER => false
-    ]);
+    $payloadJson = json_encode($payload);
 
-    $response = curl_exec($ch);
-    $err = curl_error($ch);
-    curl_close($ch);
+    foreach ($modelsToTry as $modelName) {
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/" . urlencode($modelName) . ":generateContent?key=" . urlencode($apiKey);
 
-    if ($err || !$response) {
-        return null;
-    }
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_POSTFIELDS => $payloadJson,
+            CURLOPT_TIMEOUT => 25,
+            CURLOPT_SSL_VERIFYPEER => false
+        ]);
 
-    $data = json_decode($response, true);
-    if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
-        return trim($data['candidates'][0]['content']['parts'][0]['text']);
+        $response = curl_exec($ch);
+        $err = curl_error($ch);
+        curl_close($ch);
+
+        if (!$err && $response) {
+            $data = json_decode($response, true);
+            if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+                return trim($data['candidates'][0]['content']['parts'][0]['text']);
+            }
+        }
     }
 
     return null;
