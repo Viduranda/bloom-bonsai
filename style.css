@@ -2374,13 +2374,17 @@ img {
     .section-header h2 {
         font-size: 1.65rem !important;
     }
+}
 
-.mobile-only-nav {
+/* Mobile-only navbar auth items (Hidden on desktop) */
+.mobile-only-nav,
+li.mobile-only-nav {
     display: none !important;
 }
 
 @media (max-width: 768px) {
-    .mobile-only-nav {
+    .mobile-only-nav,
+    li.mobile-only-nav {
         display: block !important;
         margin-top: 6px !important;
     }
