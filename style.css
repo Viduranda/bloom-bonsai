@@ -2376,15 +2376,28 @@ img {
     }
 }
 
-/* Mobile-only navbar auth items (Hidden on desktop) */
+/* Hide all mobile-only nav elements on desktop (>768px) */
+.mobile-auth-item,
 .mobile-only-nav,
-li.mobile-only-nav {
+li.mobile-auth-item,
+li.mobile-only-nav,
+ul.nav-links li.mobile-auth-item,
+ul.nav-links li.mobile-only-nav,
+#navLinks li.mobile-auth-item,
+#navLinks li.mobile-only-nav {
     display: none !important;
 }
 
+/* Show only inside mobile hamburger menu (<=768px) */
 @media (max-width: 768px) {
+    .mobile-auth-item,
     .mobile-only-nav,
-    li.mobile-only-nav {
+    li.mobile-auth-item,
+    li.mobile-only-nav,
+    ul.nav-links li.mobile-auth-item,
+    ul.nav-links li.mobile-only-nav,
+    #navLinks li.mobile-auth-item,
+    #navLinks li.mobile-only-nav {
         display: block !important;
         margin-top: 6px !important;
     }
