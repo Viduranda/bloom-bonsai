@@ -1232,7 +1232,8 @@ async function loadMyPlants() {
   const statusColor = { healthy: '#2D6A4F', needs_attention: '#b7791f', diseased: '#dc3545' };
 
   try {
-    const plants = await apiFetch('garden/my-plants.php');
+    const res = await apiFetch('garden/my-plants.php');
+    const plants = (res && (res.plants || res.data || res.purchases || (Array.isArray(res) ? res : []))) || [];
     if (!plants.length) {
       grid.innerHTML = '<p style="text-align:center;color:#888;">No plants yet — buy a plant from the <a href="shop.html">shop</a>!</p>';
       return;
@@ -1811,12 +1812,14 @@ async function loadDashboard() {
   const greet = document.getElementById('dashGreeting');
   if (greet) greet.textContent = 'Welcome back, ' + (user.name || 'Plant Lover') + '!';
   try {
-    const [orders, plants] = await Promise.all([
+    const [ordersRes, plantsRes] = await Promise.all([
       apiFetch('orders/my-orders.php'),
       apiFetch('garden/purchases.php')
     ]);
-    renderOrders(orders || []);
-    renderPlants(plants || []);
+    const orders = (ordersRes && (ordersRes.data || ordersRes.orders || (Array.isArray(ordersRes) ? ordersRes : []))) || [];
+    const plants = (plantsRes && (plantsRes.purchases || plantsRes.data || plantsRes.plants || (Array.isArray(plantsRes) ? plantsRes : []))) || [];
+    renderOrders(orders);
+    renderPlants(plants);
   } catch (err) {
     const list = document.getElementById('ordersList');
     if (list) list.innerHTML = '<p style="color:#c0392b;">Could not load dashboard: ' + esc(err.error || err.message) + '</p>';
@@ -2144,7 +2147,7 @@ async function loadMyGardenPage() {
 
   try {
     const res = await apiFetch('garden/purchases.php');
-    const plants = res.data || res || [];
+    const plants = (res && (res.purchases || res.data || res.plants || (Array.isArray(res) ? res : []))) || [];
 
     if (!plants.length) {
       renderGuestGardenState();

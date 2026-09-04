@@ -4,7 +4,7 @@ require_once __DIR__ . '/../auth.php';
 
 $user = getUserFromToken();
 if (!$user) {
-    respond(['success' => true, 'purchases' => []]);
+    respond(['success' => true, 'purchases' => [], 'data' => []]);
 }
 
 try {
@@ -20,7 +20,7 @@ try {
     ");
     $stmt->execute([$user['user_id']]);
     $purchases = $stmt->fetchAll();
-    respond(['success' => true, 'purchases' => $purchases]);
+    respond(['success' => true, 'purchases' => $purchases, 'data' => $purchases]);
 } catch (Exception $e) {
-    respond(['success' => true, 'purchases' => []]);
+    respond(['success' => true, 'purchases' => [], 'data' => []]);
 }
