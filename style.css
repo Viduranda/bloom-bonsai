@@ -685,6 +685,38 @@ img {
     border-radius: 50px;
     font-size: 0.75rem;
     font-weight: 600;
+    z-index: 3;
+}
+
+/* ========== BEST SELLERS SLIDER ========== */
+.best-sellers-slider-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.product-slider-track {
+    display: flex;
+    gap: 22px;
+    flex-wrap: nowrap;
+}
+
+.product-slider-track .product-card {
+    flex: 0 0 280px;
+    min-width: 280px;
+    width: 280px;
+}
+
+.slider-btn:hover {
+    transform: scale(1.08) !important;
+}
+
+.slider-btn.prev-btn:hover {
+    background: #f4f8f5 !important;
+    border-color: #17482f !important;
+}
+
+.slider-btn.next-btn:hover {
+    background: #0f3421 !important;
+    border-color: #0f3421 !important;
 }
 
 .product-info {

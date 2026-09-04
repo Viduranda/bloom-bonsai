@@ -151,17 +151,29 @@
     </div>
 </section>
 
-<!-- ========== FEATURED PLANTS (BEST SELLERS) ========== -->
-<section class="featured">
+<!-- ========== FEATURED PLANTS (BEST SELLERS HORIZONTAL SLIDER) ========== -->
+<section class="featured" id="best-sellers">
     <div class="container">
-        <div class="section-header">
-            <h2>Best <span class="highlight">Sellers</span></h2>
-            <p>Handpicked customer favorites with instant AI Care Plans</p>
+        <div class="section-header" style="display:flex;justify-space-between;align-items:flex-end;margin-bottom:30px;flex-wrap:wrap;gap:15px;">
+            <div>
+                <h2 style="margin-bottom:5px;">Best <span class="highlight">Sellers</span></h2>
+                <p>Handpicked customer favorites with instant AI Care Plans</p>
+            </div>
+            <div class="slider-nav-btns" style="display:flex;gap:10px;margin-left:auto;">
+                <button class="slider-btn prev-btn" onclick="slideBestSellers(-1)" aria-label="Previous Products" style="width:44px;height:44px;border-radius:50%;background:#ffffff;border:1px solid #d8e2dc;color:#17482f;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.06);transition:all 0.25s ease;">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="slider-btn next-btn" onclick="slideBestSellers(1)" aria-label="Next Products" style="width:44px;height:44px;border-radius:50%;background:#17482f;border:1px solid #17482f;color:#ffffff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(23,72,47,0.25);transition:all 0.25s ease;">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
         </div>
-        <div class="product-grid" id="featuredProducts">
-            <!-- Products loaded via JS -->
+        <div class="best-sellers-slider-wrapper" style="overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:10px 4px 20px;scrollbar-width:none;-ms-overflow-style:none;">
+            <div class="product-slider-track" id="featuredProducts" style="display:flex;gap:22px;flex-wrap:nowrap;">
+                <!-- Products loaded via JS -->
+            </div>
         </div>
-        <div class="view-all" style="margin-top:40px;text-align:center;">
+        <div class="view-all" style="margin-top:35px;text-align:center;">
             <a href="shop.html" class="btn-primary shimmer-btn">View All Plants <i class="fas fa-arrow-right"></i></a>
         </div>
     </div>

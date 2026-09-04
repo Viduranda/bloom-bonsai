@@ -477,14 +477,14 @@ function renderProductCard(p) {
     <div class="product-card" onclick="openProductModal(${p.id})" style="cursor:pointer;position:relative;">
       <div class="product-img" style="position:relative;">
         <img src="${esc(p.image || FALLBACK_IMG)}" alt="${esc(p.name)}" loading="lazy">
-        ${p.badge ? `<span class="product-badge" style="background:#c9a227;color:#fff;">${esc(p.badge)}</span>` : ''}
-        <span style="position:absolute;top:10px;left:10px;background:rgba(255,255,255,0.92);color:#17482f;padding:2px 8px;border-radius:999px;font-size:0.75rem;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+        ${p.badge ? `<span class="product-badge" style="background:#c9a227;color:#fff;z-index:3;">${esc(p.badge)}</span>` : ''}
+        <span style="position:absolute;bottom:10px;left:10px;background:rgba(255,255,255,0.92);color:#17482f;padding:2px 8px;border-radius:999px;font-size:0.75rem;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.1);z-index:4;">
           ${ratingText} ${reviewsCount}
         </span>
         <button class="wishlist-heart-btn" data-pid="${p.id}" onclick="event.stopPropagation(); toggleWishlist(${p.id}, event);" title="${isSaved ? 'Remove from Wishlist' : 'Save to Wishlist'}" style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.92);border:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.15);z-index:5;transition:transform 0.2s ease;">
           <i class="${isSaved ? 'fas fa-heart' : 'far fa-heart'}" style="color:${isSaved ? '#e74c3c' : '#555'};font-size:1.05rem;"></i>
         </button>
-        ${isOutOfStock ? `<span style="position:absolute;bottom:8px;right:8px;background:#c0392b;color:#fff;padding:3px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;">Out of Stock</span>` : ''}
+        ${isOutOfStock ? `<span style="position:absolute;bottom:8px;right:8px;background:#c0392b;color:#fff;padding:3px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;z-index:4;">Out of Stock</span>` : ''}
       </div>
       <div class="product-info" style="display:flex;flex-direction:column;justify-content:space-between;">
         <div>
@@ -519,7 +519,7 @@ function renderProductCard(p) {
 
 // Home page → "Best Sellers" grid (controlled by FEATURED_COUNT constant)
 async function loadFeaturedProducts() {
-  const FEATURED_COUNT = 5; // Change this single number to show more/fewer Best Sellers
+  const FEATURED_COUNT = 8; // Change this single number to show more/fewer Best Sellers
   const grid = document.getElementById('featuredProducts') || document.getElementById('homeProducts') || document.querySelector('#best-sellers .product-grid') || document.querySelector('.featured-grid');
   if (!grid) return;
 
@@ -550,6 +550,14 @@ async function loadFeaturedProducts() {
     }
   }
 }
+
+// Helper for horizontal Best Sellers slider
+window.slideBestSellers = function(dir) {
+  const wrapper = document.querySelector('.best-sellers-slider-wrapper');
+  if (!wrapper) return;
+  const scrollAmount = 302 * dir;
+  wrapper.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+};
 
 let currentShopCategory = '';
 let currentShopSearch = '';
