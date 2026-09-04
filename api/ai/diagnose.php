@@ -27,7 +27,7 @@ require_once __DIR__ . '/gemini_helper.php';
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'GET') {
     $modelFileExists = file_exists(__DIR__ . '/bloom_bonsai_unified_25class_model.pth');
     $scriptExists    = file_exists(__DIR__ . '/predict_local_model.py');
-    $geminiConfigured = !empty(getEnvVar('GEMINI_API_KEY', ''));
+    $geminiConfigured = !empty(getGeminiApiKey());
 
     respond([
         'success' => true,
