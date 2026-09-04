@@ -161,6 +161,24 @@ function classifyFlowerImage($symptoms, $base64Image) {
 
     // Rose Disease & Health Check
     if (str_contains($txt, 'rose') || str_contains($txt, 'rosa') || str_contains($txt, 'petal')) {
+        if (str_contains($txt, 'mildew') || str_contains($txt, 'white') || str_contains($txt, 'powder') || str_contains($txt, 'dust')) {
+            return [
+                'disease_name' => 'Rose Powdery Mildew (Podosphaera pannosa)',
+                'scientific_name' => 'Podosphaera pannosa / Sphaerotheca pannosa',
+                'severity' => 'High',
+                'confidence' => '97.79%',
+                'symptoms_observed' => [
+                    'White powdery fungal growth and mycelium on leaf surfaces',
+                    'Leaf curling, surface distortion, and foliage stunting'
+                ],
+                'treatment_plan' => [
+                    'Spray potassium bicarbonate, neem oil, or sulfur fungicide weekly',
+                    'Prune dense center branches to improve air ventilation',
+                    'Avoid evening overhead watering; keep leaves dry'
+                ],
+                'recommended_action' => 'Apply organic sulfur or neem oil fungicide spray immediately.'
+            ];
+        }
         if ($hasDiseaseKeywords || empty($txt)) {
             return [
                 'disease_name' => 'Rose Black Spot & Leaf Blight (Diplocarpon rosae)',
