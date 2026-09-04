@@ -88,7 +88,6 @@ if (file_exists($localModelPath) && file_exists($pythonScript) && (!empty($tmpPa
             $pythonExecs[] = $_SERVER['LOCALAPPDATA'] . '\\Programs\\Python\\Python312\\python.exe';
             $pythonExecs[] = $_SERVER['LOCALAPPDATA'] . '\\Programs\\Python\\Python311\\python.exe';
         }
-        $pythonExecs[] = 'C:\\Users\\HP\\AppData\\Local\\Programs\\Python\\Python313\\python.exe';
 
         foreach ($pythonExecs as $pyBin) {
             $cmd = '"' . $pyBin . '" "' . $pythonScript . '" "' . $evalImgPath . '" 2>&1';
@@ -104,7 +103,7 @@ if (file_exists($localModelPath) && file_exists($pythonScript) && (!empty($tmpPa
                 }
                 
                 $confVal = floatval($result['confidence_float'] ?? 0);
-                if ($result && !empty($result['success']) && ($confVal >= 0.30 || !empty($result['disease_name']))) {
+                if ($result && !empty($result['success']) && $confVal >= 0.40) {
                     respond([
                         'success' => true,
                         'data' => [
@@ -120,7 +119,7 @@ if (file_exists($localModelPath) && file_exists($pythonScript) && (!empty($tmpPa
                                 'treatment_plan' => $result['treatment_plan'] ?? ["Water 2-3 times per week", "Ensure adequate sunlight"],
                                 'recommended_action' => $result['recommended_action'] ?? "Apply organic fertilizer during active growing season."
                             ],
-                            'source' => 'Custom Fine-Tuned 25-Class Model (97.79% Acc)'
+                            'source' => 'Custom Fine-Tuned 25-Class PyTorch Model (97.79% Acc)'
                         ]
                     ]);
                 }
@@ -148,7 +147,7 @@ if ($aiReply) {
             'success' => true,
             'data' => [
                 'diagnosis' => $parsed,
-                'source' => 'Custom Fine-Tuned 25-Class Model (97.79% Acc) + AI Vision'
+                'source' => 'Gemini Vision AI (Multimodal Image Scanner)'
             ]
         ]);
     }
@@ -306,7 +305,7 @@ function classifyFlowerImage($symptoms, $base64Image) {
             'Water when top 1-2 inches of soil feel dry',
             'Provide bright indirect sunlight and maintain good air flow'
         ],
-        'recommended_action' => 'Inspect leaves carefully. Add GEMINI_API_KEY to api/.env for live AI photo vision scanning!'
+        'recommended_action' => 'Inspect leaves carefully for pests, fungal spots, or discoloration. Ensure proper watering and ventilation.'
     ];
 }
 
@@ -316,6 +315,6 @@ respond([
     'success' => true,
     'data' => [
         'diagnosis' => $diagnosisData,
-        'source' => 'Custom Fine-Tuned 25-Class Model (97.79% Acc)'
+        'source' => 'Botanical Knowledge Base Rule Engine'
     ]
 ]);

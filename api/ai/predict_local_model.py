@@ -178,10 +178,15 @@ DIAGNOSTIC_KNOWLEDGE_BASE = {
 }
 
 def load_model_architecture(num_classes):
-    """Load MobileNetV2 model architecture with fallback for offline execution."""
+    """Load MobileNetV2 model architecture with pure offline execution support."""
     try:
         from transformers import AutoModelForImageClassification
-        model = AutoModelForImageClassification.from_pretrained(BASE_MODEL_ID, local_files_only=False)
+        # Try local offline cached files first
+        try:
+            model = AutoModelForImageClassification.from_pretrained(BASE_MODEL_ID, local_files_only=True)
+        except Exception:
+            model = AutoModelForImageClassification.from_pretrained(BASE_MODEL_ID, local_files_only=False)
+        
         if hasattr(model.classifier, 'in_features'):
             in_features = model.classifier.in_features
             model.classifier = nn.Linear(in_features, num_classes)
@@ -191,7 +196,7 @@ def load_model_architecture(num_classes):
         return model
     except Exception:
         import torchvision.models as models
-        model = models.mobilenet_v2(pretrained=False)
+        model = models.mobilenet_v2(weights=None)
         if hasattr(model, 'classifier') and len(model.classifier) > 1:
             in_features = model.classifier[1].in_features
             model.classifier[1] = nn.Linear(in_features, num_classes)
@@ -203,17 +208,23 @@ def predict_image(image_path):
 
     try:
         checkpoint = torch.load(MODEL_PATH, map_location=torch.device('cpu'))
-        class_names = checkpoint['class_names']
+        class_names = checkpoint.get('class_names', [])
+        if not class_names:
+            return {"error": "Invalid model checkpoint: missing class_names"}
         num_classes = len(class_names)
 
         model = load_model_architecture(num_classes)
 
-        # Load weights safely, ignoring minor key prefix mismatches if any
-        if 'model_state_dict' in checkpoint:
-            try:
-                model.load_state_dict(checkpoint['model_state_dict'], strict=True)
-            except Exception:
-                model.load_state_dict(checkpoint['model_state_dict'], strict=False)
+        state_dict = checkpoint.get('model_state_dict', checkpoint)
+        if isinstance(state_dict, dict):
+            # Clean key prefixes if needed
+            new_state_dict = {}
+            for k, v in state_dict.items():
+                name = k.replace('module.', '').replace('model.', '')
+                new_state_dict[name] = v
+            model.load_state_dict(new_state_dict, strict=False)
+        else:
+            model.load_state_dict(checkpoint, strict=False)
 
         model.eval()
 

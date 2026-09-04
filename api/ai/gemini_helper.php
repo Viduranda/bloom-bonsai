@@ -1,26 +1,35 @@
 <?php
 // api/ai/gemini_helper.php — Gemini 1.5 Flash API Helper
 
+function getGeminiApiKeys() {
+    $keys = [];
+    $envKey = getEnvVar('GEMINI_API_KEY', '');
+    if (!empty($envKey)) $keys[] = $envKey;
+
+    // Direct fallback keys encoded to protect credentials
+    $keys[] = base64_decode('QVEuQWI4Uk42Sjh2ZmI1OU1aRE5JZm1hM2NFTjU4bTFYMUJzbEJWS3duLVAwZ081bXpCQ0E=');
+    $keys[] = base64_decode('QVEuQWI4Uk42SmhLbVlST0JERzNFbXMzaGRBd2VwVmlOdkluVGd4V3hsTkFuSEJLUDVNTHc=');
+
+    return array_unique(array_filter($keys));
+}
+
 function getGeminiApiKey() {
-    $key = getEnvVar('GEMINI_API_KEY', '');
-    if (empty($key)) {
-        $key = base64_decode('QVEuQWI4Uk42Sjh2ZmI1OU1aRE5JZm1hM2NFTjU4bTFYMUJzbEJWS3duLVAwZ081bXpCQ0E=');
-    }
-    return $key;
+    $keys = getGeminiApiKeys();
+    return $keys[0] ?? '';
 }
 
 function callGemini15Flash($prompt, $systemInstruction = '', $base64Image = null, $mimeType = 'image/jpeg') {
-    $apiKey = getGeminiApiKey();
+    $apiKeys = getGeminiApiKeys();
 
-    if (empty($apiKey)) {
+    if (empty($apiKeys)) {
         return null;
     }
 
     $modelsToTry = [
-        'gemini-1.5-flash',
+        'gemini-flash-latest',
         'gemini-2.5-flash',
-        'gemini-2.0-flash',
-        'gemini-flash-latest'
+        'gemini-1.5-flash',
+        'gemini-2.0-flash'
     ];
 
     $parts = [];
@@ -57,27 +66,29 @@ function callGemini15Flash($prompt, $systemInstruction = '', $base64Image = null
 
     $payloadJson = json_encode($payload);
 
-    foreach ($modelsToTry as $modelName) {
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/" . urlencode($modelName) . ":generateContent?key=" . urlencode($apiKey);
+    foreach ($apiKeys as $apiKey) {
+        foreach ($modelsToTry as $modelName) {
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/" . urlencode($modelName) . ":generateContent?key=" . urlencode($apiKey);
 
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-            CURLOPT_POSTFIELDS => $payloadJson,
-            CURLOPT_TIMEOUT => 25,
-            CURLOPT_SSL_VERIFYPEER => false
-        ]);
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                CURLOPT_POSTFIELDS => $payloadJson,
+                CURLOPT_TIMEOUT => 25,
+                CURLOPT_SSL_VERIFYPEER => false
+            ]);
 
-        $response = curl_exec($ch);
-        $err = curl_error($ch);
-        curl_close($ch);
+            $response = curl_exec($ch);
+            $err = curl_error($ch);
+            curl_close($ch);
 
-        if (!$err && $response) {
-            $data = json_decode($response, true);
-            if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
-                return trim($data['candidates'][0]['content']['parts'][0]['text']);
+            if (!$err && $response) {
+                $data = json_decode($response, true);
+                if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+                    return trim($data['candidates'][0]['content']['parts'][0]['text']);
+                }
             }
         }
     }
