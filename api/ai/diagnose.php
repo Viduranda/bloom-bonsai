@@ -23,6 +23,28 @@ try {
 
 require_once __DIR__ . '/gemini_helper.php';
 
+// Status / Health Check GET Endpoint
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'GET') {
+    $modelFileExists = file_exists(__DIR__ . '/bloom_bonsai_unified_25class_model.pth');
+    $scriptExists    = file_exists(__DIR__ . '/predict_local_model.py');
+    $geminiConfigured = !empty(getEnvVar('GEMINI_API_KEY', ''));
+
+    respond([
+        'success' => true,
+        'status' => 'Operational',
+        'engine' => 'Bloom & Bonsai Universal Multimodal Disease & Botanical Classifier',
+        'fine_tuned_model' => [
+            'name' => 'bloom_bonsai_unified_25class_model.pth',
+            'accuracy' => '97.79% Peak Validation Accuracy',
+            'classes' => 25,
+            'model_file_present' => $modelFileExists,
+            'inference_script_present' => $scriptExists
+        ],
+        'gemini_vision_fallback' => $geminiConfigured ? 'Active' : 'Unconfigured (Set GEMINI_API_KEY in api/.env)',
+        'rule_engine_fallback' => 'Active (25-Class Botanical Database)'
+    ]);
+}
+
 $rawInput = file_get_contents('php://input');
 $body = json_decode($rawInput, true) ?? [];
 
@@ -55,11 +77,18 @@ if (file_exists($localModelPath) && file_exists($pythonScript) && (!empty($tmpPa
 
     if ($evalImgPath && file_exists($evalImgPath)) {
         $pythonExecs = [
-            'C:\\Users\\HP\\AppData\\Local\\Programs\\Python\\Python313\\python.exe',
             'python3',
+            '/usr/bin/python3',
+            '/usr/local/bin/python3',
             'python',
             'py'
         ];
+        if (isset($_SERVER['LOCALAPPDATA'])) {
+            $pythonExecs[] = $_SERVER['LOCALAPPDATA'] . '\\Programs\\Python\\Python313\\python.exe';
+            $pythonExecs[] = $_SERVER['LOCALAPPDATA'] . '\\Programs\\Python\\Python312\\python.exe';
+            $pythonExecs[] = $_SERVER['LOCALAPPDATA'] . '\\Programs\\Python\\Python311\\python.exe';
+        }
+        $pythonExecs[] = 'C:\\Users\\HP\\AppData\\Local\\Programs\\Python\\Python313\\python.exe';
 
         foreach ($pythonExecs as $pyBin) {
             $cmd = '"' . $pyBin . '" "' . $pythonScript . '" "' . $evalImgPath . '" 2>&1';
