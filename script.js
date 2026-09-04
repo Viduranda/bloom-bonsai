@@ -142,10 +142,12 @@ function updateAuthUI(user) {
   const signupBtn = document.getElementById('signupBtn');
   const userMenu  = document.getElementById('userMenu');
   const userName  = document.getElementById('userName');
+  const navLinks  = document.getElementById('navLinks');
 
-  // Remove any stale duplicate admin links from middle nav-links list
+  // Remove any stale duplicate admin or mobile auth links
   const navAdminLi = document.getElementById('navAdminLi');
   if (navAdminLi) navAdminLi.remove();
+  document.querySelectorAll('.mobile-auth-item').forEach(el => el.remove());
 
   if (user) {
     if (loginBtn)  loginBtn.style.display  = 'none';
@@ -170,12 +172,45 @@ function updateAuthUI(user) {
     } else {
       if (adminMenuBtn) adminMenuBtn.style.display = 'none';
     }
+
+    // Add Mobile-only Auth links to Hamburger Dropdown
+    if (navLinks) {
+      if (user.role === 'admin') {
+        const mobileAdminLi = document.createElement('li');
+        mobileAdminLi.className = 'mobile-auth-item mobile-only-nav';
+        mobileAdminLi.innerHTML = '<a href="admin_dash.html" style="color:#c9a227;font-weight:700;"><i class="fas fa-crown"></i> Admin Panel</a>';
+        navLinks.appendChild(mobileAdminLi);
+      }
+
+      const mobileUserLi = document.createElement('li');
+      mobileUserLi.className = 'mobile-auth-item mobile-only-nav';
+      mobileUserLi.innerHTML = '<span style="color:#2D6A4F;font-weight:600;"><i class="fas fa-user-circle"></i> Hi, ' + esc(user.name ? user.name.split(' ')[0] : 'User') + '</span>';
+      navLinks.appendChild(mobileUserLi);
+
+      const mobileLogoutLi = document.createElement('li');
+      mobileLogoutLi.className = 'mobile-auth-item mobile-only-nav';
+      mobileLogoutLi.innerHTML = '<a href="#" onclick="logout(); return false;" style="color:#e74c3c;font-weight:600;"><i class="fas fa-sign-out-alt"></i> Logout</a>';
+      navLinks.appendChild(mobileLogoutLi);
+    }
   } else {
     if (loginBtn)  loginBtn.style.display  = 'inline-block';
     if (signupBtn) signupBtn.style.display = 'inline-block';
     if (userMenu)  userMenu.style.display  = 'none';
     const adminMenuBtn = document.getElementById('userMenuAdminBtn');
     if (adminMenuBtn) adminMenuBtn.style.display = 'none';
+
+    // Add Mobile Login & Sign Up links to Hamburger Dropdown when logged out
+    if (navLinks) {
+      const mobileLoginLi = document.createElement('li');
+      mobileLoginLi.className = 'mobile-auth-item mobile-only-nav';
+      mobileLoginLi.innerHTML = '<a href="login.html" class="btn-login" style="display:block;width:100%;margin-top:5px;">Login</a>';
+      navLinks.appendChild(mobileLoginLi);
+
+      const mobileSignupLi = document.createElement('li');
+      mobileSignupLi.className = 'mobile-auth-item mobile-only-nav';
+      mobileSignupLi.innerHTML = '<a href="register.html" class="btn-signup" style="display:block;width:100%;">Sign Up</a>';
+      navLinks.appendChild(mobileSignupLi);
+    }
   }
 }
 

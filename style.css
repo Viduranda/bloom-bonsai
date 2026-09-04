@@ -2375,7 +2375,13 @@ img {
         font-size: 1.65rem !important;
     }
 
-    .footer-grid {
-        padding-bottom: 20px !important;
+.mobile-only-nav {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .mobile-only-nav {
+        display: block !important;
+        margin-top: 6px !important;
     }
 }
