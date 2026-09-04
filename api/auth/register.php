@@ -6,9 +6,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     respond(['success' => false, 'error' => 'Method Not Allowed'], 405);
 }
 
-$input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+$input = $body;
 $name  = trim($input['name'] ?? '');
-$email = trim($input['email'] ?? '');
+$email = strtolower(trim($input['email'] ?? ''));
 $pass  = trim($input['password'] ?? '');
 
 if (empty($name) || empty($email) || empty($pass)) {
@@ -23,25 +23,27 @@ if (strlen($pass) < 6) {
     respond(['success' => false, 'error' => 'Password must be at least 6 characters.'], 400);
 }
 
-$stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+$stmt = $pdo->prepare("SELECT id FROM users WHERE LOWER(email) = ?");
 $stmt->execute([$email]);
 if ($stmt->fetch()) {
     respond(['success' => false, 'error' => 'Email already registered.'], 409);
 }
 
+$role = (in_array($email, ['vidurandarukmal@gmail.com', 'admin@bloombonsai.com'])) ? 'admin' : 'customer';
+
 $hash = password_hash($pass, PASSWORD_DEFAULT);
-$stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, 'customer')");
-$stmt->execute([$name, $email, $hash]);
+$stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)");
+$stmt->execute([$name, $email, $hash, $role]);
 $userId = $pdo->lastInsertId();
 
 $user = [
     'id'    => $userId,
     'name'  => $name,
     'email' => $email,
-    'role'  => 'customer'
+    'role'  => $role
 ];
 
-$token = createToken($userId, 'customer');
+$token = createToken($userId, $role);
 
 respond([
     'success' => true,
