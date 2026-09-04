@@ -478,6 +478,26 @@ function getCategoryFallbackImg(p) {
   return 'https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=600';
 }
 
+function getValidPlantImage(p) {
+  let img = p.image || '';
+  if (typeof img === 'string') img = img.trim();
+  
+  // Filter out tech images, electronics, circuit boards, or invalid broken paths
+  const isTechOrInvalid = !img ||
+    img.includes('photo-1518770660439') || // motherboard image
+    img.includes('circuit') ||
+    img.includes('motherboard') ||
+    img.includes('computer') ||
+    img.includes('tech') ||
+    img.includes('undefined') ||
+    img.includes('null');
+
+  if (isTechOrInvalid) {
+    return getCategoryFallbackImg(p);
+  }
+  return esc(img);
+}
+
 function renderProductCard(p) {
   const isOutOfStock = (p.stock != null && p.stock <= 0);
   const ratingText = (p.avg_rating || '5.0') + ' ⭐';
@@ -488,14 +508,14 @@ function renderProductCard(p) {
   const isAccessory = Number(p.category_id) === 3 || (p.category && String(p.category).toLowerCase().includes('accessories'));
 
   const fallbackImg = getCategoryFallbackImg(p);
-  const imgSrc = (p.image && typeof p.image === 'string' && p.image.trim() !== '') ? esc(p.image) : fallbackImg;
+  const imgSrc = getValidPlantImage(p);
 
   return `
-    <div class="product-card" onclick="openProductModal(${p.id})" style="cursor:pointer;position:relative;background:#ffffff;border-radius:18px;border:1px solid rgba(23,72,47,0.08);box-shadow:0 8px 25px rgba(0,0,0,0.05);overflow:hidden;display:flex;flex-direction:column;transition:all 0.35s ease;">
-      <div class="product-img" style="position:relative;height:220px;min-height:220px;overflow:hidden;background:#eef4f0;">
-        <img src="${imgSrc}" alt="${esc(p.name)}" loading="lazy" onerror="this.onerror=null;this.src='${fallbackImg}';" style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease;">
-        ${p.badge ? `<span class="product-badge" style="position:absolute;top:12px;left:12px;z-index:3;background:linear-gradient(135deg,#d4af37,#aa7c11);color:#fff;padding:5px 12px;border-radius:30px;font-size:0.72rem;font-weight:700;letter-spacing:0.4px;box-shadow:0 4px 12px rgba(212,175,55,0.35);text-transform:uppercase;">${esc(p.badge)}</span>` : ''}
-        <span style="position:absolute;bottom:12px;left:12px;z-index:4;background:rgba(255,255,255,0.94);backdrop-filter:blur(6px);color:#17482f;padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,0.1);border:1px solid rgba(255,255,255,0.9);display:flex;align-items:center;gap:4px;">
+    <div class="product-card" onclick="openProductModal(${p.id})" style="cursor:pointer;position:relative;background:#ffffff;border-radius:20px;border:1px solid rgba(23,72,47,0.08);box-shadow:0 10px 30px rgba(0,0,0,0.04);overflow:hidden;display:flex;flex-direction:column;transition:all 0.35s ease;">
+      <div class="product-img" style="position:relative;height:230px;min-height:230px;overflow:hidden;background:#eef4f0;">
+        <img src="${imgSrc}" alt="${esc(p.name)}" loading="lazy" onerror="this.onerror=null;this.src='${fallbackImg}';" style="width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease;">
+        ${p.badge ? `<span class="product-badge" style="position:absolute;top:12px;left:12px;z-index:3;background:linear-gradient(135deg,#c9a227,#a37f17);color:#fff;padding:5px 12px;border-radius:30px;font-size:0.72rem;font-weight:700;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(201,162,39,0.35);text-transform:uppercase;display:flex;align-items:center;gap:4px;"><i class="fas fa-crown" style="font-size:0.68rem;"></i> ${esc(p.badge)}</span>` : ''}
+        <span style="position:absolute;bottom:12px;left:12px;z-index:4;background:rgba(255,255,255,0.96);backdrop-filter:blur(6px);color:#17482f;padding:4px 11px;border-radius:20px;font-size:0.75rem;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.9);display:flex;align-items:center;gap:4px;">
           ${ratingText} ${reviewsCount}
         </span>
         <button class="wishlist-heart-btn" data-pid="${p.id}" onclick="event.stopPropagation(); toggleWishlist(${p.id}, event);" title="${isSaved ? 'Remove from Wishlist' : 'Save to Wishlist'}" style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.92);backdrop-filter:blur(4px);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.12);z-index:5;transition:all 0.25s ease;">
@@ -503,13 +523,13 @@ function renderProductCard(p) {
         </button>
         ${isOutOfStock ? `<span style="position:absolute;bottom:12px;right:12px;z-index:4;background:rgba(192,57,43,0.92);color:#fff;padding:4px 10px;border-radius:8px;font-size:0.72rem;font-weight:700;backdrop-filter:blur(4px);">Out of Stock</span>` : ''}
       </div>
-      <div class="product-info" style="padding:16px 16px 18px;display:flex;flex-direction:column;justify-content:space-between;flex-grow:1;">
+      <div class="product-info" style="padding:16px 16px 18px;display:flex;flex-direction:column;justify-space-between;flex-grow:1;">
         <div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-            <span class="category-tag" style="color:#2D6A4F;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">${esc(p.category || (isAccessory ? 'Accessory' : 'Plant'))}</span>
+            <span class="category-tag" style="color:#2D6A4F;font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;">${esc(p.category || (isAccessory ? 'Accessory' : 'Plant'))}</span>
             ${!isAccessory && p.pet_safe == 1 ? `<span style="font-size:0.72rem;color:#2e7d4f;font-weight:600;background:#e8f5e9;padding:2px 8px;border-radius:12px;">🐶 Pet Safe</span>` : ''}
           </div>
-          <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:#17482f;margin:2px 0 4px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${esc(p.name)}">${esc(p.name)}</h3>
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:#17482f;margin:2px 0 4px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${esc(p.name)}">${esc(p.name)}</h3>
           ${!isAccessory && p.scientific_name ? `<p style="color:#52B788;font-style:italic;font-size:0.8rem;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">🌿 ${esc(p.scientific_name)}</p>` : ''}
           ${!isAccessory ? `
           <div style="font-size:0.78rem;color:#7c8878;margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;">
@@ -517,16 +537,16 @@ function renderProductCard(p) {
             ${diffText ? `<span>${diffText}</span>` : ''}
           </div>
           ` : '<div style="margin-bottom:10px;"></div>'}
-          <div class="price" style="font-size:1.25rem;font-weight:800;color:#17482f;margin-bottom:14px;display:flex;align-items:baseline;gap:6px;">
+          <div class="price" style="font-size:1.3rem;font-weight:800;color:#17482f;margin-bottom:14px;display:flex;align-items:baseline;gap:6px;">
             ${formatINR(p.price)}
             ${p.old_price ? `<s style="color:#95a5a6;font-size:0.85rem;font-weight:400;">${formatINR(p.old_price)}</s>` : ''}
           </div>
         </div>
         <div style="display:flex;gap:8px;margin-top:auto;">
-          <button class="add-to-cart-btn" style="flex:1;background:#17482f;color:#fff;border:none;padding:11px 10px;border-radius:12px;font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 14px rgba(23,72,47,0.25);transition:all 0.25s ease;" data-id="${p.id}" onclick="event.stopPropagation(); addToCart(${p.id});">
+          <button class="add-to-cart-btn" style="flex:1;background:linear-gradient(135deg,#17482f 0%,#2D6A4F 100%);color:#fff;border:none;padding:12px 10px;border-radius:12px;font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 6px 18px rgba(23,72,47,0.25);transition:all 0.25s ease;" data-id="${p.id}" onclick="event.stopPropagation(); addToCart(${p.id});">
             <i class="fas fa-shopping-bag"></i> Add to Cart
           </button>
-          <button onclick="event.stopPropagation(); openProductModal(${p.id});" style="background:#f4f8f5;color:#17482f;border:1px solid #d0e2d4;padding:11px 12px;border-radius:12px;font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.25s ease;" title="View Details & Photos">
+          <button onclick="event.stopPropagation(); openProductModal(${p.id});" style="background:#f4f8f5;color:#17482f;border:1px solid #d0e2d4;padding:12px 12px;border-radius:12px;font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.25s ease;" title="View Details & Photos">
             <i class="fas fa-eye"></i> Details
           </button>
         </div>

@@ -152,29 +152,35 @@
 </section>
 
 <!-- ========== FEATURED PLANTS (BEST SELLERS HORIZONTAL SLIDER) ========== -->
-<section class="featured" id="best-sellers" style="padding: 70px 0; background: linear-gradient(180deg, #f7faf8 0%, #edf4ef 100%);">
-    <div class="container">
-        <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;flex-wrap:wrap;gap:15px;">
-            <div>
-                <h2 style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:#17482f;margin-bottom:6px;">Best <span class="highlight" style="color:#2D6A4F;">Sellers</span></h2>
-                <p style="color:#52796f;font-size:1rem;margin:0;">Handpicked customer favorites with instant AI Care Plans</p>
+<section class="featured" id="best-sellers" style="padding: 80px 0; background: linear-gradient(180deg, #f4f8f5 0%, #ebf3ed 100%); position: relative; overflow: hidden;">
+    <div class="container" style="position: relative; z-index: 2;">
+        <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:36px;flex-wrap:wrap;gap:20px;">
+            <div style="max-width: 580px;">
+                <span class="section-pill" style="display:inline-flex;align-items:center;gap:7px;background:rgba(45,106,79,0.12);color:#17482f;padding:6px 16px;border-radius:50px;font-size:0.78rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;border:1px solid rgba(45,106,79,0.2);">
+                    <i class="fas fa-leaf" style="color:#2D6A4F;"></i> Customer Favorites
+                </span>
+                <h2 style="font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:800;color:#17482f;margin-bottom:8px;line-height:1.2;">
+                    Most Loved <span class="highlight" style="background:linear-gradient(120deg,#17482f,#52B788);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Botanicals</span>
+                </h2>
+                <p style="color:#52796f;font-size:1.05rem;margin:0;line-height:1.5;">Hand-selected indoor & outdoor plants delivered with instant AI-powered personalized Care Plans.</p>
             </div>
-            <div class="slider-nav-btns" style="display:flex;gap:12px;margin-left:auto;">
-                <button class="slider-btn prev-btn" onclick="slideBestSellers(-1)" aria-label="Previous Products" style="width:46px;height:46px;border-radius:50%;background:#ffffff;border:1px solid #d4e2d7;color:#17482f;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,0.06);transition:all 0.3s ease;">
-                    <i class="fas fa-chevron-left"></i>
+            <div class="slider-control-pill" style="display:flex;align-items:center;gap:10px;background:#ffffff;padding:6px 12px;border-radius:50px;box-shadow:0 10px 30px rgba(23,72,47,0.08);border:1px solid rgba(23,72,47,0.12);margin-left:auto;">
+                <button class="slider-btn prev-btn" onclick="slideBestSellers(-1)" aria-label="Previous Products" style="width:44px;height:44px;border-radius:50%;background:#f4f8f5;border:1px solid #d4e4d6;color:#17482f;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s ease;">
+                    <i class="fas fa-arrow-left"></i>
                 </button>
-                <button class="slider-btn next-btn" onclick="slideBestSellers(1)" aria-label="Next Products" style="width:46px;height:46px;border-radius:50%;background:#17482f;border:1px solid #17482f;color:#ffffff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(23,72,47,0.3);transition:all 0.3s ease;">
-                    <i class="fas fa-chevron-right"></i>
+                <span style="font-weight:700;font-size:0.75rem;color:#2D6A4F;padding:0 4px;letter-spacing:1px;user-select:none;">SWIPE</span>
+                <button class="slider-btn next-btn" onclick="slideBestSellers(1)" aria-label="Next Products" style="width:44px;height:44px;border-radius:50%;background:#17482f;border:none;color:#ffffff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(23,72,47,0.3);transition:all 0.3s ease;">
+                    <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
         </div>
-        <div class="best-sellers-slider-wrapper" style="overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:12px 6px 24px;scrollbar-width:none;-ms-overflow-style:none;">
-            <div class="product-slider-track" id="featuredProducts" style="display:flex;gap:24px;flex-wrap:nowrap;">
+        <div class="best-sellers-slider-wrapper" style="overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:12px 6px 28px;scrollbar-width:none;-ms-overflow-style:none;">
+            <div class="product-slider-track" id="featuredProducts" style="display:flex;gap:26px;flex-wrap:nowrap;">
                 <!-- Products loaded via JS -->
             </div>
         </div>
         <div class="view-all" style="margin-top:35px;text-align:center;">
-            <a href="shop.html" class="btn-primary shimmer-btn">View All Plants <i class="fas fa-arrow-right"></i></a>
+            <a href="shop.html" class="btn-primary shimmer-btn" style="padding:14px 32px;font-size:1rem;border-radius:50px;box-shadow:0 8px 25px rgba(23,72,47,0.25);">Explore Full Collection <i class="fas fa-arrow-right" style="margin-left:6px;"></i></a>
         </div>
     </div>
 </section>
