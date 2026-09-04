@@ -2175,7 +2175,22 @@ img {
 }
 
 /* 3. MOBILE SCREENS (<= 768px) */
+/* 3. MOBILE SCREENS (<= 768px) */
 @media (max-width: 768px) {
+    html, body {
+        overflow-x: hidden !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+        box-sizing: border-box !important;
+    }
+
     .nav-inner {
         display: flex !important;
         align-items: center !important;
@@ -2250,6 +2265,51 @@ img {
         padding: 30px 16px !important;
     }
 
+    .hero-buttons {
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 12px !important;
+    }
+
+    .hero-buttons a, .hero-buttons button {
+        width: 100% !important;
+        text-align: center !important;
+        justify-content: center !important;
+    }
+
+    .hero-stats {
+        flex-direction: column !important;
+        gap: 12px !important;
+        text-align: center !important;
+    }
+
+    /* Responsive Section Grids */
+    .category-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px !important;
+    }
+
+    .ai-tools-grid,
+    .ai-tools-container {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+
+    .ai-tool-card {
+        padding: 24px 18px !important;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr !important;
+        gap: 30px !important;
+        text-align: left !important;
+    }
+
     /* Admin Sidebar Mobile Stacking */
     .admin-page {
         flex-direction: column !important;
@@ -2270,10 +2330,25 @@ img {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 12px !important;
     }
+
+    /* Floating AI Chat Button Mobile Optimization */
+    #aiChatBtn, .floating-ai-btn, .ai-float-trigger {
+        bottom: 15px !important;
+        right: 15px !important;
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 1.2rem !important;
+        z-index: 9999 !important;
+    }
 }
 
 /* 4. SMALL SMARTPHONES (<= 480px) */
 @media (max-width: 480px) {
+    .features-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
     .product-grid,
     #shopGrid,
     #shopProducts {
@@ -2294,5 +2369,13 @@ img {
         height: 120px !important;
         object-fit: cover !important;
         border-radius: 12px !important;
+    }
+
+    .section-header h2 {
+        font-size: 1.65rem !important;
+    }
+
+    .footer-grid {
+        padding-bottom: 20px !important;
     }
 }
