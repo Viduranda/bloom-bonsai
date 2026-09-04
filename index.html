@@ -152,24 +152,24 @@
 </section>
 
 <!-- ========== FEATURED PLANTS (BEST SELLERS HORIZONTAL SLIDER) ========== -->
-<section class="featured" id="best-sellers">
+<section class="featured" id="best-sellers" style="padding: 70px 0; background: linear-gradient(180deg, #f7faf8 0%, #edf4ef 100%);">
     <div class="container">
-        <div class="section-header" style="display:flex;justify-space-between;align-items:flex-end;margin-bottom:30px;flex-wrap:wrap;gap:15px;">
+        <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;flex-wrap:wrap;gap:15px;">
             <div>
-                <h2 style="margin-bottom:5px;">Best <span class="highlight">Sellers</span></h2>
-                <p>Handpicked customer favorites with instant AI Care Plans</p>
+                <h2 style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:#17482f;margin-bottom:6px;">Best <span class="highlight" style="color:#2D6A4F;">Sellers</span></h2>
+                <p style="color:#52796f;font-size:1rem;margin:0;">Handpicked customer favorites with instant AI Care Plans</p>
             </div>
-            <div class="slider-nav-btns" style="display:flex;gap:10px;margin-left:auto;">
-                <button class="slider-btn prev-btn" onclick="slideBestSellers(-1)" aria-label="Previous Products" style="width:44px;height:44px;border-radius:50%;background:#ffffff;border:1px solid #d8e2dc;color:#17482f;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.06);transition:all 0.25s ease;">
+            <div class="slider-nav-btns" style="display:flex;gap:12px;margin-left:auto;">
+                <button class="slider-btn prev-btn" onclick="slideBestSellers(-1)" aria-label="Previous Products" style="width:46px;height:46px;border-radius:50%;background:#ffffff;border:1px solid #d4e2d7;color:#17482f;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,0.06);transition:all 0.3s ease;">
                     <i class="fas fa-chevron-left"></i>
                 </button>
-                <button class="slider-btn next-btn" onclick="slideBestSellers(1)" aria-label="Next Products" style="width:44px;height:44px;border-radius:50%;background:#17482f;border:1px solid #17482f;color:#ffffff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(23,72,47,0.25);transition:all 0.25s ease;">
+                <button class="slider-btn next-btn" onclick="slideBestSellers(1)" aria-label="Next Products" style="width:46px;height:46px;border-radius:50%;background:#17482f;border:1px solid #17482f;color:#ffffff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(23,72,47,0.3);transition:all 0.3s ease;">
                     <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
         </div>
-        <div class="best-sellers-slider-wrapper" style="overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:10px 4px 20px;scrollbar-width:none;-ms-overflow-style:none;">
-            <div class="product-slider-track" id="featuredProducts" style="display:flex;gap:22px;flex-wrap:nowrap;">
+        <div class="best-sellers-slider-wrapper" style="overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:12px 6px 24px;scrollbar-width:none;-ms-overflow-style:none;">
+            <div class="product-slider-track" id="featuredProducts" style="display:flex;gap:24px;flex-wrap:nowrap;">
                 <!-- Products loaded via JS -->
             </div>
         </div>
