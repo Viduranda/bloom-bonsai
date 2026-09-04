@@ -97,14 +97,11 @@ function requireAdmin() {
     // Direct DB check for fresh role status
     if ($userId > 0 && isset($pdo)) {
         try {
-            $stmt = $pdo->prepare("SELECT role, email FROM users WHERE id = ?");
+            $stmt = $pdo->prepare("SELECT role FROM users WHERE id = ?");
             $stmt->execute([$userId]);
             $dbUser = $stmt->fetch();
-            if ($dbUser) {
-                $email = strtolower($dbUser['email']);
-                if (strtolower($dbUser['role']) === 'admin' || $email === 'admin@bloombonsai.com' || $email === 'vidurandarukmal@gmail.com') {
-                    return $user;
-                }
+            if ($dbUser && strtolower($dbUser['role'] ?? '') === 'admin') {
+                return $user;
             }
         } catch (Exception $e) {}
     }

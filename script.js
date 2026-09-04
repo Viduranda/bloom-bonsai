@@ -27,11 +27,6 @@ async function apiFetch(endpoint, options = {}) {
   if (token) headers['Authorization'] = 'Bearer ' + token;
 
   let fetchUrl = API_BASE + endpoint;
-  if (token) {
-    const sep = fetchUrl.includes('?') ? '&' : '?';
-    fetchUrl += sep + 'token=' + encodeURIComponent(token);
-  }
-
   let fetchOptions = { ...options, headers };
   if (!options.formdata && options.body && typeof options.body === 'object') {
     fetchOptions.body = JSON.stringify(options.body);
@@ -42,9 +37,9 @@ async function apiFetch(endpoint, options = {}) {
     res = await fetch(fetchUrl, fetchOptions);
   } catch (netErr) {
     if (window.location.protocol === 'file:') {
-      throw new Error('You opened this file directly (file://). Please visit http://localhost/bloom-bonsai/ in your browser!');
+      throw new Error('You opened this file directly (file://). Please open the site via web server (HTTP/HTTPS)!');
     }
-    throw new Error('Unable to connect to server. Please ensure XAMPP Apache is running at http://localhost/bloom-bonsai/');
+    throw new Error('Unable to connect to server. Please check your internet connection or server status.');
   }
 
   let json;
