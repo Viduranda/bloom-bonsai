@@ -407,13 +407,21 @@
         <!-- Orders Section -->
         <div id="section-orders" style="display:none;">
             <div class="admin-header">
-                <h1>📦 Customer Orders</h1>
+                <h1>📦 Customer Orders & Fulfillments</h1>
+                <span style="color:#7c8878;font-size:0.9rem;">View customer delivery addresses, ordered items & update shipping status</span>
             </div>
             <div class="admin-table">
                 <table>
                     <thead>
                         <tr>
-                            <th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Update Status</th>
+                            <th>Order ID</th>
+                            <th>Customer & Contact</th>
+                            <th>Delivery Address</th>
+                            <th>Ordered Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Update Status</th>
                         </tr>
                     </thead>
                     <tbody id="adminOrdersTable"></tbody>
@@ -662,20 +670,52 @@
             const statusOptions = ['confirmed', 'packed', 'shipped', 'out_for_delivery', 'delivered', 'cancelled'];
             const statusColors = { confirmed: '#2e7d4f', packed: '#c9a227', shipped: '#c9a227', out_for_delivery: '#c9a227', delivered: '#2e7d4f', cancelled: '#c0392b' };
 
-            document.getElementById('adminOrdersTable').innerHTML = (orders || []).map(o => `
-                <tr>
-                    <td><b>#${o.order_id || o.id}</b></td>
-                    <td>${esc(o.customer || o.customer_name || 'Customer')}<br><small style="color:#666;">${esc(o.email || '')}</small></td>
-                    <td>${o.items} item(s)</td>
-                    <td><b>${formatINR(o.total)}</b></td>
-                    <td><span class="status-badge" style="background:${statusColors[o.status] || '#7c8878'};color:#fff;padding:3px 8px;border-radius:10px;font-size:0.75rem;font-weight:bold;text-transform:uppercase;">${esc(o.status || 'confirmed')}</span></td>
-                    <td>${esc(o.created_at)}</td>
-                    <td>
-                        <select onchange="updateOrderStatus(${o.order_id || o.id}, this.value)" style="padding:5px 8px;border-radius:6px;border:1px solid #17482f;font-size:0.85rem;cursor:pointer;background:#fff;font-weight:600;">
-                            ${statusOptions.map(opt => `<option value="${opt}" ${o.status === opt ? 'selected' : ''}>${opt.replace(/_/g,' ')}</option>`).join('')}
-                        </select>
-                    </td>
-                </tr>`).join('');
+            document.getElementById('adminOrdersTable').innerHTML = (orders || []).map(o => {
+                const itemList = (o.items && Array.isArray(o.items) && o.items.length) ? o.items.map(it => `
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                        <img src="${esc(it.image || 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400')}" style="width:34px;height:34px;object-fit:cover;border-radius:6px;border:1px solid #e0e0e0;">
+                        <div>
+                            <b style="color:#17482f;font-size:0.85rem;display:block;">${esc(it.product_name || 'Plant Item')}</b>
+                            <span style="font-size:0.78rem;color:#555;">Qty: <b>${it.quantity}</b> • ${formatINR(it.price_at_purchase || 0)}</span>
+                        </div>
+                    </div>
+                `).join('') : `<span style="color:#777;font-style:italic;">No items recorded</span>`;
+
+                const fullAddr = o.shipping_address || (o.city ? `${o.customer_name || ''}, ${o.city} ${o.pincode || ''}` : 'No delivery address stored');
+                const phoneStr = o.phone ? `📞 ${esc(o.phone)}` : '';
+
+                return `
+                    <tr>
+                        <td><b>#${o.order_id || o.id}</b></td>
+                        <td>
+                            <strong style="color:#17482f;font-size:0.95rem;">${esc(o.customer || o.customer_name || 'Customer')}</strong><br>
+                            <small style="color:#555;">📧 ${esc(o.email || 'No email')}</small><br>
+                            <small style="color:#2e7d4f;font-weight:700;">${phoneStr}</small>
+                        </td>
+                        <td style="max-width:260px;">
+                            <div style="background:#f9f8f4;border:1px solid #e7e2d3;border-radius:8px;padding:8px 10px;font-size:0.82rem;line-height:1.4;color:#222;margin-bottom:4px;">
+                                📍 ${esc(fullAddr)}
+                            </div>
+                            <button type="button" onclick="navigator.clipboard.writeText('${esc(fullAddr).replace(/'/g, "\\'")}');showToast('Address copied to clipboard! 📋');" style="background:#e8f5e9;border:1px solid #a8d5b5;color:#2e7d4f;font-size:0.72rem;font-weight:700;cursor:pointer;padding:3px 8px;border-radius:6px;">
+                                📋 Copy Address
+                            </button>
+                        </td>
+                        <td>
+                            <div style="max-height:130px;overflow-y:auto;padding-right:4px;">
+                                ${itemList}
+                            </div>
+                        </td>
+                        <td><strong style="color:#17482f;font-size:0.98rem;">${formatINR(o.total)}</strong></td>
+                        <td><span class="status-badge" style="background:${statusColors[o.status] || '#7c8878'};color:#fff;padding:4px 10px;border-radius:12px;font-size:0.72rem;font-weight:bold;text-transform:uppercase;">${esc(o.status || 'confirmed')}</span></td>
+                        <td><small style="color:#555;">${esc(o.created_at)}</small></td>
+                        <td>
+                            <select onchange="updateOrderStatus(${o.order_id || o.id}, this.value)" style="padding:6px 10px;border-radius:8px;border:1px solid #17482f;font-size:0.82rem;cursor:pointer;background:#fff;font-weight:700;color:#17482f;">
+                                ${statusOptions.map(opt => `<option value="${opt}" ${o.status === opt ? 'selected' : ''}>${opt.replace(/_/g,' ')}</option>`).join('')}
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
 
             loadAdminCustomers();
             loadAdminCancelledOrders();
@@ -1155,10 +1195,20 @@
         document.getElementById('editModalOverlay').style.display = 'flex';
     }
 
+    let isUploadingImage = false;
+
     async function handleAdminFileUpload(fileInput, targetInputId, previewImgId, previewWrapperId) {
         if (!fileInput.files || !fileInput.files[0]) return;
         const file = fileInput.files[0];
         
+        isUploadingImage = true;
+        const submitBtns = document.querySelectorAll('form button[type="submit"]');
+        submitBtns.forEach(btn => {
+            btn.disabled = true;
+            if (!btn.dataset.origText) btn.dataset.origText = btn.textContent;
+            btn.textContent = 'Uploading Photo... ⏳';
+        });
+
         const reader = new FileReader();
         reader.onload = function(e) {
             const img = document.getElementById(previewImgId);
@@ -1172,26 +1222,46 @@
         formData.append('image', file);
 
         try {
-            showToast('Uploading plant photo... ⏳');
+            showToast('Uploading photo from device... ⏳');
             const data = await apiFetch('admin/upload_image.php', {
                 method: 'POST',
                 body: formData,
                 formdata: true
             });
 
-            document.getElementById(targetInputId).value = data.url;
-            showToast('Plant photo uploaded successfully! 📷');
+            const uploadedPath = (typeof data === 'string') ? data : (data.url || data.path || '');
+            if (!uploadedPath) throw new Error('Server did not return image path');
+
+            document.getElementById(targetInputId).value = uploadedPath;
+            showToast('Photo uploaded & attached successfully! 📷');
         } catch (err) {
             alert('Upload Error: ' + (err.message || err.error || 'Upload failed'));
+            document.getElementById(targetInputId).value = '';
+            const img = document.getElementById(previewImgId);
+            const wrapper = document.getElementById(previewWrapperId);
+            if (img) img.src = '';
+            if (wrapper) wrapper.style.display = 'none';
+        } finally {
+            isUploadingImage = false;
+            submitBtns.forEach(btn => {
+                btn.disabled = false;
+                if (btn.dataset.origText) btn.textContent = btn.dataset.origText;
+            });
         }
     }
 
     function closeEditModal() {
         document.getElementById('editModalOverlay').style.display = 'none';
+        document.querySelectorAll('#editModalOverlay input[type="file"]').forEach(inp => inp.value = '');
     }
 
     async function saveProductEdit(e) {
         e.preventDefault();
+
+        if (isUploadingImage) {
+            alert('Please wait for the photo to finish uploading before saving.');
+            return;
+        }
 
         const w1 = document.getElementById('editCareWeek1') ? document.getElementById('editCareWeek1').value.trim() : '';
         const w2 = document.getElementById('editCareWeek2') ? document.getElementById('editCareWeek2').value.trim() : '';
@@ -1329,19 +1399,28 @@
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:#7c8878;">No cancelled orders found.</td></tr>';
                 return;
             }
-            tbody.innerHTML = cancelled.map(o => `
-                <tr>
-                    <td><b>#${o.order_id || o.id}</b></td>
-                    <td><strong>${esc(o.customer || o.customer_name || 'Customer')}</strong><br><small style="color:#777;">${esc(o.email || o.phone || '')}</small></td>
-                    <td>${o.items} item(s)</td>
-                    <td><strong style="color:#c0392b;">${formatINR(o.total)}</strong></td>
-                    <td><span style="background:#ffebee;color:#c0392b;padding:3px 10px;border-radius:999px;font-size:0.75rem;font-weight:700;">🚫 Cancelled</span></td>
-                    <td>${esc(String(o.created_at || '').slice(0, 16))}</td>
-                    <td>
-                        <span style="color:#888;font-size:0.82rem;font-style:italic;">Cancelled / Order Wiped</span>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = cancelled.map(o => {
+                const itemList = (o.items && Array.isArray(o.items) && o.items.length) ? o.items.map(it => `
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                        <img src="${esc(it.image || 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400')}" style="width:28px;height:28px;object-fit:cover;border-radius:4px;">
+                        <span style="font-size:0.82rem;color:#555;">${esc(it.product_name || 'Item')} × ${it.quantity}</span>
+                    </div>
+                `).join('') : `<span style="color:#777;font-style:italic;">No items recorded</span>`;
+
+                return `
+                    <tr>
+                        <td><b>#${o.order_id || o.id}</b></td>
+                        <td><strong>${esc(o.customer || o.customer_name || 'Customer')}</strong><br><small style="color:#777;">${esc(o.email || o.phone || '')}</small></td>
+                        <td>${itemList}</td>
+                        <td><strong style="color:#c0392b;">${formatINR(o.total)}</strong></td>
+                        <td><span style="background:#ffebee;color:#c0392b;padding:3px 10px;border-radius:999px;font-size:0.75rem;font-weight:700;">🚫 Cancelled</span></td>
+                        <td>${esc(String(o.created_at || '').slice(0, 16))}</td>
+                        <td>
+                            <span style="color:#888;font-size:0.82rem;font-style:italic;">Cancelled Order</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         } catch (err) {
             tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#c0392b;padding:20px;">${esc(err.message)}</td></tr>`;
         }

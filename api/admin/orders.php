@@ -4,16 +4,28 @@ require_once __DIR__ . '/../auth.php';
 requireAdmin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    try {
-        $orders = $pdo->query('SELECT * FROM v_recent_orders')->fetchAll();
-    } catch (Exception $e) {
-        $orders = $pdo->query('SELECT o.id, o.user_id, o.total, o.status, o.shipping_address, o.customer_name, o.phone, o.city, o.pincode, o.payment_method, o.expected_delivery, o.created_at,
-                                      COALESCE(o.customer_name, u.name, "Customer") AS user_name,
-                                      COALESCE(u.email, "") AS user_email
-                               FROM orders o
-                               LEFT JOIN users u ON u.id = o.user_id
-                               ORDER BY o.created_at DESC')->fetchAll();
+    $orders = $pdo->query('SELECT o.id, o.id AS order_id, o.user_id, o.total, o.coupon_code, o.discount_amount, o.status,
+                                  o.shipping_address, o.customer_name, o.phone, o.city, o.pincode, o.payment_method,
+                                  o.expected_delivery, o.created_at,
+                                  COALESCE(o.customer_name, u.name, "Customer") AS customer,
+                                  COALESCE(o.customer_name, u.name, "Customer") AS customer_name,
+                                  COALESCE(u.email, "") AS email
+                           FROM orders o
+                           LEFT JOIN users u ON u.id = o.user_id
+                           ORDER BY o.created_at DESC')->fetchAll();
+
+    $itemsStmt = $pdo->prepare('SELECT oi.id, oi.product_id, oi.quantity, oi.price_at_purchase,
+                                       p.name AS product_name, p.image
+                                FROM order_items oi
+                                LEFT JOIN products p ON p.id = oi.product_id
+                                WHERE oi.order_id = ?');
+
+    foreach ($orders as &$o) {
+        $itemsStmt->execute([$o['id']]);
+        $o['items'] = $itemsStmt->fetchAll();
+        $o['total_items'] = count($o['items']);
     }
+
     respond(['success' => true, 'data' => $orders]);
 }
 

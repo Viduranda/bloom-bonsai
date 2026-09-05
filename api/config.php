@@ -179,10 +179,7 @@ if (!function_exists('uploadImage')) {
         $targetPath = $uploadDir . '/' . $filename;
         
         if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-            $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-            $basePath = (strpos($_SERVER['REQUEST_URI'] ?? '', '/bloom-bonsai/') !== false) ? '/bloom-bonsai/' : '/';
-            return $protocol . '://' . $host . $basePath . 'uploads/products/' . $filename;
+            return 'uploads/products/' . $filename;
         }
         return null;
     }
