@@ -66,6 +66,8 @@ function callGemini15Flash($prompt, $systemInstruction = '', $base64Image = null
 
     $payloadJson = json_encode($payload);
 
+    $GLOBALS['GEMINI_LAST_ERROR'] = '';
+
     foreach ($apiKeys as $apiKey) {
         foreach ($modelsToTry as $modelName) {
             $url = "https://generativelanguage.googleapis.com/v1beta/models/" . urlencode($modelName) . ":generateContent?key=" . urlencode($apiKey);
@@ -90,7 +92,12 @@ function callGemini15Flash($prompt, $systemInstruction = '', $base64Image = null
                 if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
                     return trim($data['candidates'][0]['content']['parts'][0]['text']);
                 }
-            } elseif ($httpCode === 429) {
+            }
+            
+            $snippet = $response ? substr($response, 0, 150) : ($err ? $err : 'No Response');
+            $GLOBALS['GEMINI_LAST_ERROR'] = "Model $modelName HTTP $httpCode: $snippet";
+
+            if ($httpCode === 429) {
                 usleep(1200000); // 1.2s delay for rate limit resolution
             }
         }

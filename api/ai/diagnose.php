@@ -315,11 +315,12 @@ function classifyFlowerImage($symptoms, $base64Image) {
 }
 
 $diagnosisData = classifyFlowerImage($symptoms, $base64Image);
+$errTrace = !empty($GLOBALS['GEMINI_LAST_ERROR']) ? ' (' . $GLOBALS['GEMINI_LAST_ERROR'] . ')' : '';
 
 respond([
     'success' => true,
     'data' => [
         'diagnosis' => $diagnosisData,
-        'source' => 'Botanical Knowledge Base Rule Engine'
+        'source' => 'Botanical Knowledge Base Rule Engine' . $errTrace
     ]
 ]);
