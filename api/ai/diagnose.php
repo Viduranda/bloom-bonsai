@@ -149,27 +149,28 @@ if ($aiReply) {
     }
 
     if ($parsed && (!empty($parsed['disease_name']) || !empty($parsed['plant_name']))) {
-    $rawConf = $parsed['confidence'] ?? '98.5%';
-    if (is_numeric($rawConf)) {
-        $rawConf = round(floatval($rawConf) * ($rawConf <= 1.0 ? 100 : 1), 1) . '%';
-    }
+        $rawConf = $parsed['confidence'] ?? '98.5%';
+        if (is_numeric($rawConf)) {
+            $rawConf = round(floatval($rawConf) * ($rawConf <= 1.0 ? 100 : 1), 1) . '%';
+        }
 
-    respond([
-        'success' => true,
-        'data' => [
-            'diagnosis' => [
-                'plant_name' => $parsed['plant_name'] ?? 'Botanical Specimen',
-                'disease_name' => $parsed['disease_name'] ?? 'Botanical Species Diagnosis',
-                'scientific_name' => $parsed['scientific_name'] ?? 'Botanical Taxonomy',
-                'severity' => $parsed['severity'] ?? 'Moderate',
-                'confidence' => $rawConf,
-                'symptoms_observed' => is_array($parsed['symptoms_observed'] ?? null) ? $parsed['symptoms_observed'] : [$parsed['symptoms_observed'] ?? 'Foliage and bloom structure scanned via AI Vision'],
-                'treatment_plan' => is_array($parsed['treatment_plan'] ?? null) ? $parsed['treatment_plan'] : ["Provide bright indirect sunlight", "Water when topsoil dries out"],
-                'recommended_action' => $parsed['recommended_action'] ?? "Foliage and bloom scanned successfully."
-            ],
-            'source' => 'Gemini Multimodal AI Vision Scanner'
-        ]
-    ]);
+        respond([
+            'success' => true,
+            'data' => [
+                'diagnosis' => [
+                    'plant_name' => $parsed['plant_name'] ?? 'Botanical Specimen',
+                    'disease_name' => $parsed['disease_name'] ?? 'Botanical Species Diagnosis',
+                    'scientific_name' => $parsed['scientific_name'] ?? 'Botanical Taxonomy',
+                    'severity' => $parsed['severity'] ?? 'Moderate',
+                    'confidence' => $rawConf,
+                    'symptoms_observed' => is_array($parsed['symptoms_observed'] ?? null) ? $parsed['symptoms_observed'] : [$parsed['symptoms_observed'] ?? 'Foliage and bloom structure scanned via AI Vision'],
+                    'treatment_plan' => is_array($parsed['treatment_plan'] ?? null) ? $parsed['treatment_plan'] : ["Provide bright indirect sunlight", "Water when topsoil dries out"],
+                    'recommended_action' => $parsed['recommended_action'] ?? "Foliage and bloom scanned successfully."
+                ],
+                'source' => 'Gemini Multimodal AI Vision Scanner'
+            ]
+        ]);
+    }
 }
 
 // 3. Universal 25-Class Botanical Classifier for All Flowers & Plants
