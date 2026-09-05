@@ -181,28 +181,15 @@ textarea:focus, select:focus{ outline:none; border-color:#17482f; box-shadow:0 0
           </div>
         </div>
 
-        <!-- Garden Style Selection Cards -->
+        <!-- Garden Style Selection Dropdown -->
         <div class="form-group">
           <label>3. Choose Aesthetic Style</label>
-          <input type="hidden" id="designStyle" value="tropical">
-          <div class="style-grid">
-            <div class="style-option selected" onclick="selectStyle(this, 'tropical')">
-              <img src="flowers.jpg" alt="Tropical" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1545241047-6083a3684587?w=400';">
-              <span>🌺 Tropical Oasis</span>
-            </div>
-            <div class="style-option" onclick="selectStyle(this, 'bonsai')">
-              <img src="bonsayi.avif" alt="Zen Bonsai" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1562408590-e32931084e23?w=400';">
-              <span>⛩️ Zen Bonsai</span>
-            </div>
-            <div class="style-option" onclick="selectStyle(this, 'minimalist')">
-              <img src="gardenitems.jpg" alt="Minimalist" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=400';">
-              <span>🌿 Minimalist Modern</span>
-            </div>
-            <div class="style-option" onclick="selectStyle(this, 'maximalist')">
-              <img src="flowers.jpg" alt="Lush Flower" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400';">
-              <span>🌸 Lush Cottage</span>
-            </div>
-          </div>
+          <select id="designStyle" style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid #c9a227;font-size:0.92rem;background:#fff;color:#17482f;font-weight:600;cursor:pointer;">
+            <option value="tropical">🌺 Tropical Oasis (Lush Palms &amp; Vibrant Flowers)</option>
+            <option value="bonsai">⛩️ Zen Bonsai (Stone Sanctuary &amp; Japanese Pines)</option>
+            <option value="minimalist">🌿 Minimalist Modern (Clean Lines &amp; Terracotta Pots)</option>
+            <option value="maximalist">🌸 Lush Cottage (Dense Blooming Perennials)</option>
+          </select>
         </div>
 
         <!-- Description Notes -->
