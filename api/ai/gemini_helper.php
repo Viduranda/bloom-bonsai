@@ -6,9 +6,8 @@ function getGeminiApiKeys() {
     $envKey = getEnvVar('GEMINI_API_KEY', '');
     if (!empty($envKey)) $keys[] = $envKey;
 
-    // Direct fallback keys encoded to protect credentials
+    // Active primary Gemini API key
     $keys[] = base64_decode('QVEuQWI4Uk42Sjh2ZmI1OU1aRE5JZm1hM2NFTjU4bTFYMUJzbEJWS3duLVAwZ081bXpCQ0E=');
-    $keys[] = base64_decode('QVEuQWI4Uk42SmhLbVlST0JERzNFbXMzaGRBd2VwVmlOdkluVGd4V3hsTkFuSEJLUDVNTHc=');
 
     return array_unique(array_filter($keys));
 }
@@ -27,9 +26,7 @@ function callGemini15Flash($prompt, $systemInstruction = '', $base64Image = null
 
     $modelsToTry = [
         'gemini-flash-lite-latest',
-        'gemini-flash-latest',
-        'gemini-3.5-flash',
-        'gemini-3.6-flash'
+        'gemini-flash-latest'
     ];
 
     $parts = [];
@@ -65,40 +62,43 @@ function callGemini15Flash($prompt, $systemInstruction = '', $base64Image = null
     }
 
     $payloadJson = json_encode($payload);
-
     $GLOBALS['GEMINI_LAST_ERROR'] = '';
 
     foreach ($apiKeys as $apiKey) {
         foreach ($modelsToTry as $modelName) {
             $url = "https://generativelanguage.googleapis.com/v1beta/models/" . urlencode($modelName) . ":generateContent?key=" . urlencode($apiKey);
 
-            $ch = curl_init($url);
-            curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POST => true,
-                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-                CURLOPT_POSTFIELDS => $payloadJson,
-                CURLOPT_TIMEOUT => 25,
-                CURLOPT_SSL_VERIFYPEER => false
-            ]);
+            for ($attempt = 0; $attempt < 2; $attempt++) {
+                $ch = curl_init($url);
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_POST => true,
+                    CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                    CURLOPT_POSTFIELDS => $payloadJson,
+                    CURLOPT_TIMEOUT => 25,
+                    CURLOPT_SSL_VERIFYPEER => false
+                ]);
 
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $err = curl_error($ch);
-            curl_close($ch);
+                $response = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $err = curl_error($ch);
+                curl_close($ch);
 
-            if (!$err && $response && $httpCode === 200) {
-                $data = json_decode($response, true);
-                if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
-                    return trim($data['candidates'][0]['content']['parts'][0]['text']);
+                if (!$err && $response && $httpCode === 200) {
+                    $data = json_decode($response, true);
+                    if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+                        return trim($data['candidates'][0]['content']['parts'][0]['text']);
+                    }
                 }
-            }
-            
-            $snippet = $response ? substr($response, 0, 150) : ($err ? $err : 'No Response');
-            $GLOBALS['GEMINI_LAST_ERROR'] = "Model $modelName HTTP $httpCode: $snippet";
 
-            if ($httpCode === 429) {
-                usleep(1200000); // 1.2s delay for rate limit resolution
+                $snippet = $response ? substr($response, 0, 150) : ($err ? $err : 'No Response');
+                $GLOBALS['GEMINI_LAST_ERROR'] = "Model $modelName HTTP $httpCode: $snippet";
+
+                if ($httpCode === 429) {
+                    sleep(2);
+                } else {
+                    break;
+                }
             }
         }
     }
