@@ -97,13 +97,49 @@ if (isset($pdo)) {
 
 if (empty($products)) {
     $products = [
-        ['id' => 1, 'name' => 'Bonsai Ficus Microcarpa', 'category' => 'Bonsai', 'price' => 4500, 'image' => 'assets/images/ficus.jpg'],
-        ['id' => 2, 'name' => 'Anthurium Red Flowering', 'category' => 'Flowering', 'price' => 2200, 'image' => 'assets/images/anthurium.jpg'],
-        ['id' => 3, 'name' => 'Crape Jasmine (Wathusudda)', 'category' => 'Flowering', 'price' => 1800, 'image' => 'assets/images/jasmine.jpg'],
-        ['id' => 4, 'name' => 'Snake Plant (Sansevieria)', 'category' => 'Foliage', 'price' => 1500, 'image' => 'assets/images/snake.jpg'],
-        ['id' => 5, 'name' => 'Peace Lily (Spathiphyllum)', 'category' => 'Flowering', 'price' => 1950, 'image' => 'assets/images/peacelily.jpg'],
-        ['id' => 6, 'name' => 'Hibiscus Rosasinensis', 'category' => 'Flowering', 'price' => 1600, 'image' => 'assets/images/hibiscus.jpg']
+        ['id' => 1, 'name' => 'Bonsai Ficus Microcarpa', 'category' => 'Bonsai', 'price' => 4500, 'image' => 'bonsayi.avif'],
+        ['id' => 2, 'name' => 'Anthurium Red Flowering', 'category' => 'Flowering', 'price' => 2200, 'image' => 'flowers.jpg'],
+        ['id' => 3, 'name' => 'Crape Jasmine (Wathusudda)', 'category' => 'Flowering', 'price' => 1800, 'image' => 'flowers.jpg'],
+        ['id' => 4, 'name' => 'Snake Plant (Sansevieria)', 'category' => 'Foliage', 'price' => 1500, 'image' => 'gardenitems.jpg'],
+        ['id' => 5, 'name' => 'Peace Lily (Spathiphyllum)', 'category' => 'Flowering', 'price' => 1950, 'image' => 'flowers.jpg'],
+        ['id' => 6, 'name' => 'Hibiscus Rosasinensis', 'category' => 'Flowering', 'price' => 1600, 'image' => 'flowers.jpg']
     ];
+}
+
+function optimizeImageForAI($base64Img, $maxDim = 1024) {
+    if (empty($base64Img)) return [null, 'image/jpeg'];
+    $mime = 'image/jpeg';
+    if (preg_match('/^data:(image\/[a-zA-Z]+);base64,/', $base64Img, $m)) {
+        $mime = $m[1];
+        $base64Img = substr($base64Img, strpos($base64Img, ',') + 1);
+    }
+    $rawBytes = base64_decode($base64Img);
+    if (!$rawBytes) return [$base64Img, $mime];
+    if (function_exists('imagecreatefromstring')) {
+        $srcImg = @imagecreatefromstring($rawBytes);
+        if ($srcImg) {
+            $w = imagesx($srcImg);
+            $h = imagesy($srcImg);
+            if ($w > $maxDim || $h > $maxDim) {
+                $ratio = min($maxDim / $w, $maxDim / $h);
+                $newW = max(1, (int)($w * $ratio));
+                $newH = max(1, (int)($h * $ratio));
+                $dstImg = imagecreatetruecolor($newW, $newH);
+                imagealphablending($dstImg, false);
+                imagesavealpha($dstImg, true);
+                imagecopyresampled($dstImg, $srcImg, 0, 0, 0, 0, $newW, $newH, $w, $h);
+                ob_start();
+                imagejpeg($dstImg, null, 85);
+                $compressed = ob_get_clean();
+                imagedestroy($srcImg);
+                imagedestroy($dstImg);
+                if ($compressed) return [base64_encode($compressed), 'image/jpeg'];
+            } else {
+                imagedestroy($srcImg);
+            }
+        }
+    }
+    return [$base64Img, $mime];
 }
 
 $catalogSummaryStr = implode("; ", array_map(fn($p) => "ID:{$p['id']} - {$p['name']} (LKR {$p['price']})", $products));
@@ -130,7 +166,7 @@ $prompt = "Act as an Expert AI Landscape Architect & Lead Prompt Engineer.\n" .
           "- User Preferences: " . ($userPrompt ?: "None provided") . "\n" .
           "- Available Store Catalog: [{$catalogSummaryStr}]\n\n" .
           "Generate a JSON response with keys:\n" .
-          "1. \"visual_concept_prompt\": A comprehensive 8K photorealistic image prompt describing the transformed garden space. CRITICAL REQUIREMENT: Match the EXACT camera angle and aspect ratio ({$aspectRatioDesc}). Include specific photo elements (e.g. brick wall, wooden lounger daybed, teak deck floor, city balcony view, white marble pots) and directly weave user preferences (\"{$userPrompt}\"). Specify architectural lighting, teak stands, ceramic pots, Bloom & Bonsai plants (Ficus Bonsai, Anthurium, Jasmine, Snake Plant), natural sunlight, Architectural Digest photography style.\n" .
+          "1. \"visual_concept_prompt\": A comprehensive 8K photorealistic image prompt describing the transformed garden space.\n" .
           "2. \"architectural_summary\": A 3-sentence architectural design summary explaining the layout.\n" .
           "3. \"zone_a\": Placement details for Zone A (Sunlight Hotspot, high-light plants).\n" .
           "4. \"zone_b\": Placement details for Zone B (Filtered Midground Stand, medium-light plants).\n" .
@@ -138,7 +174,10 @@ $prompt = "Act as an Expert AI Landscape Architect & Lead Prompt Engineer.\n" .
           "6. \"recommended_product_ids\": Array of integer IDs matching products from the catalog provided.\n" .
           "7. \"care_strategy\": Hydration, soil aeration, and acclimation guidance.";
 
-$aiReply = callGemini15Flash($prompt, $systemInstruction, $base64Image);
+list($sendImage, $sendMime) = optimizeImageForAI($base64Image);
+if (empty($sendImage)) $sendImage = $base64Image;
+
+$aiReply = callGemini15Flash($prompt, $systemInstruction, $sendImage, $sendMime);
 
 $parsedJSON = null;
 if ($aiReply) {
@@ -165,11 +204,12 @@ if (!$parsedJSON || empty($parsedJSON['visual_concept_prompt'])) {
     ];
 }
 
-// Build Pollinations AI FLUX.1 Realism Render URL with EXACT original aspect ratio & dimensions
-$encodedVisualPrompt = urlencode($parsedJSON['visual_concept_prompt']);
+// Build Pollinations AI Render URL with clean short prompt & aspect ratio
+$cleanPromptShort = substr(preg_replace('/[^a-zA-Z0-9\s,]/', '', $parsedJSON['visual_concept_prompt']), 0, 220);
+$encodedVisualPrompt = urlencode("8k photorealistic architectural garden render, " . $cleanPromptShort);
 $randomSeed = rand(1000, 9999);
 
-$renderUrl = "https://image.pollinations.ai/prompt/{$encodedVisualPrompt}?width={$origW}&height={$origH}&seed={$randomSeed}&model=flux-realism&nologo=true&enhance=true";
+$renderUrl = "https://image.pollinations.ai/prompt/{$encodedVisualPrompt}?width={$origW}&height={$origH}&seed={$randomSeed}&nologo=true";
 
 // Only pass &image= URL if the server is publicly accessible (not localhost/127.0.0.1)
 if ($savedImagePublicUrl && strpos($savedImagePublicUrl, 'localhost') === false && strpos($savedImagePublicUrl, '127.0.0.1') === false) {

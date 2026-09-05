@@ -6,9 +6,11 @@ function getGeminiApiKeys() {
     $envKey = getEnvVar('GEMINI_API_KEY', '');
     if (!empty($envKey)) $keys[] = $envKey;
 
-    // Primary Gemini API Key
+    // Primary Garden Designer & Multimodal Key
+    $keys[] = base64_decode('QVEuQWI4Uk42SXpOQ3BnM1FZeVBaay14eEV5N3BiOGZ3alpkOUlMNUUxWVFhOXRMV0tuQVE=');
+    // Backup Key 2
     $keys[] = base64_decode('QVEuQWI4Uk42S2EzemhjYnprSEExRG5lYmlQQWpTcGtaSld0bHhyXzZMY081SE55dFZQWnc=');
-    // Secondary Backup Gemini API Key
+    // Secondary Backup Key 3
     $keys[] = base64_decode('QVEuQWI4Uk42Sjh2ZmI1OU1aRE5JZm1hM2NFTjU4bTFYMUJzbEJWS3duLVAwZ081bXpCQ0E=');
 
     return array_unique(array_filter($keys));

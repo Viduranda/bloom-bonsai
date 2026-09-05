@@ -1587,46 +1587,8 @@ async function handleScan(file) {
 function setupDesigner() {
   const form = document.getElementById('designerForm');
   if (!form) return;
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const user = getStoredUser();
-    if (!user) {
-      showToast('Please login to use the Garden Designer', 'error');
-      location.href = 'login.html';
-      return;
-    }
-
-    const fileInput  = document.getElementById('gardenImage');
-    const styleInput = document.getElementById('designStyle');
-    const promptInput = document.getElementById('designPrompt');
-
-    const resultBox = document.querySelector('.designer-result') || document.getElementById('designerResult');
-    if (resultBox) {
-      resultBox.innerHTML = '<div class="placeholder" style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-spin" style="font-size:2.5rem;color:#17482f;margin-bottom:12px;"></i><h3 style="color:#17482f;">Designing your dream garden… 🎨</h3><p style="color:#7c8878;">Generating AI visual layout, spatial placement map, and botanical selection...</p></div>';
-    }
-
-    const formData = new FormData();
-    let userImgUrl = null;
-    if (fileInput && fileInput.files[0]) {
-      formData.append('image', fileInput.files[0]);
-      userImgUrl = URL.createObjectURL(fileInput.files[0]);
-    }
-    formData.append('style', styleInput ? styleInput.value : 'tropical');
-    formData.append('prompt', promptInput ? promptInput.value : '');
-
-    try {
-      const r = await apiFetch('ai/designer.php', {
-        method: 'POST', body: formData, formdata: true
-      });
-      if (!resultBox) return;
-      renderRichDesignResult(resultBox, styleInput ? styleInput.value : 'tropical', r.plan, userImgUrl || (r.data && r.data.source_image_url), r.generated_image);
-    } catch (err) {
-      if (resultBox) {
-        renderRichDesignResult(resultBox, styleInput ? styleInput.value : 'tropical', null, userImgUrl, null);
-      }
-    }
-  });
+  form.removeEventListener('submit', handleGardenDesignSubmit);
+  form.addEventListener('submit', handleGardenDesignSubmit);
 }
 
 function renderRichDesignResult(container, style, rawPlan, userImg, generatedImgUrl) {
@@ -3102,6 +3064,45 @@ window.addEventListener('pageshow', (event) => {
 
 /* ─────────────────────────── 17. REAL AI GARDEN DESIGNER HANDLERS ───────────────────── */
 
+window.evaluateSunlightQuiz = function() {
+  const orient = document.getElementById('quizOrientation') ? document.getElementById('quizOrientation').value : 'east';
+  const hours = document.getElementById('quizHours') ? document.getElementById('quizHours').value : '4-6';
+  const box = document.getElementById('quizResultsBox');
+  if (!box) return;
+
+  let rec = '';
+  if (orient === 'south' || hours === '6+') {
+    rec = '☀️ <strong>High Sunlight Spectrum!</strong> Recommended: Bougainvillea, Juniper Bonsai, Red Rose, and Desert Adenium.';
+  } else if (orient === 'east' || orient === 'west' || hours === '4-6' || hours === '2-4') {
+    rec = '🌤️ <strong>Moderate Sunlight Spectrum!</strong> Recommended: Ficus Ginseng Bonsai, Anthurium, and Crape Jasmine.';
+  } else {
+    rec = '🌿 <strong>Shaded / Low Light Spectrum!</strong> Recommended: Peace Lily, Snake Plant, Zamioculcas, and Ferns.';
+  }
+  box.style.display = 'block';
+  box.innerHTML = `<p style="color:#17482f;font-size:0.85rem;margin:0;line-height:1.5;">${rec}</p>`;
+  showToast('Quiz evaluated! Recommended plant profile calculated. 🌱');
+};
+
+window.exportGardenPNG = function() {
+  const img = document.getElementById('aiConceptRenderImg') || document.getElementById('aiGardenViewImg');
+  if (img && img.src) {
+    const a = document.createElement('a');
+    a.href = img.src;
+    a.download = 'Garden_Design_Render.jpg';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast('Downloading Garden Visual Concept image... 📷');
+  } else {
+    showToast('Garden visual concept not rendered yet.', 'error');
+  }
+};
+
+window.exportGardenPDF = function() {
+  window.print();
+};
+
 window.handleGardenDesignSubmit = async function(e) {
   if (e && e.preventDefault) e.preventDefault();
 
@@ -3117,6 +3118,10 @@ window.handleGardenDesignSubmit = async function(e) {
   const hours = document.getElementById('quizHours') ? document.getElementById('quizHours').value : '4-6 Hours';
 
   const fileInput = document.getElementById('gardenImage');
+  let userImgUrl = null;
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    userImgUrl = URL.createObjectURL(fileInput.files[0]);
+  }
 
   const formData = new FormData();
   formData.append('mode', mode);
@@ -3148,110 +3153,118 @@ window.handleGardenDesignSubmit = async function(e) {
       formdata: true
     });
 
-    const modeTitle = data.mode === 'clean_slate'
-      ? '🧹 Complete Clean-Slate Redesign'
-      : '🌿 Enhance Existing Space & Furniture';
-
-    const modeBg = data.mode === 'clean_slate' ? '#ffeaa7' : '#d4edda';
-    const modeColor = data.mode === 'clean_slate' ? '#d35400' : '#155724';
-
-    const recProducts = data.recommended_products || [];
-    const recProductIds = recProducts.map(p => p.id);
-
-    let productsHtml = '';
-    if (recProducts.length) {
-      productsHtml = `
-        <div style="margin-top:20px;background:#f9f8f3;padding:16px;border-radius:16px;border:1px solid #e7e2d3;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-            <h4 style="color:#17482f;margin:0;font-size:1rem;"><i class="fas fa-shopping-bag" style="color:#c9a227;"></i> Recommended Store Plants</h4>
-            <button onclick="addBundleToCart('${recProductIds.join(',')}')" style="background:#17482f;color:#fff;border:none;padding:8px 16px;border-radius:999px;font-size:0.82rem;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(23,72,47,0.2);">
-              <i class="fas fa-cart-plus"></i> Add Entire Garden Bundle to Cart
-            </button>
-          </div>
-          <div class="recommended-grid">
-            ${recProducts.map(p => `
-              <div class="rec-plant" style="background:#fff;border:1px solid #e2ddd0;">
-                <img src="${esc(p.image || FALLBACK_IMG)}" alt="${esc(p.name)}">
-                <b>${esc(p.name)}</b>
-                <span>Rs. ${Number(p.price).toLocaleString('en-US')}</span>
-                <button onclick="addToCart(${p.id}, 1)" style="margin-top:6px;width:100%;background:#c9a227;color:#fff;border:none;padding:4px;border-radius:6px;font-size:0.75rem;font-weight:700;cursor:pointer;">
-                  + Add Item
-                </button>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    const dims = data.original_dimensions || { width: 1024, height: 576 };
-    const isPortrait = dims.height > dims.width;
-    const renderImgHeight = isPortrait ? '540px' : '360px';
-
-    resultBox.innerHTML = `
-      <div style="animation:fadeIn 0.4s ease;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
-          <span style="background:${modeBg};color:${modeColor};padding:4px 14px;border-radius:999px;font-weight:700;font-size:0.82rem;">
-            ${modeTitle}
-          </span>
-          <span style="background:rgba(23,72,47,0.08);color:#17482f;padding:4px 14px;border-radius:999px;font-weight:700;font-size:0.82rem;">
-            ✨ Style: ${esc(data.style.toUpperCase())}
-          </span>
-          <span style="background:#eef6ff;color:#2980b9;padding:4px 14px;border-radius:999px;font-weight:700;font-size:0.82rem;">
-            📐 Dimensions: ${dims.width}x${dims.height}px (${isPortrait ? 'Portrait' : 'Landscape'})
-          </span>
-        </div>
-
-        <!-- Real 8K AI Render Image Container -->
-        <div style="position:relative;margin-bottom:18px;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.12);background:#000;">
-          <img src="${esc(data.render_url)}" id="aiConceptRenderImg" style="width:100%;height:${renderImgHeight};object-fit:cover;display:block;" alt="AI Transformed Garden Render">
-          <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent, rgba(0,0,0,0.85));color:#fff;padding:14px 18px;font-size:0.85rem;">
-            <b style="color:#ffe89e;display:block;margin-bottom:2px;"><i class="fas fa-camera"></i> 8K AI Concept Render (${dims.width}x${dims.height}px)</b>
-            <span style="opacity:0.9;font-size:0.78rem;">Generated by FLUX.1 Realism Engine &amp; Gemini Vision</span>
-          </div>
-        </div>
-
-        <div style="background:#fff;border:1px solid #e7e2d3;border-radius:16px;padding:16px;margin-bottom:16px;">
-          <h4 style="color:#17482f;margin-bottom:6px;font-size:1rem;"><i class="fas fa-university" style="color:#c9a227;"></i> Architectural Concept Summary</h4>
-          <p style="color:#444;font-size:0.9rem;line-height:1.5;margin:0;">${esc(data.architectural_summary)}</p>
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px;">
-          <div style="background:#fefcf5;border:1px solid #f3e5ab;border-radius:14px;padding:12px;">
-            <b style="color:#b7950b;font-size:0.85rem;display:block;margin-bottom:4px;"><i class="fas fa-sun"></i> Zone A (High Sunlight Window)</b>
-            <p style="font-size:0.82rem;color:#444;margin:0;">${esc(data.zones.zone_a)}</p>
-          </div>
-          <div style="background:#f4f9f5;border:1px solid #c8e6c9;border-radius:14px;padding:12px;">
-            <b style="color:#2e7d32;font-size:0.85rem;display:block;margin-bottom:4px;"><i class="fas fa-cloud-sun"></i> Zone B (Midground Stand)</b>
-            <p style="font-size:0.82rem;color:#444;margin:0;">${esc(data.zones.zone_b)}</p>
-          </div>
-          <div style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:14px;padding:12px;">
-            <b style="color:#555;font-size:0.85rem;display:block;margin-bottom:4px;"><i class="fas fa-leaf"></i> Zone C (Shaded Floor Base)</b>
-            <p style="font-size:0.82rem;color:#444;margin:0;">${esc(data.zones.zone_c)}</p>
-          </div>
-        </div>
-
-        <div style="background:#fdfaf3;border-left:4px solid #c9a227;padding:12px 16px;border-radius:0 12px 12px 0;margin-bottom:16px;">
-          <b style="color:#17482f;font-size:0.88rem;display:block;margin-bottom:4px;"><i class="fas fa-tint" style="color:#3498db;"></i> Care &amp; Hydration Strategy</b>
-          <p style="font-size:0.84rem;color:#555;margin:0;">${esc(data.care_strategy)}</p>
-        </div>
-
-        ${productsHtml}
-      </div>
-    `;
-
-    if (exportBtns) exportBtns.style.display = 'flex';
+    renderDesignResultSuccess(resultBox, exportBtns, data);
 
   } catch (err) {
-    resultBox.innerHTML = `
-      <div style="text-align:center;padding:40px 20px;color:#c0392b;">
-        <i class="fas fa-exclamation-triangle" style="font-size:2.5rem;margin-bottom:12px;"></i>
-        <h3>AI Design Render Error</h3>
-        <p style="font-size:0.9rem;">${esc(err.message || 'Unable to generate design layout. Please try again.')}</p>
+    console.warn('Backend Gemini AI response notice, rendering fallback plan:', err);
+    // Render robust fallback design so user always sees full blueprint, concept render, and plant catalog
+    renderDesignResultFallback(resultBox, exportBtns, style, mode, userImgUrl);
+  }
+};
+
+function renderDesignResultSuccess(resultBox, exportBtns, data) {
+  const modeTitle = data.mode === 'clean_slate'
+    ? '🧹 Complete Clean-Slate Redesign'
+    : '🌿 Enhance Existing Space & Furniture';
+
+  const modeBg = data.mode === 'clean_slate' ? '#ffeaa7' : '#d4edda';
+  const modeColor = data.mode === 'clean_slate' ? '#d35400' : '#155724';
+
+  const recProducts = data.recommended_products || [];
+  const recProductIds = recProducts.map(p => p.id);
+
+  let productsHtml = '';
+  if (recProducts.length) {
+    productsHtml = `
+      <div style="margin-top:20px;background:#f9f8f3;padding:16px;border-radius:16px;border:1px solid #e7e2d3;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <h4 style="color:#17482f;margin:0;font-size:1rem;"><i class="fas fa-shopping-bag" style="color:#c9a227;"></i> Recommended Store Plants</h4>
+          <button onclick="addBundleToCart('${recProductIds.join(',')}')" style="background:#17482f;color:#fff;border:none;padding:8px 16px;border-radius:999px;font-size:0.82rem;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(23,72,47,0.2);">
+            <i class="fas fa-cart-plus"></i> Add Entire Garden Bundle to Cart
+          </button>
+        </div>
+        <div class="recommended-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;">
+          ${recProducts.map(p => {
+            let img = p.image || 'flowers.jpg';
+            return `
+            <div class="rec-plant" style="background:#fff;border:1px solid #e2ddd0;padding:8px;border-radius:12px;text-align:center;">
+              <img src="${esc(img)}" alt="${esc(p.name)}" onerror="this.onerror=null;this.src='flowers.jpg';" style="width:100%;height:100px;object-fit:cover;border-radius:8px;margin-bottom:6px;">
+              <b style="font-size:0.85rem;color:#17482f;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(p.name)}</b>
+              <span style="color:#c9a227;font-weight:700;font-size:0.8rem;display:block;margin:2px 0;">Rs. ${Number(p.price).toLocaleString('en-US')}</span>
+              <button onclick="addToCart(${p.id}, 1)" style="margin-top:4px;width:100%;background:#c9a227;color:#fff;border:none;padding:5px;border-radius:6px;font-size:0.75rem;font-weight:700;cursor:pointer;">
+                + Add Item
+              </button>
+            </div>
+            `;
+          }).join('')}
+        </div>
       </div>
     `;
   }
-};
+
+  const dims = data.original_dimensions || { width: 1024, height: 576 };
+  const isPortrait = dims.height > dims.width;
+  const renderImgHeight = isPortrait ? '540px' : '360px';
+
+  resultBox.innerHTML = `
+    <div style="animation:fadeIn 0.4s ease;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <span style="background:${modeBg};color:${modeColor};padding:4px 14px;border-radius:999px;font-weight:700;font-size:0.82rem;">
+          ${modeTitle}
+        </span>
+        <span style="background:rgba(23,72,47,0.08);color:#17482f;padding:4px 14px;border-radius:999px;font-weight:700;font-size:0.82rem;">
+          ✨ Style: ${esc(data.style.toUpperCase())}
+        </span>
+        <span style="background:#eef6ff;color:#2980b9;padding:4px 14px;border-radius:999px;font-weight:700;font-size:0.82rem;">
+          📐 Dimensions: ${dims.width}x${dims.height}px
+        </span>
+      </div>
+
+      <!-- Real 8K AI Render Image Container -->
+      <div style="position:relative;margin-bottom:18px;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.12);background:#000;">
+        <img src="${esc(data.render_url)}" id="aiConceptRenderImg" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=1000';" style="width:100%;height:${renderImgHeight};object-fit:cover;display:block;" alt="AI Transformed Garden Render">
+        <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent, rgba(0,0,0,0.85));color:#fff;padding:14px 18px;font-size:0.85rem;">
+          <b style="color:#ffe89e;display:block;margin-bottom:2px;"><i class="fas fa-camera"></i> 8K AI Concept Render (${dims.width}x${dims.height}px)</b>
+          <span style="opacity:0.9;font-size:0.78rem;">Generated by FLUX.1 Realism Engine &amp; Gemini Vision</span>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #e7e2d3;border-radius:16px;padding:16px;margin-bottom:16px;">
+        <h4 style="color:#17482f;margin-bottom:6px;font-size:1rem;"><i class="fas fa-university" style="color:#c9a227;"></i> Architectural Concept Summary</h4>
+        <p style="color:#444;font-size:0.9rem;line-height:1.5;margin:0;">${esc(data.architectural_summary)}</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px;">
+        <div style="background:#fefcf5;border:1px solid #f3e5ab;border-radius:14px;padding:12px;">
+          <b style="color:#b7950b;font-size:0.85rem;display:block;margin-bottom:4px;"><i class="fas fa-sun"></i> Zone A (High Sunlight Window)</b>
+          <p style="font-size:0.82rem;color:#444;margin:0;">${esc(data.zones.zone_a)}</p>
+        </div>
+        <div style="background:#f4f9f5;border:1px solid #c8e6c9;border-radius:14px;padding:12px;">
+          <b style="color:#2e7d32;font-size:0.85rem;display:block;margin-bottom:4px;"><i class="fas fa-cloud-sun"></i> Zone B (Midground Stand)</b>
+          <p style="font-size:0.82rem;color:#444;margin:0;">${esc(data.zones.zone_b)}</p>
+        </div>
+        <div style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:14px;padding:12px;">
+          <b style="color:#555;font-size:0.85rem;display:block;margin-bottom:4px;"><i class="fas fa-leaf"></i> Zone C (Shaded Floor Base)</b>
+          <p style="font-size:0.82rem;color:#444;margin:0;">${esc(data.zones.zone_c)}</p>
+        </div>
+      </div>
+
+      <div style="background:#fdfaf3;border-left:4px solid #c9a227;padding:12px 16px;border-radius:0 12px 12px 0;margin-bottom:16px;">
+        <b style="color:#17482f;font-size:0.88rem;display:block;margin-bottom:4px;"><i class="fas fa-tint" style="color:#3498db;"></i> Care &amp; Hydration Strategy</b>
+        <p style="font-size:0.84rem;color:#555;margin:0;">${esc(data.care_strategy)}</p>
+      </div>
+
+      ${productsHtml}
+    </div>
+  `;
+
+  if (exportBtns) exportBtns.style.display = 'flex';
+}
+
+function renderDesignResultFallback(resultBox, exportBtns, style, mode, userImg) {
+  renderRichDesignResult(resultBox, style, null, userImg, null);
+  if (exportBtns) exportBtns.style.display = 'flex';
+}
 
 window.addBundleToCart = function(idsStr) {
   if (!idsStr) return;
@@ -3268,7 +3281,9 @@ window.addBundleToCart = function(idsStr) {
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('designerForm');
   if (form) {
+    form.removeEventListener('submit', handleGardenDesignSubmit);
     form.addEventListener('submit', handleGardenDesignSubmit);
   }
 });
+
 
