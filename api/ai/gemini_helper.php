@@ -27,9 +27,9 @@ function callGemini15Flash($prompt, $systemInstruction = '', $base64Image = null
 
     $modelsToTry = [
         'gemini-flash-latest',
-        'gemini-2.5-flash',
-        'gemini-1.5-flash',
-        'gemini-2.0-flash'
+        'gemma-4-26b-a4b-it',
+        'gemini-2.5-flash-image',
+        'gemini-3.6-flash'
     ];
 
     $parts = [];
