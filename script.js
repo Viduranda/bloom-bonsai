@@ -723,8 +723,18 @@ function renderProductDetail(p) {
   // Robustly parse & normalize care_plan data so Week numbers and text content are guaranteed
   let carePlanArr = p.care_plan;
   if (typeof carePlanArr === 'string') {
-    try { carePlanArr = JSON.parse(carePlanArr); } catch(e) { carePlanArr = []; }
+    try { 
+      carePlanArr = JSON.parse(carePlanArr); 
+    } catch(e) { 
+      if (carePlanArr.trim()) {
+        const lines = carePlanArr.split(/\n+/).map(l => l.trim()).filter(Boolean);
+        carePlanArr = lines.map((line, idx) => ({ week_number: idx + 1, title: `Week ${idx + 1} Care`, content: line }));
+      } else {
+        carePlanArr = [];
+      }
+    }
   }
+
   if (!Array.isArray(carePlanArr) || carePlanArr.length === 0) {
     carePlanArr = [
       { week_number: 1, title: 'Unboxing & First Hydration', content: 'Water deeply until soil drains freely. Place in warm, bright indirect sunlight for initial acclimation.' },
@@ -735,17 +745,40 @@ function renderProductDetail(p) {
   }
 
   carePlanArr = carePlanArr.map((w, i) => {
-    let weekNum = (w && (w.week_number || w.week || w.week_num)) ? (w.week_number || w.week || w.week_num) : (i + 1);
-    let title = (w && (w.title || w.heading || w.name)) ? (w.title || w.heading || w.name) : (`Week ${weekNum} Care Plan`);
-    let content = (w && (w.content || w.description || w.details || w.text || w.instructions)) ? (w.content || w.description || w.details || w.text || w.instructions) : 'Water appropriately when soil top dries out and maintain bright indirect sunlight.';
-    return { week_number: weekNum, title: title, content: content };
+    if (typeof w === 'string') {
+      return { label: `Week ${i + 1}`, title: `Week ${i + 1} Care Plan`, content: w };
+    }
+    let rawNum = (w && (w.week_number !== undefined ? w.week_number : (w.week !== undefined ? w.week : w.week_num)));
+    let label = (rawNum !== undefined && rawNum !== null && String(rawNum).trim() !== '') ? String(rawNum).trim() : String(i + 1);
+    if (!/^week/i.test(label)) {
+      label = 'Week ' + label;
+    }
+
+    let title = (w && (w.title || w.heading || w.name || w.topic || w.stage)) ? (w.title || w.heading || w.name || w.topic || w.stage) : (`${label} Care Plan`);
+    
+    let content = (w && (w.content || w.description || w.details || w.text || w.instructions || w.care || w.plan || w.info || w.schedule || w.body || w.note || w.action || w.care_instructions || w.summary)) ? (w.content || w.description || w.details || w.text || w.instructions || w.care || w.plan || w.info || w.schedule || w.body || w.note || w.action || w.care_instructions || w.summary) : '';
+
+    if (!content && w && typeof w === 'object') {
+      const keys = Object.keys(w);
+      for (const k of keys) {
+        if (!['week_number', 'week', 'week_num', 'title', 'heading', 'name', 'label'].includes(k) && typeof w[k] === 'string' && w[k].trim()) {
+          content = w[k];
+          break;
+        }
+      }
+    }
+    if (!content) {
+      content = 'Water appropriately when soil top dries out and maintain bright indirect sunlight.';
+    }
+
+    return { label: label, title: title, content: content };
   });
   p.care_plan = carePlanArr;
 
   const careWeeks = p.care_plan.map((w, i) =>
     `<button class="care-tab ${i === 0 ? 'active' : ''}" onclick="switchProductWeek(${i})" 
              style="padding:7px 16px;border-radius:999px;background:${i === 0 ? '#17482f' : '#f6f3ea'};color:${i === 0 ? '#fff' : '#23301f'};border:none;cursor:pointer;font-weight:600;font-size:0.88rem;">
-       Week ${w.week_number}
+       ${esc(w.label)}
      </button>`
   ).join('');
 
