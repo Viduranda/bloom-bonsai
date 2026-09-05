@@ -51,9 +51,11 @@ $body = json_decode($rawInput, true) ?? [];
 $symptoms = strtolower(trim($body['symptoms'] ?? $_POST['symptoms'] ?? ''));
 $base64Image = null;
 $tmpPath = null;
+$mimeType = 'image/jpeg';
 
 if (!empty($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $tmpPath = $_FILES['image']['tmp_name'];
+    $mimeType = $_FILES['image']['type'] ?? 'image/jpeg';
     $imgData = file_get_contents($tmpPath);
     if ($imgData !== false) {
         $base64Image = base64_encode($imgData);
@@ -62,6 +64,53 @@ if (!empty($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $base64Image = $_POST['image'];
 } elseif (!empty($body['image'])) {
     $base64Image = $body['image'];
+}
+
+function optimizeImageForAI($base64Img, $maxDim = 1024) {
+    if (empty($base64Img)) return [null, 'image/jpeg'];
+    
+    $mime = 'image/jpeg';
+    if (preg_match('/^data:(image\/[a-zA-Z]+);base64,/', $base64Img, $m)) {
+        $mime = $m[1];
+        $base64Img = substr($base64Img, strpos($base64Img, ',') + 1);
+    }
+    
+    $rawBytes = base64_decode($base64Img);
+    if (!$rawBytes) return [$base64Img, $mime];
+
+    if (function_exists('imagecreatefromstring')) {
+        $srcImg = @imagecreatefromstring($rawBytes);
+        if ($srcImg) {
+            $w = imagesx($srcImg);
+            $h = imagesy($srcImg);
+            
+            if ($w > $maxDim || $h > $maxDim) {
+                $ratio = min($maxDim / $w, $maxDim / $h);
+                $newW = max(1, (int)($w * $ratio));
+                $newH = max(1, (int)($h * $ratio));
+                
+                $dstImg = imagecreatetruecolor($newW, $newH);
+                imagealphablending($dstImg, false);
+                imagesavealpha($dstImg, true);
+                imagecopyresampled($dstImg, $srcImg, 0, 0, 0, 0, $newW, $newH, $w, $h);
+                
+                ob_start();
+                imagejpeg($dstImg, null, 85);
+                $compressed = ob_get_clean();
+                
+                imagedestroy($srcImg);
+                imagedestroy($dstImg);
+                
+                if ($compressed) {
+                    return [base64_encode($compressed), 'image/jpeg'];
+                }
+            } else {
+                imagedestroy($srcImg);
+            }
+        }
+    }
+    
+    return [$base64Img, $mime];
 }
 
 // 1. Try local fine-tuned 25-Class PyTorch Model first (97.79% Accuracy)
@@ -131,6 +180,9 @@ if (file_exists($localModelPath) && file_exists($pythonScript) && (!empty($tmpPa
 }
 
 // 2. Multimodal AI Handoff via Gemini Vision API
+list($sendImage, $sendMime) = optimizeImageForAI($base64Image);
+if (empty($sendImage)) $sendImage = $base64Image;
+
 $prompt = "Analyze this plant/flower photo using the Bloom & Bonsai Universal Botanical Taxonomy. " .
           ($symptoms ? "User reported symptoms: '$symptoms'. " : "") .
           "Identify exact flower/plant species (e.g. Hibiscus, Rose, Anthurium, Peace Lily, Bougainvillea, Wathusudda, Kobonila, Ixora, Bonsai, Sunflower, Orchid, etc.), plant disease symptoms, severity, and treatment remedies. " .
@@ -139,7 +191,7 @@ $prompt = "Analyze this plant/flower photo using the Bloom & Bonsai Universal Bo
 
 $systemInstruction = "You are the Bloom & Bonsai AI Plant Pathologist powered by our Custom Fine-Tuned 25-Class Botanical Model. Return valid JSON output only.";
 
-$aiReply = callGemini15Flash($prompt, $systemInstruction, $base64Image);
+$aiReply = callGemini15Flash($prompt, $systemInstruction, $sendImage, $sendMime);
 
 if ($aiReply) {
     $cleanJson = preg_replace('/^```json\s*|\s*```$/i', '', trim($aiReply));
