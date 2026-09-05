@@ -1350,45 +1350,58 @@ async function loadMyPlants() {
 }
 
 /* ── AI Plant Scan (upload area on My Garden page) ── */
+/* ── AI Plant Scan (upload area on My Garden page) ── */
 function setupUpload() {
   const fileInput  = document.getElementById('fileInput');
-  const uploadArea = document.querySelector('.upload-area');
-  if (!fileInput) return;
+  const uploadArea = document.querySelector('.upload-area') || document.getElementById('uploadArea') || document.querySelector('.ai-upload-box');
+  if (!fileInput && !uploadArea) return;
 
-  // Only attach click if the area doesn't already have an inline onclick
   if (uploadArea && !uploadArea.getAttribute('onclick')) {
-    uploadArea.addEventListener('click', () => fileInput.click());
-  }
-
-  if (uploadArea) {
-    uploadArea.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      uploadArea.style.borderColor = 'var(--primary)';
-      uploadArea.style.background  = 'var(--lighter)';
-    });
-    uploadArea.addEventListener('dragleave', () => {
-      uploadArea.style.borderColor = '';
-      uploadArea.style.background  = '';
-    });
-    uploadArea.addEventListener('drop', (e) => {
-      e.preventDefault();
-      uploadArea.style.borderColor = '';
-      uploadArea.style.background  = '';
-      if (e.dataTransfer.files.length) handleScan(e.dataTransfer.files[0]);
+    uploadArea.addEventListener('click', () => {
+      const input = document.getElementById('fileInput') || fileInput;
+      if (input) input.click();
     });
   }
 
-  fileInput.addEventListener('change', () => {
-    if (fileInput.files[0]) handleScan(fileInput.files[0]);
+  const dropTargets = document.querySelectorAll('.upload-area, #uploadArea, .ai-upload-box');
+  dropTargets.forEach(area => {
+    area.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      area.style.borderColor = '#2d6a4f';
+      area.style.background  = '#f0f7f2';
+    });
+    area.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      area.style.borderColor = '';
+      area.style.background  = '';
+    });
+    area.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      area.style.borderColor = '';
+      area.style.background  = '';
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+        handleScan(e.dataTransfer.files[0]);
+      }
+    });
   });
+
+  if (fileInput) {
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files && fileInput.files[0]) handleScan(fileInput.files[0]);
+    });
+  }
 }
 
 // Compatibility: pages with inline onchange="handleFileUpload(event)" or handleImageScan(event)
 function handleFileUpload(event) {
-  const file = event ? (event.target ? event.target.files[0] : event) : null;
+  const file = event ? (event.target && event.target.files ? event.target.files[0] : (event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files[0] : event)) : null;
   if (file) handleScan(file);
 }
 window.handleImageScan = handleFileUpload;
+window.handleFileUpload = handleFileUpload;
 
 // Compatibility: pages with inline onclick="triggerFileUpload()"
 function triggerFileUpload() {
@@ -1467,7 +1480,7 @@ async function callClientGeminiVision(file, apiKey) {
   };
 }
 
-async function handleDiagnose(file) {
+async function handleScan(file) {
   const resultBox = document.querySelector('.ai-result') || document.getElementById('aiResult');
   if (!resultBox) return;
 
