@@ -720,12 +720,34 @@ function renderProductDetail(p) {
          onmouseover="this.style.borderColor='#17482f'">
   `).join('');
 
-  const careWeeks = (p.care_plan || []).map((w, i) =>
+  // Robustly parse & normalize care_plan data so Week numbers and text content are guaranteed
+  let carePlanArr = p.care_plan;
+  if (typeof carePlanArr === 'string') {
+    try { carePlanArr = JSON.parse(carePlanArr); } catch(e) { carePlanArr = []; }
+  }
+  if (!Array.isArray(carePlanArr) || carePlanArr.length === 0) {
+    carePlanArr = [
+      { week_number: 1, title: 'Unboxing & First Hydration', content: 'Water deeply until soil drains freely. Place in warm, bright indirect sunlight for initial acclimation.' },
+      { week_number: 2, title: 'Sunlight & Moisture Adjustment', content: 'Check top 2 inches of soil moisture twice weekly. Rotate plant 90 degrees for even light growth.' },
+      { week_number: 3, title: 'Foliage & Soil Aeration', content: 'Gently loosen topsoil with a rake or wooden stick. Mist leaves 3x weekly to maintain humidity.' },
+      { week_number: 4, title: 'Nutrient Feed & Pruning Check', content: 'Apply balanced liquid organic fertilizer diluted to half-strength. Prune any yellowing baseline leaves.' }
+    ];
+  }
+
+  carePlanArr = carePlanArr.map((w, i) => {
+    let weekNum = (w && (w.week_number || w.week || w.week_num)) ? (w.week_number || w.week || w.week_num) : (i + 1);
+    let title = (w && (w.title || w.heading || w.name)) ? (w.title || w.heading || w.name) : (`Week ${weekNum} Care Plan`);
+    let content = (w && (w.content || w.description || w.details || w.text || w.instructions)) ? (w.content || w.description || w.details || w.text || w.instructions) : 'Water appropriately when soil top dries out and maintain bright indirect sunlight.';
+    return { week_number: weekNum, title: title, content: content };
+  });
+  p.care_plan = carePlanArr;
+
+  const careWeeks = p.care_plan.map((w, i) =>
     `<button class="care-tab ${i === 0 ? 'active' : ''}" onclick="switchProductWeek(${i})" 
              style="padding:7px 16px;border-radius:999px;background:${i === 0 ? '#17482f' : '#f6f3ea'};color:${i === 0 ? '#fff' : '#23301f'};border:none;cursor:pointer;font-weight:600;font-size:0.88rem;">
        Week ${w.week_number}
      </button>`
-  ).join('') || '<p style="color:#7c8878;font-size:0.9rem;">4-Week AI Care schedule loading...</p>';
+  ).join('');
 
   const reviewsList = (p.reviews || []).map(r => `
     <div style="background:#f9fcf9;border:1px solid #e2ece4;border-radius:12px;padding:12px;margin-bottom:10px;">
@@ -821,7 +843,7 @@ function setDetailMainImage(src) {
 }
 
 function renderProductWeek(p, idx) {
-  const w = (p.care_plan || [])[idx];
+  const w = (p && p.care_plan && p.care_plan[idx]) ? p.care_plan[idx] : null;
   if (!w) return '<p style="color:#777;font-size:0.9rem;">Care instructions coming soon for this plant.</p>';
   return '<h4 style="margin:4px 0 8px;color:#17482f;font-weight:700;">' + esc(w.title) + '</h4><p style="line-height:1.65;color:#3d4a3a;font-size:0.92rem;">' + esc(w.content) + '</p>';
 }
