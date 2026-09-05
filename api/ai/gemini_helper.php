@@ -26,9 +26,9 @@ function callGemini15Flash($prompt, $systemInstruction = '', $base64Image = null
     }
 
     $modelsToTry = [
+        'gemini-flash-lite-latest',
         'gemini-flash-latest',
-        'gemma-4-26b-a4b-it',
-        'gemini-2.5-flash-image',
+        'gemini-3.5-flash',
         'gemini-3.6-flash'
     ];
 
@@ -81,14 +81,17 @@ function callGemini15Flash($prompt, $systemInstruction = '', $base64Image = null
             ]);
 
             $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $err = curl_error($ch);
             curl_close($ch);
 
-            if (!$err && $response) {
+            if (!$err && $response && $httpCode === 200) {
                 $data = json_decode($response, true);
                 if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
                     return trim($data['candidates'][0]['content']['parts'][0]['text']);
                 }
+            } elseif ($httpCode === 429) {
+                usleep(1200000); // 1.2s delay for rate limit resolution
             }
         }
     }

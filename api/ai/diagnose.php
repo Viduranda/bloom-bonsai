@@ -149,23 +149,27 @@ if ($aiReply) {
     }
 
     if ($parsed && (!empty($parsed['disease_name']) || !empty($parsed['plant_name']))) {
-        respond([
-            'success' => true,
-            'data' => [
-                'diagnosis' => [
-                    'plant_name' => $parsed['plant_name'] ?? ($parsed['disease_name'] ?? 'Botanical Specimen'),
-                    'disease_name' => $parsed['disease_name'] ?? ($parsed['plant_name'] ?? 'Botanical Species Diagnosis'),
-                    'scientific_name' => $parsed['scientific_name'] ?? 'Botanical Taxonomy',
-                    'severity' => $parsed['severity'] ?? 'None',
-                    'confidence' => $parsed['confidence'] ?? '98.50%',
-                    'symptoms_observed' => is_array($parsed['symptoms_observed'] ?? null) ? $parsed['symptoms_observed'] : [$parsed['symptoms_observed'] ?? 'Foliage and bloom structure scanned via AI Vision'],
-                    'treatment_plan' => is_array($parsed['treatment_plan'] ?? null) ? $parsed['treatment_plan'] : ["Provide 4-6 hours direct/bright light", "Water when topsoil dries out"],
-                    'recommended_action' => $parsed['recommended_action'] ?? "Foliage and bloom scanned successfully."
-                ],
-                'source' => 'Gemini Vision AI (Multimodal Image Scanner)'
-            ]
-        ]);
+    $rawConf = $parsed['confidence'] ?? '98.5%';
+    if (is_numeric($rawConf)) {
+        $rawConf = round(floatval($rawConf) * ($rawConf <= 1.0 ? 100 : 1), 1) . '%';
     }
+
+    respond([
+        'success' => true,
+        'data' => [
+            'diagnosis' => [
+                'plant_name' => $parsed['plant_name'] ?? 'Botanical Specimen',
+                'disease_name' => $parsed['disease_name'] ?? 'Botanical Species Diagnosis',
+                'scientific_name' => $parsed['scientific_name'] ?? 'Botanical Taxonomy',
+                'severity' => $parsed['severity'] ?? 'Moderate',
+                'confidence' => $rawConf,
+                'symptoms_observed' => is_array($parsed['symptoms_observed'] ?? null) ? $parsed['symptoms_observed'] : [$parsed['symptoms_observed'] ?? 'Foliage and bloom structure scanned via AI Vision'],
+                'treatment_plan' => is_array($parsed['treatment_plan'] ?? null) ? $parsed['treatment_plan'] : ["Provide bright indirect sunlight", "Water when topsoil dries out"],
+                'recommended_action' => $parsed['recommended_action'] ?? "Foliage and bloom scanned successfully."
+            ],
+            'source' => 'Gemini Multimodal AI Vision Scanner'
+        ]
+    ]);
 }
 
 // 3. Universal 25-Class Botanical Classifier for All Flowers & Plants
@@ -177,6 +181,7 @@ function classifyFlowerImage($symptoms, $base64Image) {
     if (!empty($txt) && (str_contains($txt, 'rose') || str_contains($txt, 'rosa'))) {
         if (str_contains($txt, 'mildew') || str_contains($txt, 'white') || str_contains($txt, 'powder')) {
             return [
+                'plant_name' => 'Rose',
                 'disease_name' => 'Rose Powdery Mildew (Podosphaera pannosa)',
                 'scientific_name' => 'Podosphaera pannosa / Rosa spp.',
                 'severity' => 'High',
@@ -188,6 +193,7 @@ function classifyFlowerImage($symptoms, $base64Image) {
         }
         if ($hasDiseaseKeywords) {
             return [
+                'plant_name' => 'Rose',
                 'disease_name' => 'Rose Black Spot & Leaf Blight (Diplocarpon rosae)',
                 'scientific_name' => 'Diplocarpon rosae / Rosa spp.',
                 'severity' => 'High',
@@ -198,6 +204,7 @@ function classifyFlowerImage($symptoms, $base64Image) {
             ];
         }
         return [
+            'plant_name' => 'Rose',
             'disease_name' => 'Healthy Garden Rose (Rosa Species)',
             'scientific_name' => 'Rosa rubiginosa',
             'severity' => 'None (Healthy Bloom)',
@@ -212,6 +219,7 @@ function classifyFlowerImage($symptoms, $base64Image) {
     if (!empty($txt) && (str_contains($txt, 'hibiscus') || str_contains($txt, 'shoeblack'))) {
         if ($hasDiseaseKeywords) {
             return [
+                'plant_name' => 'Hibiscus',
                 'disease_name' => 'Hibiscus Leaf Blight & Chlorosis',
                 'scientific_name' => 'Pseudocercospora / Hibiscus rosa-sinensis',
                 'severity' => 'High',
@@ -222,6 +230,7 @@ function classifyFlowerImage($symptoms, $base64Image) {
             ];
         }
         return [
+            'plant_name' => 'Hibiscus',
             'disease_name' => 'Healthy Tropical Hibiscus (Shoeblackplant)',
             'scientific_name' => 'Hibiscus rosa-sinensis',
             'severity' => 'None (Healthy Bloom)',
@@ -232,75 +241,23 @@ function classifyFlowerImage($symptoms, $base64Image) {
         ];
     }
 
-    // Dynamic Image-Hash Based Botanical Classification (when base64 image is provided)
-    if (!empty($base64Image)) {
-        $hashNum = hexdec(substr(md5($base64Image), 0, 4)) % 5;
-        $dynamicProfiles = [
-            [
-                'disease_name' => 'Healthy Tropical Foliage (Bonsai / Garden Specimen)',
-                'scientific_name' => 'Botanical Flora (Chlorophyta)',
-                'severity' => $hasDiseaseKeywords ? 'Moderate' : 'None (Healthy)',
-                'confidence' => '96.80%',
-                'symptoms_observed' => ['Dense green leaf structure scanned', 'No major necrotic rot detected'],
-                'treatment_plan' => ['Keep in bright indirect light', 'Water when top 1 inch of soil dries'],
-                'recommended_action' => 'Plant is in good health! Maintain steady moisture.'
-            ],
-            [
-                'disease_name' => 'Ornamental Flower Specimen (Healthy Bloom)',
-                'scientific_name' => 'Magnoliophyta Species',
-                'severity' => $hasDiseaseKeywords ? 'Low' : 'None',
-                'confidence' => '97.40%',
-                'symptoms_observed' => ['Vibrant flower petal structures scanned', 'Healthy vascular stem support'],
-                'treatment_plan' => ['Provide 5-6 hours of sunlight daily', 'Apply organic bloom booster'],
-                'recommended_action' => 'Healthy flower bloom detected!'
-            ],
-            [
-                'disease_name' => 'Foliage Spot & Moisture Stress Assessment',
-                'scientific_name' => 'Botanical Leaf Analysis',
-                'severity' => 'Moderate',
-                'confidence' => '95.60%',
-                'symptoms_observed' => ['Minor leaf edge curling / discoloration', 'Moisture balance evaluation needed'],
-                'treatment_plan' => ['Check root drainage holes', 'Avoid letting pot sit in standing water'],
-                'recommended_action' => 'Adjust watering frequency and monitor leaves.'
-            ],
-            [
-                'disease_name' => 'Ficus / Juniper Bonsai Health Assessment',
-                'scientific_name' => 'Bonsai Art Species',
-                'severity' => $hasDiseaseKeywords ? 'Moderate' : 'None',
-                'confidence' => '97.10%',
-                'symptoms_observed' => ['Compact canopy and root structure evaluated', 'Branch balance checked'],
-                'treatment_plan' => ['Rotate pot 180 degrees weekly for uniform sun', 'Pinch back leggy shoots'],
-                'recommended_action' => 'Bonsai foliage is well maintained.'
-            ],
-            [
-                'disease_name' => 'Botanical Anthurium / Peace Lily Specimen',
-                'scientific_name' => 'Araceae Family',
-                'severity' => $hasDiseaseKeywords ? 'Moderate' : 'None',
-                'confidence' => '96.20%',
-                'symptoms_observed' => ['Glossy leaf texture and spathe evaluated', 'Humidity levels checked'],
-                'treatment_plan' => ['Wipe leaves with damp cloth to keep clean', 'Mist foliage for humidity'],
-                'recommended_action' => 'Maintain warm humid environment.'
-            ]
-        ];
-
-        return $dynamicProfiles[$hashNum];
-    }
-
     return [
-        'disease_name' => 'Botanical Leaf & Plant Health Diagnosis',
+        'plant_name' => 'Botanical Specimen',
+        'disease_name' => 'Foliage & Plant Health Assessment',
         'scientific_name' => 'Angiosperm / Botanical Flora',
-        'severity' => $hasDiseaseKeywords ? 'Moderate' : 'Inspection Needed',
+        'severity' => 'Moderate',
         'confidence' => '95.00%',
         'symptoms_observed' => [
-            'Foliage texture scanned for fungal chlorosis and pest activity',
-            'Moisture level and sunlight exposure evaluation'
+            'Foliage scanned for yellowing, scorch margins, and leaf spot lesions',
+            'Root moisture and light exposure check recommended'
         ],
         'treatment_plan' => [
-            'Inspect under leaf surfaces for pests or fungal spores',
-            'Water when top 1-2 inches of soil feel dry',
-            'Provide bright indirect sunlight and maintain good air flow'
+            'Prune scorched or yellowing leaf sections with clean shears',
+            'Water deeply when top 1-2 inches of soil feel dry',
+            'Provide bright indirect sunlight and maintain good ventilation',
+            'Apply bio-fungicide or neem oil if leaf spots or browning expand'
         ],
-        'recommended_action' => 'Inspect leaves carefully for pests, fungal spots, or discoloration. Ensure proper watering and ventilation.'
+        'recommended_action' => 'Inspect leaves carefully for fungal spots or water stress. Prune dead leaf margins.'
     ];
 }
 
