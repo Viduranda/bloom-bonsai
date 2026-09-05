@@ -1,18 +1,20 @@
-# api/ai/predict_local_model.py
-"""
-Bloom & Bonsai - Local PyTorch Inference Engine for 25-Class Fine-Tuned Model
-Model Path: api/ai/bloom_bonsai_unified_25class_model.pth
-Accuracy: 97.79% Peak Validation Accuracy
-"""
-
 import sys
 import json
 import os
+import warnings
+import logging
+
+# Suppress HuggingFace & PyTorch warning noise for clean JSON output
+os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+warnings.filterwarnings("ignore")
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+logging.getLogger("transformers").setLevel(logging.ERROR)
+
 import torch
 import torch.nn as nn
 from PIL import Image
 from torchvision import transforms
-from transformers import AutoModelForImageClassification
 
 BASE_MODEL_ID = "linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification"
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "bloom_bonsai_unified_25class_model.pth")
@@ -272,5 +274,17 @@ if __name__ == "__main__":
         sys.exit(1)
 
     img_path = sys.argv[1]
-    res = predict_image(img_path)
+    
+    # Redirect stderr during inference to keep stdout 100% clean JSON for PHP shell_exec
+    orig_stderr = sys.stderr
+    try:
+        with open(os.devnull, 'w') as fnull:
+            sys.stderr = fnull
+            res = predict_image(img_path)
+    except Exception:
+        sys.stderr = orig_stderr
+        res = predict_image(img_path)
+    finally:
+        sys.stderr = orig_stderr
+
     print(json.dumps(res))
