@@ -321,7 +321,7 @@ respond([
     'success' => true,
     'data' => [
         'diagnosis' => $diagnosisData,
-        'source' => 'Botanical Knowledge Base Rule Engine' . $errTrace
-    ],
-    'client_key' => getGeminiApiKey()
+        'source' => 'Botanical Knowledge Base Rule Engine' . $errTrace,
+        'client_key' => getGeminiApiKey()
+    ]
 ]);
