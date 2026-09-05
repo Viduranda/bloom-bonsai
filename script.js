@@ -1428,6 +1428,7 @@ async function handleScan(file) {
     const d = (res && res.diagnosis) ? res.diagnosis : res;
     const sourceLabel = res.source || d.source || 'Custom Fine-Tuned 25-Class Model (97.79% Acc)';
 
+    const plantName = d.plant_name || d.plant || 'Identified Plant Specimen';
     const disease = d.disease_name || 'Healthy Foliage';
     const sciName = d.scientific_name || 'Botanical Specimen';
     const severity = d.severity || 'Low';
@@ -1439,6 +1440,7 @@ async function handleScan(file) {
     resultBox.innerHTML = `
       <div style="background:#fff;border:1px solid #cce3d2;border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(14,42,26,0.06);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <span style="background:#2d6a4f;color:#fff;padding:4px 14px;border-radius:999px;font-size:0.78rem;font-weight:700;">🌱 Plant: ${esc(plantName)}</span>
           <span style="background:#17482f;color:#fff;padding:4px 14px;border-radius:999px;font-size:0.75rem;font-weight:700;">🤖 ${esc(sourceLabel)}</span>
           <span style="background:${severity === 'High' ? '#f8d7da' : (severity === 'Moderate' ? '#fff3cd' : '#d1e7dd')};color:${severity === 'High' ? '#721c24' : (severity === 'Moderate' ? '#856404' : '#0f5132')};padding:4px 14px;border-radius:999px;font-size:0.78rem;font-weight:700;">
             Severity: ${esc(severity)} (${esc(conf)})
@@ -1446,7 +1448,7 @@ async function handleScan(file) {
         </div>
 
         <h3 style="font-family:'Playfair Display',serif;color:#17482f;margin-bottom:4px;font-size:1.45rem;">${esc(disease)}</h3>
-        <p style="color:#52B788;font-weight:600;font-size:0.88rem;font-style:italic;margin-bottom:14px;">🌿 Pathogen: ${esc(sciName)}</p>
+        <p style="color:#52B788;font-weight:600;font-size:0.88rem;font-style:italic;margin-bottom:14px;">🌿 Species / Scientific Name: ${esc(sciName)}</p>
 
         ${symptoms.length ? `
           <div style="margin-bottom:14px;">

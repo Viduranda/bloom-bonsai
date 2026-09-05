@@ -108,12 +108,14 @@ if (file_exists($localModelPath) && file_exists($pythonScript) && (!empty($tmpPa
                         'success' => true,
                         'data' => [
                             'diagnosis' => [
+                                'plant_name' => $result['plant_name'] ?? 'Botanical Specimen',
                                 'disease_name' => $result['disease_name'],
-                                'scientific_name' => $result['raw_label'] ?? 'Botanical Taxonomy',
+                                'scientific_name' => $result['scientific_name'] ?? 'Botanical Taxonomy',
                                 'severity' => $result['severity'] ?? 'None',
                                 'confidence' => $result['confidence'] ?? '97.79%',
                                 'symptoms_observed' => [
-                                    "Scanned leaf matched 25-Class Model: " . $result['disease_name'],
+                                    "Identified Plant Specimen: " . ($result['plant_name'] ?? 'Botanical Specimen'),
+                                    "Scanned Condition: " . $result['disease_name'],
                                     "Classification confidence: " . ($result['confidence'] ?? '97.79%')
                                 ],
                                 'treatment_plan' => $result['treatment_plan'] ?? ["Water 2-3 times per week", "Ensure adequate sunlight"],
@@ -133,7 +135,7 @@ $prompt = "Analyze this plant/flower photo using the Bloom & Bonsai Universal Bo
           ($symptoms ? "User reported symptoms: '$symptoms'. " : "") .
           "Identify exact flower/plant species (e.g. Hibiscus, Rose, Anthurium, Peace Lily, Bougainvillea, Wathusudda, Kobonila, Ixora, Bonsai, Sunflower, Orchid, etc.), plant disease symptoms, severity, and treatment remedies. " .
           "Respond strictly in valid JSON format with keys: " .
-          "\"disease_name\", \"scientific_name\", \"severity\" (Low/Moderate/High/None), \"confidence\" (e.g. 97%), \"symptoms_observed\" (array of strings), \"treatment_plan\" (array of strings), \"recommended_action\".";
+          "\"plant_name\", \"disease_name\", \"scientific_name\", \"severity\" (Low/Moderate/High/None), \"confidence\" (e.g. 97%), \"symptoms_observed\" (array of strings), \"treatment_plan\" (array of strings), \"recommended_action\".";
 
 $systemInstruction = "You are the Bloom & Bonsai AI Plant Pathologist powered by our Custom Fine-Tuned 25-Class Botanical Model. Return valid JSON output only.";
 
@@ -151,6 +153,7 @@ if ($aiReply) {
             'success' => true,
             'data' => [
                 'diagnosis' => [
+                    'plant_name' => $parsed['plant_name'] ?? ($parsed['disease_name'] ?? 'Botanical Specimen'),
                     'disease_name' => $parsed['disease_name'] ?? ($parsed['plant_name'] ?? 'Botanical Species Diagnosis'),
                     'scientific_name' => $parsed['scientific_name'] ?? 'Botanical Taxonomy',
                     'severity' => $parsed['severity'] ?? 'None',
