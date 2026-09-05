@@ -6,7 +6,9 @@ function getGeminiApiKeys() {
     $envKey = getEnvVar('GEMINI_API_KEY', '');
     if (!empty($envKey)) $keys[] = $envKey;
 
-    // Active primary Gemini API key
+    // Primary Gemini API Key
+    $keys[] = base64_decode('QVEuQWI4Uk42S2EzemhjYnprSEExRG5lYmlQQWpTcGtaSld0bHhyXzZMY081SE55dFZQWnc=');
+    // Secondary Backup Gemini API Key
     $keys[] = base64_decode('QVEuQWI4Uk42Sjh2ZmI1OU1aRE5JZm1hM2NFTjU4bTFYMUJzbEJWS3duLVAwZ081bXpCQ0E=');
 
     return array_unique(array_filter($keys));
