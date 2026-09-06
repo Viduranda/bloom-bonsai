@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us — Bloom & Bonsai</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css?v=43.0">
+
+  <style>
+    /* ============================================================ */
+    /* LUXURY ABOUT PAGE STYLES WITH VIDEO BG & BLOOMING ANIMATIONS */
+    /* ============================================================ */
+    :root {
+      --ab-primary: #17482f;
+      --ab-accent: #c9a227;
+      --ab-bg: #faf8f3;
+      --ab-card-bg: #ffffff;
+      --ab-text: #2c382b;
+      --ab-muted: #5c6b58;
+      --ab-border: #ece7d9;
+    }
+
+    body {
+      background-color: var(--ab-bg);
+      color: var(--ab-text);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* 🎥 CINEMATIC VIDEO HERO SECTION */
+    .about-hero {
+      position: relative;
+      padding: 110px 20px 80px;
+      text-align: center;
+      overflow: hidden;
+      min-height: 620px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .about-hero-video-wrapper {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .about-hero-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.65) saturate(1.2);
+      transform: scale(1.05);
+    }
+
+    .video-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(14, 42, 26, 0.88) 0%, rgba(23, 72, 47, 0.78) 100%);
+      backdrop-filter: blur(2px);
+    }
+
+    .about-hero-content {
+      position: relative;
+      z-index: 2;
+      color: #ffffff;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(8px);
+      color: #ffffff;
+      padding: 6px 22px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    .about-hero-content h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2.6rem, 5.8vw, 4.2rem);
+      color: #ffffff;
+      line-height: 1.15;
+      margin: 0 auto 20px;
+      font-weight: 700;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .about-hero-content h1 i {
+      font-style: italic;
+      color: var(--ab-accent);
+      font-weight: 500;
+    }
+
+    .about-hero-content p.subtitle {
+      font-size: 1.18rem;
+      color: #e0eee4;
+      max-width: 740px;
+      margin: 0 auto 35px;
+      line-height: 1.7;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    /* 🌸 BLOOMING FLOWER CANVAS / ANIMATION CONTAINER */
+    .bloom-stage-card {
+      max-width: 480px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 28px;
+      padding: 32px 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .bloom-aura {
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201, 162, 39, 0.35) 0%, rgba(82, 183, 136, 0.22) 50%, transparent 80%);
+      filter: blur(25px);
+      animation: pulseAura 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseAura {
+      0% { transform: scale(0.8); opacity: 0.6; }
+      100% { transform: scale(1.25); opacity: 1; }
+    }
+
+    .bloom-svg {
+      width: 175px;
+      height: 175px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .petal {
+      transform-origin: 100px 100px;
+      opacity: 0;
+      transform: scale(0.1) rotate(0deg);
+      animation: bloomPetal 2.2s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    }
+
+    .petal-layer-1 { animation-delay: 0.2s; }
+    .petal-layer-2 { animation-delay: 0.5s; }
+    .petal-layer-3 { animation-delay: 0.8s; }
+    .petal-center  { animation-delay: 1.2s; }
+
+    @keyframes bloomPetal {
+      0% {
+        opacity: 0;
+        transform: scale(0.1) rotate(-30deg);
+      }
+      60% {
+        opacity: 0.9;
+        transform: scale(1.08) rotate(5deg);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    .bloom-caption {
+      margin-top: 14px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      color: var(--ab-primary);
+      font-weight: 700;
+      z-index: 2;
+    }
+
+    .replay-bloom-btn {
+      margin-top: 12px;
+      background: var(--ab-primary);
+      border: none;
+      color: #ffffff;
+      padding: 8px 20px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      z-index: 2;
+      box-shadow: 0 4px 12px rgba(23, 72, 47, 0.2);
+    }
+
+    .replay-bloom-btn:hover {
+      background: #0e2a1a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(23, 72, 47, 0.35);
+    }
+
+    /* Main Container */
+    .about-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 20px;
+    }
+
+    /* Grid Story Section */
+    .story-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 55px;
+      align-items: center;
+      margin-bottom: 90px;
+    }
+
+    @media (max-width: 900px) {
+      .story-grid { grid-template-columns: 1fr; gap: 35px; }
+    }
+
+    .story-card-img {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+    }
+
+    .story-card-img img {
+      width: 100%;
+      height: 450px;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+
+    .story-card-img:hover img {
+      transform: scale(1.05);
+    }
+
+    .story-badge-overlay {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      border: 1px solid #ffffff;
+      padding: 12px 22px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .story-badge-overlay i {
+      font-size: 1.5rem;
+      color: var(--ab-accent);
+    }
+
+    .story-badge-overlay div b {
+      display: block;
+      color: var(--ab-primary);
+      font-size: 0.95rem;
+    }
+
+    .story-badge-overlay div span {
+      font-size: 0.8rem;
+      color: var(--ab-muted);
+    }
+
+    .story-content h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2.3rem;
+      color: var(--ab-primary);
+      margin-bottom: 20px;
+      line-height: 1.25;
+    }
+
+    .story-content p {
+      font-size: 1.02rem;
+      line-height: 1.8;
+      color: var(--ab-muted);
+      margin-bottom: 18px;
+    }
+
+    /* 🎥 VIDEO SHOWCASE SECTION CARD */
+    .video-showcase-section {
+      background: #ffffff;
+      border: 1px solid var(--ab-border);
+      border-radius: 28px;
+      padding: 45px 35px;
+      margin-bottom: 90px;
+      box-shadow: 0 20px 50px rgba(23, 72, 47, 0.08);
+      position: relative;
+    }
+
+    .video-showcase-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 30px;
+    }
+
+    .video-showcase-header span {
+      color: var(--ab-accent);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .video-showcase-header h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2.2rem;
+      color: var(--ab-primary);
+      margin: 6px 0 12px;
+    }
+
+    .video-showcase-header p {
+      color: var(--ab-muted);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .video-frame-container {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+      background: #000;
+      max-height: 480px;
+    }
+
+    .video-frame-container video {
+      width: 100%;
+      height: 100%;
+      max-height: 480px;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* 4 Feature Pillars Grid */
+    .section-title-wrap {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .section-title-wrap h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2.4rem;
+      color: var(--ab-primary);
+      margin-bottom: 10px;
+    }
+
+    .section-title-wrap p {
+      color: var(--ab-muted);
+      font-size: 1.05rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 90px;
+    }
+
+    @media (max-width: 1024px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+
+    .feature-card {
+      background: var(--ab-card-bg);
+      border: 1px solid var(--ab-border);
+      border-radius: 20px;
+      padding: 32px 24px;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 36px rgba(23, 72, 47, 0.12);
+      border-color: var(--ab-accent);
+    }
+
+    .feature-icon-box {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(23, 72, 47, 0.1) 0%, rgba(201, 162, 39, 0.15) 100%);
+      color: var(--ab-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 22px;
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon-box {
+      transform: scale(1.1) rotate(5deg);
+      background: var(--ab-primary);
+      color: #ffffff;
+    }
+
+    .feature-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      color: var(--ab-primary);
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: var(--ab-muted);
+    }
+
+    /* Stats Strip */
+    .stats-strip {
+      background: linear-gradient(135deg, #17482f 0%, #0e2a1a 100%);
+      color: #ffffff;
+      border-radius: 24px;
+      padding: 45px 30px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30px;
+      text-align: center;
+      margin-bottom: 90px;
+      box-shadow: 0 15px 40px rgba(14, 42, 26, 0.25);
+    }
+
+    @media (max-width: 800px) {
+      .stats-strip { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .stat-item h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.8rem;
+      color: var(--ab-accent);
+      margin-bottom: 4px;
+    }
+
+    .stat-item p {
+      font-size: 0.9rem;
+      color: #d8e8dc;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    /* Contact Card Section */
+    .contact-card-box {
+      background: #ffffff;
+      border: 1px solid var(--ab-border);
+      border-radius: 24px;
+      padding: 50px 40px;
+      text-align: center;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.04);
+    }
+
+    .contact-card-box h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2.2rem;
+      color: var(--ab-primary);
+      margin-bottom: 10px;
+    }
+
+    .contact-card-box p.sub {
+      color: var(--ab-muted);
+      font-size: 1rem;
+      margin-bottom: 35px;
+    }
+
+    .contact-info-grid {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .contact-pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f4f8f5;
+      border: 1px solid #d4e4d6;
+      padding: 12px 24px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: var(--ab-primary);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.25s ease;
+    }
+
+    .contact-pill:hover {
+      background: var(--ab-primary);
+      color: #ffffff;
+      border-color: var(--ab-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(23, 72, 47, 0.25);
+    }
+
+    .contact-pill i {
+      color: var(--ab-accent);
+      font-size: 1.1rem;
+    }
+
+    .contact-pill:hover i {
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ UNIFIED PREMIUM NAVBAR ═══ -->
+<header class="navbar premium">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Bloom <span>&amp;</span> Bonsai</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="mygarden.html">My Garden</a></li>
+      <li><a href="gardendesigner.html">Garden AI</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="wishlist.html" class="cart-link" style="margin-right:10px;">Wishlist <span class="cart-badge wishlist-count-badge" id="wishlistCount" style="background:#e74c3c;">0</span></a>
+      <a href="cart.html" class="cart-link">Cart <span class="cart-badge" id="cartCount">0</span></a>
+      <a href="login.html" class="btn-login" id="loginBtn">Login</a>
+      <a href="register.html" class="btn-signup" id="signupBtn">Sign Up</a>
+      <div class="user-menu" id="userMenu" style="display:none;align-items:center;gap:10px;">
+        <i class="fas fa-user-circle"></i>
+        <span id="userName">User</span>
+        <a href="#" id="logoutBtn" class="btn-mini" style="font-size:0.8rem;">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<!-- 🎥 HERO WITH AUTOPLAY BACKGROUND VIDEO & BLOOMING FLOWER -->
+<section class="about-hero">
+  <!-- Background Video Element -->
+  <div class="about-hero-video-wrapper">
+    <video autoplay loop muted playsinline class="about-hero-video">
+      <source src="aboutpage.mp4" type="video/mp4">
+      <source src="A_breathtaking_luxury_botanica.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+  </div>
+
+  <div class="about-hero-content">
+    <div class="hero-eyebrow">
+      <i class="fas fa-seedling"></i> Sri Lanka’s Premier Botanical Sanctuary
+    </div>
+    <h1>Where Nature <i>Blooms</i> with Technology</h1>
+    <p class="subtitle">
+      From handcrafted bonsai specimens to rare flowering plants, we deliver living art into your home — complete with AI diagnostics and personalized care plans.
+    </p>
+
+    <!-- 🌸 BLOOMING ANIMATION STAGE -->
+    <div class="bloom-stage-card">
+      <div class="bloom-aura"></div>
+      <svg class="bloom-svg" id="bloomSvg" viewBox="0 0 200 200">
+        <!-- Stem & Leaves -->
+        <path d="M100 190 C100 150 100 120 100 100" stroke="#17482f" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path class="petal petal-layer-1" d="M100 140 Q70 130 65 150 Q90 160 100 140" fill="#2d6a4f"/>
+        <path class="petal petal-layer-1" d="M100 135 Q130 125 135 145 Q110 155 100 135" fill="#2d6a4f"/>
+
+        <!-- Outer Petals (Deep Emerald/Rose) -->
+        <path class="petal petal-layer-1" d="M100 100 C60 60 40 100 100 100" fill="#40916c"/>
+        <path class="petal petal-layer-1" d="M100 100 C140 60 160 100 100 100" fill="#40916c"/>
+        <path class="petal petal-layer-2" d="M100 100 C70 40 130 40 100 100" fill="#52b788"/>
+        <path class="petal petal-layer-2" d="M100 100 C50 80 50 130 100 100" fill="#74c69d"/>
+        <path class="petal petal-layer-2" d="M100 100 C150 80 150 130 100 100" fill="#74c69d"/>
+
+        <!-- Inner Gold Blooming Crown -->
+        <path class="petal petal-layer-3" d="M100 100 C80 65 120 65 100 100" fill="#c9a227"/>
+        <path class="petal petal-layer-3" d="M100 100 C75 85 85 115 100 100" fill="#e5c158"/>
+        <path class="petal petal-layer-3" d="M100 100 C125 85 115 115 100 100" fill="#e5c158"/>
+
+        <!-- Glowing Center Stamen -->
+        <circle class="petal petal-center" cx="100" cy="100" r="10" fill="#ffffff" stroke="#c9a227" stroke-width="3"/>
+      </svg>
+      <div class="bloom-caption">Watch Your Garden Bloom 🌸</div>
+      <button class="replay-bloom-btn" onclick="replayBloomAnimation()"><i class="fas fa-redo-alt"></i> Replay Bloom Animation</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ MAIN CONTENT CONTAINER ═══ -->
+<main class="about-container">
+
+  <!-- 🌿 STORY & MISSION GRID -->
+  <section class="story-grid">
+    <div class="story-card-img">
+      <img src="https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=800" alt="Bonsai Cultivation Sri Lanka">
+      <div class="story-badge-overlay">
+        <i class="fas fa-award"></i>
+        <div>
+          <b>100% Organically Grown</b>
+          <span>Nurtured in Island Soil</span>
+        </div>
+      </div>
+    </div>
+    <div class="story-content">
+      <h2>Cultivating Serenity &amp; Lifetime Botanical Beauty</h2>
+      <p>
+        At <b>Bloom &amp; Bonsai</b>, we believe that bringing a plant into your living space should be a joyful, effortless journey. Founded in Sri Lanka, we combine decades of traditional bonsai cultivation knowledge with cutting-edge artificial intelligence.
+      </p>
+      <p>
+        Every bonsai, orchid, and foliage plant in our gallery is hand-trimmed, inspected for optimal root health, and shipped in specialized eco-friendly protective packaging to ensure it reaches your doorstep thriving.
+      </p>
+    </div>
+  </section>
+
+  <!-- 🎥 DEDICATED GREENHOUSE VIDEO SHOWCASE CARD -->
+  <section class="video-showcase-section">
+    <div class="video-showcase-header">
+      <span>🎥 Exclusive Botanical Film</span>
+      <h2>Inside the Bloom &amp; Bonsai Sanctuary</h2>
+      <p>Take a virtual tour inside our Sri Lankan greenhouse. See how our Master Artisans prune centuries-old bonsai trees and prepare rare blooms for safe delivery.</p>
+    </div>
+    <div class="video-frame-container">
+      <video controls loop playsinline poster="https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=1200">
+        <source src="A_breathtaking_luxury_botanica.mp4" type="video/mp4">
+        <source src="aboutpage.mp4" type="video/mp4">
+        Your browser does not support HTML5 video.
+      </video>
+    </div>
+  </section>
+
+  <!-- 🌸 4 CORE FEATURE PILLARS -->
+  <section class="section-title-wrap">
+    <h2>Why Plant Lovers Choose Us</h2>
+    <p>Everything you need to buy, design, and care for your plants with confidence.</p>
+  </section>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon-box"><i class="fas fa-camera"></i></div>
+      <h3>Gemini AI Disease Scan</h3>
+      <p>Upload a photo of any leaf. Our Vision AI flags health issues early and provides step-by-step organic remedies.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon-box"><i class="fas fa-magic"></i></div>
+      <h3>AI Garden &amp; Balcony Planner</h3>
+      <p>Describe your lighting and room size. Get custom plant layout recommendations tailored to your home style.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon-box"><i class="fas fa-truck-fast"></i></div>
+      <h3>Free 50 KM Delivery</h3>
+      <p>All orders qualify for free delivery within a 50 KM radius with specialized moisture-sealed protection.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon-box"><i class="fas fa-book-open"></i></div>
+      <h3>4-Week Digital Care Guide</h3>
+      <p>Every specimen includes a customized watering schedule, sunlight preferences, and soil re-potting instructions.</p>
+    </div>
+  </div>
+
+  <!-- 📊 MILESTONES STATS STRIP -->
+  <section class="stats-strip">
+    <div class="stat-item">
+      <h3>1,500+</h3>
+      <p>Happy Customers</p>
+    </div>
+    <div class="stat-item">
+      <h3>50+</h3>
+      <p>Exotic Species</p>
+    </div>
+    <div class="stat-item">
+      <h3>50 KM</h3>
+      <p>Free Delivery Radius</p>
+    </div>
+    <div class="stat-item">
+      <h3>100%</h3>
+      <p>Health Guarantee</p>
+    </div>
+  </section>
+
+  <!-- 📞 CONTACT & SUPPORT CARD -->
+  <section class="contact-card-box">
+    <h2>Get in Touch with Our Botanical Team</h2>
+    <p class="sub">Have questions about an order, plant selection, or care advice? We're here to help!</p>
+    <div class="contact-info-grid">
+      <a href="#" class="contact-pill"><i class="fas fa-map-marker-alt"></i> Sri Lanka</a>
+      <a href="mailto:vidurandarukmal@gmail.com" class="contact-pill"><i class="fas fa-envelope"></i> vidurandarukmal@gmail.com</a>
+      <a href="tel:+94770431874" class="contact-pill"><i class="fas fa-phone-alt"></i> +94 77 043 1874</a>
+    </div>
+  </section>
+
+</main>
+
+<script src="script.js?v=43.0"></script>
+<script>
+  // Replay Blooming Animation helper
+  function replayBloomAnimation() {
+    const svg = document.getElementById('bloomSvg');
+    if (!svg) return;
+    const petals = svg.querySelectorAll('.petal');
+    petals.forEach(p => {
+      p.style.animation = 'none';
+      p.offsetHeight; // trigger reflow
+      p.style.animation = '';
+    });
+  }
+</script>
+</body>
+</html>

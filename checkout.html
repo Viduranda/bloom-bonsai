@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout — Bloom & Bonsai</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=43.0">
+    <script src="script.js?v=43.0"></script>
+</head>
+<body>
+
+<!-- ========== HEADER / NAVBAR ========== -->
+<header class="navbar premium">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Bloom <span>&amp;</span> Bonsai</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="mygarden.html">My Garden</a></li>
+      <li><a href="gardendesigner.html">Garden AI</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="wishlist.html" class="cart-link" style="margin-right:10px;">Wishlist <span class="cart-badge wishlist-count-badge" id="wishlistCount" style="background:#e74c3c;">0</span></a>
+      <a href="cart.html" class="cart-link">Cart <span class="cart-badge" id="cartCount">0</span></a>
+      <a href="login.html" class="btn-login" id="loginBtn">Login</a>
+      <a href="register.html" class="btn-signup" id="signupBtn">Sign Up</a>
+      <div class="user-menu" id="userMenu" style="display:none;align-items:center;gap:10px;">
+        <i class="fas fa-user-circle"></i>
+        <span id="userName">User</span>
+        <a href="#" id="logoutBtn" class="btn-mini" style="font-size:0.8rem;">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<section class="checkout-page">
+    <div class="container">
+        <h1>📋 Checkout & Secure Payment</h1>
+        <div class="checkout-layout">
+            <div class="checkout-form">
+                <h2>Shipping & Contact Details</h2>
+                <form id="checkoutForm" onsubmit="handleCheckout(event); return false;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="checkoutName" required placeholder="Your full name">
+                        </div>
+                        <div class="form-group">
+                            <label>Email (for Automated Email Receipt)</label>
+                            <input type="email" id="checkoutEmail" required placeholder="your@email.com">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" id="checkoutPhone" required placeholder="+91 98765 43210">
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" id="checkoutCity" required placeholder="City">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Delivery Address</label>
+                        <input type="text" id="shipAddress" required placeholder="House/Flat no., Building, Street Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Pincode / Postal Code</label>
+                        <input type="text" id="checkoutPincode" required placeholder="6 digits" pattern="[0-9]{6}">
+                    </div>
+
+                    <!-- Payment Gateway Selection -->
+                    <h2 style="margin-top:28px;">💳 Payment Gateway</h2>
+                    <div class="payment-options" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;margin-bottom:20px;">
+                        <label class="payment-card" style="border:2px solid var(--primary);border-radius:12px;padding:14px;cursor:pointer;background:#f4f9f5;display:flex;align-items:center;gap:10px;">
+                            <input type="radio" name="payment_method_radio" value="stripe" checked onchange="togglePaymentUI(this.value)">
+                            <div>
+                                <strong>💳 Stripe / Card</strong>
+                                <div style="font-size:0.75rem;color:#666;">Visa, MasterCard, Amex</div>
+                            </div>
+                        </label>
+                        <label class="payment-card" style="border:2px solid #e0eae3;border-radius:12px;padding:14px;cursor:pointer;background:#fff;display:flex;align-items:center;gap:10px;">
+                            <input type="radio" name="payment_method_radio" value="payhere" onchange="togglePaymentUI(this.value)">
+                            <div>
+                                <strong>📱 PayHere / Mobile</strong>
+                                <div style="font-size:0.75rem;color:#666;">Online Wallet & Bank Transfer</div>
+                            </div>
+                        </label>
+                        <label class="payment-card" style="border:2px solid #e0eae3;border-radius:12px;padding:14px;cursor:pointer;background:#fff;display:flex;align-items:center;gap:10px;">
+                            <input type="radio" name="payment_method_radio" value="cod" onchange="togglePaymentUI(this.value)">
+                            <div>
+                                <strong>🚚 Cash on Delivery</strong>
+                                <div style="font-size:0.75rem;color:#666;">Pay cash upon delivery</div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Live Card Payment Details Form -->
+                    <div id="cardPaymentDetails" style="background:#f9fcf9;border:1px solid #d0e2d5;border-radius:12px;padding:18px;margin-bottom:20px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                            <span style="font-weight:600;color:var(--primary);"><i class="fas fa-lock"></i> 256-bit Encrypted Payment</span>
+                            <div style="display:flex;gap:6px;font-size:1.4rem;color:#666;">
+                                <i class="fab fa-cc-visa"></i>
+                                <i class="fab fa-cc-mastercard"></i>
+                                <i class="fab fa-cc-amex"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <input type="text" id="cardNumber" placeholder="xxxx xxxx xxxx xxxx" maxlength="19">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Expiry Date</label>
+                                <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label>CVC / CVV</label>
+                                <input type="password" id="cardCvc" placeholder="123" maxlength="4">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>Cardholder Name</label>
+                            <input type="text" id="cardName" placeholder="Name as on card">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="auth-btn" id="placeOrderBtn" style="margin-top:10px;width:100%;padding:16px;font-size:1.1rem;">
+                        <i class="fas fa-shield-alt"></i> Complete Secure Payment & Place Order
+                    </button>
+                </form>
+            </div>
+
+            <div class="cart-summary" style="position:sticky;top:90px;">
+                <h3>Order Summary</h3>
+                <div id="checkoutSummaryItems" style="max-height:260px;overflow-y:auto;margin-bottom:16px;"></div>
+                <hr style="border:none;border-top:1px solid #eee;margin:12px 0;">
+                <!-- Coupon / Promo Code Input & Live Store Coupons Container -->
+                <div style="margin:14px 0 10px;background:#faf8f3;border:1px dashed #c9a227;border-radius:12px;padding:14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <div style="font-weight:700;font-size:0.88rem;color:#17482f;">🎟️ Available Store Coupons & Offers</div>
+                        <span style="font-size:0.72rem;color:#7c8878;font-weight:600;">Click to Apply</span>
+                    </div>
+                    
+                    <div id="availableCouponsPills" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">
+                        <span style="font-size:0.75rem;color:#888;">Loading store coupons...</span>
+                    </div>
+
+                    <div style="display:flex;gap:6px;">
+                        <input type="text" id="couponCodeInput" placeholder="Enter promo code" onkeydown="if(event.key==='Enter'){event.preventDefault();applyCheckoutCoupon();}" style="flex:1;border:1px solid #c9a227;border-radius:8px;padding:7px 10px;font-size:0.85rem;text-transform:uppercase;font-weight:700;">
+                        <button type="button" onclick="applyCheckoutCoupon()" style="background:#17482f;color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;">Apply</button>
+                    </div>
+                    <div id="couponStatusMsg" style="font-size:0.78rem;margin-top:6px;font-weight:700;"></div>
+                </div>
+
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span>Subtotal:</span>
+                    <span id="checkoutSubtotal">Rs. 0.00</span>
+                </div>
+                <div id="checkoutDiscountRow" style="display:none;justify-content:space-between;margin-bottom:8px;color:#c0392b;font-weight:600;">
+                    <span>Promo Discount:</span>
+                    <span id="checkoutDiscount">-Rs. 0.00</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span>Shipping:</span>
+                    <span id="checkoutShipping">Free</span>
+                </div>
+                <hr style="border:none;border-top:1px solid #eee;margin:12px 0;">
+                <div style="display:flex;justify-content:space-between;font-size:1.2rem;font-weight:700;color:var(--primary);">
+                    <span>Total Amount:</span>
+                    <span id="checkoutTotal">Rs. 0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function togglePaymentUI(method) {
+    var cardBox = document.getElementById('cardPaymentDetails');
+    var btn = document.getElementById('placeOrderBtn');
+    if (!cardBox || !btn) return;
+    
+    // Highlight selected card border
+    document.querySelectorAll('.payment-card').forEach(function(card) {
+        var radio = card.querySelector('input');
+        if (radio && radio.checked) {
+            card.style.borderColor = 'var(--primary)';
+            card.style.background = '#f4f9f5';
+        } else {
+            card.style.borderColor = '#e0eae3';
+            card.style.background = '#fff';
+        }
+    });
+
+    if (method === 'cod') {
+        cardBox.style.display = 'none';
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Cash on Delivery Order';
+    } else if (method === 'payhere') {
+        cardBox.style.display = 'block';
+        btn.innerHTML = '<i class="fas fa-mobile-alt"></i> Pay via PayHere & Complete Order';
+    } else {
+        cardBox.style.display = 'block';
+        btn.innerHTML = '<i class="fas fa-shield-alt"></i> Complete Stripe Payment & Place Order';
+    }
+}
+</script>
+<script src="script.js?v=44.0"></script>
+</body>
+</html>

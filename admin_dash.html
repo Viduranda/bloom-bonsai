@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — Bloom & Bonsai</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=44.0">
+    <style>
+        .admin-action-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            margin-right: 4px;
+            transition: 0.2s;
+        }
+        .btn-edit { background: #17482f; color: #fff; }
+        .btn-edit:hover { background: #0e2a1a; }
+        .btn-delete { background: #dc3545; color: #fff; }
+        .btn-delete:hover { background: #b02a37; }
+        
+        /* Edit Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+        }
+        .modal-card {
+            background: #fff; border-radius: 18px; max-width: 750px; width: 100%; max-height: 90vh;
+            overflow-y: auto; padding: 25px; position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        .modal-close {
+            position: absolute; top: 15px; right: 15px; background: #f0f0f0; border: none;
+            width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold;
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media(max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+        
+        .stat-card-btn {
+            border: 1px solid #e7e2d3;
+            border-radius: 16px;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
+        }
+        .stat-card-btn:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 28px rgba(14, 42, 26, 0.12) !important;
+            border-color: #52B788 !important;
+        }
+        .stat-card-btn:active {
+            transform: translateY(-1px) scale(0.99);
+        }
+    </style>
+</head>
+<body>
+<div class="admin-page">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <a href="index.html" class="logo"><i class="fas fa-leaf"></i> Bloom & Bonsai</a>
+        <nav class="admin-nav">
+            <a href="#" id="nav-dashboard" class="active" onclick="showAdminSection('dashboard');return false;">
+                <i class="fas fa-chart-bar"></i> Dashboard
+            </a>
+            <a href="#" id="nav-products" onclick="showAdminSection('products');return false;">
+                <i class="fas fa-seedling"></i> Products
+            </a>
+            <a href="#" id="nav-addProduct" onclick="showAdminSection('addProduct');return false;">
+                <i class="fas fa-plus-circle"></i> Add Product
+            </a>
+            <a href="#" id="nav-orders" onclick="showAdminSection('orders');return false;">
+                <i class="fas fa-truck"></i> Orders
+            </a>
+            <a href="#" id="nav-customers" onclick="showAdminSection('customers');return false;">
+                <i class="fas fa-users"></i> Registered Customers
+            </a>
+            <a href="#" id="nav-cancelled" onclick="showAdminSection('cancelled');return false;">
+                <i class="fas fa-ban"></i> Cancelled Orders
+            </a>
+            <a href="index.html">
+                <i class="fas fa-store"></i> View Site
+            </a>
+            <a href="#" onclick="handleLogout();return false;" style="margin-top:auto;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main" id="adminMain">
+        <!-- Dashboard Section -->
+        <div id="section-dashboard">
+            <!-- Header with Real-Time Live Clock Tracking -->
+            <div class="admin-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px;background:#fff;padding:18px 24px;border-radius:18px;border:1px solid #e7e2d3;box-shadow:0 4px 18px rgba(14,42,26,0.03);">
+                <div>
+                    <h1 style="margin:0;font-size:1.75rem;color:#17482f;font-family:'Playfair Display',serif;">📊 Dashboard Overview</h1>
+                    <div id="realtimeClockWidget" style="color:#2e7d4f;font-size:0.9rem;font-weight:600;margin-top:4px;display:flex;align-items:center;gap:6px;">
+                        <i class="far fa-clock"></i> <span id="clockDateTimeText">Loading real-time clock tracking...</span>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <span style="font-size:0.95rem;color:#555;">Welcome, <strong id="adminName" style="color:#17482f;">Admin</strong></span>
+                    <div style="font-size:0.78rem;color:#2e7d32;font-weight:700;margin-top:2px;">● System Status: Online &amp; Tracking Live</div>
+                </div>
+            </div>
+
+            <!-- Interactive Metric Stat Card Buttons -->
+            <div class="admin-stats" id="adminStats">
+                <div class="stat-card stat-card-btn" onclick="showAdminSection('products')" title="Click to view plant inventory" style="cursor:pointer;transition:all 0.25s ease;position:relative;">
+                    <div class="stat-icon green"><i class="fas fa-seedling"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statProducts">0</h3>
+                        <p>Total Plants</p>
+                    </div>
+                    <span class="stat-click-hint" style="position:absolute;bottom:8px;right:12px;font-size:0.72rem;color:#17482f;font-weight:700;background:#e8f5e9;padding:2px 8px;border-radius:999px;">View ➔</span>
+                </div>
+
+                <div class="stat-card stat-card-btn" onclick="showAdminSection('orders')" title="Click to view order management" style="cursor:pointer;transition:all 0.25s ease;position:relative;">
+                    <div class="stat-icon blue"><i class="fas fa-shopping-bag"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statOrders">0</h3>
+                        <p>Orders</p>
+                    </div>
+                    <span class="stat-click-hint" style="position:absolute;bottom:8px;right:12px;font-size:0.72rem;color:#2980b9;font-weight:700;background:#ebf5fb;padding:2px 8px;border-radius:999px;">View ➔</span>
+                </div>
+
+                <div class="stat-card stat-card-btn" onclick="showAdminSection('customers')" title="Click to manage registered customers" style="cursor:pointer;transition:all 0.25s ease;position:relative;">
+                    <div class="stat-icon orange"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statUsers">0</h3>
+                        <p>Customers</p>
+                    </div>
+                    <span class="stat-click-hint" style="position:absolute;bottom:8px;right:12px;font-size:0.72rem;color:#d35400;font-weight:700;background:#fef5e7;padding:2px 8px;border-radius:999px;">Manage ➔</span>
+                </div>
+
+                <div class="stat-card stat-card-btn" onclick="showAdminSection('orders')" title="Click to view revenue breakdown" style="cursor:pointer;transition:all 0.25s ease;position:relative;">
+                    <div class="stat-icon purple"><i class="fas fa-rupee-sign"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statRevenue">Rs 0</h3>
+                        <p>Revenue</p>
+                    </div>
+                    <span class="stat-click-hint" style="position:absolute;bottom:8px;right:12px;font-size:0.72rem;color:#8e44ad;font-weight:700;background:#f5eeed;padding:2px 8px;border-radius:999px;">Sales ➔</span>
+                </div>
+            </div>
+
+            <!-- Quick Category Management Shortcuts -->
+            <div style="background:#fff;border:1px solid #e7e2d3;border-radius:18px;padding:20px;margin-top:20px;box-shadow:0 6px 20px rgba(0,0,0,0.03);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+                    <h3 style="font-family:'Playfair Display',serif;color:#17482f;margin:0;font-size:1.25rem;">
+                        🏷️ Category-Wise Inventory Quick Access
+                    </h3>
+                    <span style="font-size:0.85rem;color:#7c8878;font-weight:600;">1-Click Direct Category Table Access</span>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;">
+                    <div onclick="showAdminCategory('Flowers')" style="background:#fce4ec;border:1.5px solid #f8bbd0;border-radius:14px;padding:16px;cursor:pointer;transition:0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                        <div style="display:flex;align-items:center;justify-content:space-between;">
+                            <span style="font-size:1.8rem;">🌸</span>
+                            <span style="background:#c2185b;color:#fff;padding:2px 10px;border-radius:999px;font-size:0.75rem;font-weight:800;" id="dashFlowersCount">Flowers</span>
+                        </div>
+                        <b style="color:#c2185b;font-size:1.1rem;display:block;margin-top:8px;">Flowers Category</b>
+                        <small style="color:#880e4f;font-weight:600;">Manage Rose, Jasmine & Flowering Plants ➔</small>
+                    </div>
+
+                    <div onclick="showAdminCategory('Bonsai Trees')" style="background:#e8f5e9;border:1.5px solid #c8e6c9;border-radius:14px;padding:16px;cursor:pointer;transition:0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                        <div style="display:flex;align-items:center;justify-content:space-between;">
+                            <span style="font-size:1.8rem;">🌲</span>
+                            <span style="background:#2e7d4f;color:#fff;padding:2px 10px;border-radius:999px;font-size:0.75rem;font-weight:800;" id="dashBonsaiCount">Bonsai</span>
+                        </div>
+                        <b style="color:#2e7d4f;font-size:1.1rem;display:block;margin-top:8px;">Bonsai Trees Category</b>
+                        <small style="color:#1b5e20;font-weight:600;">Manage Ficus, Maple & Mini Bonsai ➔</small>
+                    </div>
+
+                    <div onclick="showAdminCategory('Accessories')" style="background:#fff8e1;border:1.5px solid #ffe082;border-radius:14px;padding:16px;cursor:pointer;transition:0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                        <div style="display:flex;align-items:center;justify-content:space-between;">
+                            <span style="font-size:1.8rem;">🪴</span>
+                            <span style="background:#f57f17;color:#fff;padding:2px 10px;border-radius:999px;font-size:0.75rem;font-weight:800;" id="dashAccessoriesCount">Accessories</span>
+                        </div>
+                        <b style="color:#f57f17;font-size:1.1rem;display:block;margin-top:8px;">Accessories Category</b>
+                        <small style="color:#e65100;font-weight:600;">Manage Pots, Shears, Fertilizer & Soil ➔</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Store Promo Codes & Discounts Panel -->
+            <div style="background:#fff;border:1px solid #e7e2d3;border-radius:18px;padding:22px;margin-top:20px;box-shadow:0 6px 20px rgba(0,0,0,0.03);">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+                    <h3 style="font-family:'Playfair Display',serif;color:#17482f;margin:0;font-size:1.3rem;display:flex;align-items:center;gap:8px;">
+                        🎟️ Store Promo Codes & Discount Coupons
+                    </h3>
+                    <button onclick="openAddCouponModal()" style="background:#17482f;color:#fff;border:none;padding:8px 18px;border-radius:999px;font-weight:700;font-size:0.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(23,72,47,0.2);">
+                        <i class="fas fa-plus-circle"></i> + Add New Coupon
+                    </button>
+                </div>
+                <div id="adminCouponsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;">
+                    <p style="color:#777;margin:0;">Loading active coupons...</p>
+                </div>
+            </div>
+
+            <!-- ⚠️ LOW STOCK EMERGENCY ALERT & INVENTORY RESTOCK WARNING -->
+            <div id="lowStockWidget" style="background:#fff0f0;border:1px solid #f5c6cb;border-radius:18px;padding:20px;margin-top:20px;box-shadow:0 6px 20px rgba(192,57,43,0.06);">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+                    <h3 style="font-family:'Playfair Display',serif;color:#c0392b;margin:0;display:flex;align-items:center;gap:8px;font-size:1.25rem;">
+                        ⚠️ Emergency Inventory Alerts (<span id="lowStockAlertCount">0</span> Plants Low in Stock)
+                    </h3>
+                    <button onclick="filterLowStockProducts()" style="background:#c0392b;color:#fff;border:none;padding:8px 18px;border-radius:999px;font-weight:700;font-size:0.82rem;cursor:pointer;box-shadow:0 4px 12px rgba(192,57,43,0.2);">
+                        <i class="fas fa-boxes"></i> View Restock List
+                    </button>
+                </div>
+                <div id="lowStockItemsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">
+                    <p style="color:#777;margin:0;">Checking stock levels...</p>
+                </div>
+            </div>
+
+            <!-- 📈 SALES REVENUE & CATEGORY BREAKDOWN CHARTS -->
+            <div style="background:#fff;border:1px solid #e7e2d3;border-radius:18px;padding:24px;margin-top:20px;box-shadow:0 6px 20px rgba(0,0,0,0.03);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+                    <h3 style="font-family:'Playfair Display',serif;color:#17482f;margin:0;font-size:1.3rem;">
+                        📈 Category Sales Revenue Distribution
+                    </h3>
+                    <span style="font-size:0.85rem;color:#7c8878;font-weight:600;">Real-time Performance Breakdown</span>
+                </div>
+                <div id="categoryRevenueChart" style="display:flex;flex-direction:column;gap:16px;">
+                    <p style="color:#777;margin:0;">Loading revenue distribution...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Section -->
+        <div id="section-products" style="display:none;">
+            <div class="admin-header" style="margin-bottom:16px;">
+                <div>
+                    <h1>🌱 Inventory & Product Catalog</h1>
+                    <span style="color:#7c8878;font-size:0.9rem;">Organized by botanical categories (Flowers, Bonsai Trees, Accessories)</span>
+                </div>
+                <button class="btn-primary" onclick="showAdminSection('addProduct')">+ Add New Product</button>
+            </div>
+            
+            <!-- Category Filter Tabs Bar -->
+            <div id="adminCategoryTabs" style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;"></div>
+
+            <!-- Category Divided Tables Container -->
+            <div id="adminProductsCategoryContainer"></div>
+        </div>
+
+        <!-- Add Product Section -->
+        <div id="section-addProduct" style="display:none;">
+            <div class="admin-header">
+                <h1 id="addProductHeading">➕ Add New Product</h1>
+            </div>
+            <div class="admin-form-card">
+                <form onsubmit="addProduct(event)">
+                    <!-- STEP 1: Select Category FIRST -->
+                    <div style="background:#f4f8f5;border:1.5px solid #17482f;border-radius:14px;padding:16px;margin-bottom:20px;box-shadow:0 4px 12px rgba(23,72,47,0.05);">
+                        <label style="font-weight:700;font-size:1.05rem;color:#17482f;display:block;margin-bottom:6px;">
+                            🏷️ STEP 1: Select Item Category First *
+                        </label>
+                        <span style="font-size:0.82rem;color:#555;display:block;margin-bottom:10px;">
+                            Choosing Accessories automatically adjusts form fields by hiding plant-specific specs and care plans!
+                        </span>
+                        <select id="productCategory" required onchange="onAdminCategorySelectChange(this.value, 'add')" style="width:100%;padding:12px;border-radius:10px;border:1.5px solid #17482f;font-weight:700;font-size:1rem;color:#17482f;background:#fff;cursor:pointer;">
+                            <option value="1">🌸 Flowers</option>
+                            <option value="2">🌲 Bonsai Trees</option>
+                            <option value="3">🪴 Accessories</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="flex:1;">
+                            <label id="productNameLabel">Plant / Item Name *</label>
+                            <input type="text" id="productName" required placeholder="e.g. Red Rose or Pruning Shears">
+                        </div>
+                        <div class="form-group" id="productScientificGroup" style="flex:1;">
+                            <label>Scientific Name</label>
+                            <input type="text" id="productScientific" placeholder="e.g. Rosa × hybrida">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Badge (optional)</label>
+                            <input type="text" id="productBadge" placeholder="e.g. Bestseller, New, Sale">
+                        </div>
+                        <div class="form-group" id="productCareLevelGroup">
+                            <label>Care Level</label>
+                            <select id="productCareLevel">
+                                <option value="Easy">Easy</option>
+                                <option value="Moderate" selected>Moderate</option>
+                                <option value="Expert">Expert</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Price (Rs) *</label>
+                            <input type="number" step="0.01" id="productPrice" required placeholder="e.g. 299">
+                        </div>
+                        <div class="form-group">
+                            <label>Original Price (Rs)</label>
+                            <input type="number" step="0.01" id="productOldPrice" placeholder="e.g. 399">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Stock Quantity</label>
+                            <input type="number" id="productStock" value="10" placeholder="10">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="background:#f4f8f5;border:1px dashed #2e7d4f;border-radius:14px;padding:16px;margin-bottom:18px;">
+                        <label style="color:#17482f;font-weight:700;font-size:1.05rem;margin-bottom:10px;display:block;">📸 Upload Plant Photos (.jpg, .png, .webp)</label>
+                        
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
+                            <!-- Main Photo Upload -->
+                            <div style="background:#fff;border:1px solid #dcdcdc;border-radius:12px;padding:10px;text-align:center;">
+                                <label style="font-weight:600;font-size:0.85rem;color:#333;display:block;margin-bottom:6px;">Main Plant Photo *</label>
+                                <div id="previewMainWrapper" style="margin-bottom:8px;display:none;">
+                                    <img id="previewMain" src="" style="width:100%;height:100px;object-fit:cover;border-radius:8px;">
+                                </div>
+                                <input type="file" accept="image/*" onchange="handleAdminFileUpload(this, 'productImage', 'previewMain', 'previewMainWrapper')" style="width:100%;font-size:0.8rem;">
+                                <input type="hidden" id="productImage">
+                                <small style="color:#777;font-size:0.75rem;display:block;margin-top:4px;">Upload JPG / PNG from device</small>
+                            </div>
+
+                            <!-- Photo 2 Upload -->
+                            <div style="background:#fff;border:1px solid #dcdcdc;border-radius:12px;padding:10px;text-align:center;">
+                                <label style="font-weight:600;font-size:0.85rem;color:#333;display:block;margin-bottom:6px;">Photo 2 (Close-up)</label>
+                                <div id="previewImg2Wrapper" style="margin-bottom:8px;display:none;">
+                                    <img id="previewImg2" src="" style="width:100%;height:100px;object-fit:cover;border-radius:8px;">
+                                </div>
+                                <input type="file" accept="image/*" onchange="handleAdminFileUpload(this, 'productImage2', 'previewImg2', 'previewImg2Wrapper')" style="width:100%;font-size:0.8rem;">
+                                <input type="hidden" id="productImage2">
+                                <small style="color:#777;font-size:0.75rem;display:block;margin-top:4px;">Upload JPG / PNG from device</small>
+                            </div>
+
+                            <!-- Photo 3 Upload -->
+                            <div style="background:#fff;border:1px solid #dcdcdc;border-radius:12px;padding:10px;text-align:center;">
+                                <label style="font-weight:600;font-size:0.85rem;color:#333;display:block;margin-bottom:6px;">Photo 3 (Pot / Leaves)</label>
+                                <div id="previewImg3Wrapper" style="margin-bottom:8px;display:none;">
+                                    <img id="previewImg3" src="" style="width:100%;height:100px;object-fit:cover;border-radius:8px;">
+                                </div>
+                                <input type="file" accept="image/*" onchange="handleAdminFileUpload(this, 'productImage3', 'previewImg3', 'previewImg3Wrapper')" style="width:100%;font-size:0.8rem;">
+                                <input type="hidden" id="productImage3">
+                                <small style="color:#777;font-size:0.75rem;display:block;margin-top:4px;">Upload JPG / PNG from device</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="productDescription" rows="3" placeholder="Detailed description of the plant or accessory..."></textarea>
+                    </div>
+
+                    <div id="productPlantDetailsSec">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Plant Age</label>
+                                <input type="text" id="productAge" placeholder="e.g. 1-2 years">
+                            </div>
+                            <div class="form-group">
+                                <label>Max Height</label>
+                                <input type="text" id="productHeight" placeholder="e.g. 30 - 45 cm">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Light Needs</label>
+                                <input type="text" id="productLight" placeholder="e.g. Bright indirect light">
+                            </div>
+                            <div class="form-group">
+                                <label>Water Needs</label>
+                                <input type="text" id="productWater" placeholder="e.g. Water when top soil is dry">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4-Week Care Plan Builder -->
+                    <div id="productCarePlanSec" style="background:#faf8f3;border:1px solid #e7e2d3;border-radius:14px;padding:18px;margin:18px 0;">
+                        <h3 style="font-family:'Playfair Display',serif;color:#17482f;margin-bottom:12px;font-size:1.1rem;">
+                            📅 4-Week Botanical Care Plan Setup
+                        </h3>
+                        <div class="form-group" style="margin-bottom:10px;">
+                            <label style="font-weight:600;font-size:0.85rem;">Week 1 Tasks (Acclimation & Hydration)</label>
+                            <textarea id="productCareWeek1" rows="2" placeholder="e.g. Keep in bright indirect sunlight. Water thoroughly until water drains."></textarea>
+                        </div>
+                        <div class="form-group" style="margin-bottom:10px;">
+                            <label style="font-weight:600;font-size:0.85rem;">Week 2 Tasks (Root & Moisture Check)</label>
+                            <textarea id="productCareWeek2" rows="2" placeholder="e.g. Check soil moisture 2 inches deep. Mist foliage 3 times per week."></textarea>
+                        </div>
+                        <div class="form-group" style="margin-bottom:10px;">
+                            <label style="font-weight:600;font-size:0.85rem;">Week 3 Tasks (Nutrient Boosting & Pruning)</label>
+                            <textarea id="productCareWeek3" rows="2" placeholder="e.g. Apply organic liquid fertilizer diluted to half strength. Prune yellow leaves."></textarea>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label style="font-weight:600;font-size:0.85rem;">Week 4 Tasks (Full Maintenance Schedule)</label>
+                            <textarea id="productCareWeek4" rows="2" placeholder="e.g. Establish regular weekly watering schedule. Inspect leaf undersides for pests."></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="auth-btn" style="max-width:220px;margin-top:10px;">Save New Product</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Orders Section -->
+        <div id="section-orders" style="display:none;">
+            <div class="admin-header">
+                <h1>📦 Customer Orders & Fulfillments</h1>
+                <span style="color:#7c8878;font-size:0.9rem;">View customer delivery addresses, ordered items & update shipping status</span>
+            </div>
+            <div class="admin-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer & Contact</th>
+                            <th>Delivery Address</th>
+                            <th>Ordered Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Update Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminOrdersTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Registered Customers Section -->
+        <div id="section-customers" style="display:none;">
+            <div class="admin-header">
+                <h1>👥 Registered Customers</h1>
+                <span style="color:#7c8878;font-size:0.9rem;">Manage user accounts, roles & order totals</span>
+            </div>
+            <div class="admin-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined Date</th><th>Total Orders</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminCustomersTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Cancelled Orders Section -->
+        <div id="section-cancelled" style="display:none;">
+            <div class="admin-header">
+                <h1>🚫 Cancelled Orders History</h1>
+                <span style="color:#c0392b;font-size:0.9rem;font-weight:600;">Orders cancelled by customers within the 24-hour window</span>
+            </div>
+            <div class="admin-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Cancelled Date</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminCancelledOrdersTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- EDIT PRODUCT MODAL -->
+<div class="modal-overlay" id="editModalOverlay" style="display:none;">
+    <div class="modal-card">
+        <button class="modal-close" onclick="closeEditModal()">✕</button>
+        <h2 style="font-family:'Playfair Display',serif;color:#17482f;margin-bottom:15px;">✏️ Edit Product Details</h2>
+        <form onsubmit="saveProductEdit(event)">
+            <input type="hidden" id="editId">
+            <div class="form-row">
+                    <div class="form-group" style="flex:1;">
+                        <label>Plant / Item Name *</label>
+                        <input type="text" id="editName" required>
+                    </div>
+                    <div class="form-group" id="editScientificGroup" style="flex:1;">
+                        <label>Scientific Name</label>
+                        <input type="text" id="editScientific">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="editCategory" required onchange="toggleCategoryPlantFields(this.value, 'edit')">
+                            <option value="1">🌸 Flowers</option>
+                            <option value="2">🌲 Bonsai Trees</option>
+                            <option value="3">🪴 Accessories</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Badge</label>
+                        <input type="text" id="editBadge">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Price (Rs) *</label>
+                        <input type="number" step="0.01" id="editPrice" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Original Price (Rs)</label>
+                        <input type="number" step="0.01" id="editOldPrice">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Stock Quantity</label>
+                        <input type="number" id="editStock">
+                    </div>
+                    <div class="form-group" id="editCareLevelGroup">
+                        <label>Care Level</label>
+                        <select id="editCareLevel">
+                            <option value="Easy">Easy</option>
+                            <option value="Moderate">Moderate</option>
+                            <option value="Expert">Expert</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="background:#f4f8f5;border:1px dashed #2e7d4f;border-radius:14px;padding:16px;margin-bottom:18px;">
+                    <label style="color:#17482f;font-weight:700;font-size:1.05rem;margin-bottom:10px;display:block;">📸 Update Plant / Item Photos (.jpg, .png, .webp)</label>
+                    
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
+                        <!-- Edit Main Photo Upload -->
+                        <div style="background:#fff;border:1px solid #dcdcdc;border-radius:12px;padding:10px;text-align:center;">
+                            <label style="font-weight:600;font-size:0.85rem;color:#333;display:block;margin-bottom:6px;">Main Photo</label>
+                            <div id="editPreviewMainWrapper" style="margin-bottom:8px;display:none;">
+                                <img id="editPreviewMain" src="" style="width:100%;height:90px;object-fit:cover;border-radius:8px;">
+                            </div>
+                            <input type="file" accept="image/*" onchange="handleAdminFileUpload(this, 'editImage', 'editPreviewMain', 'editPreviewMainWrapper')" style="width:100%;font-size:0.78rem;">
+                            <input type="hidden" id="editImage">
+                        </div>
+
+                        <!-- Edit Photo 2 Upload -->
+                        <div style="background:#fff;border:1px solid #dcdcdc;border-radius:12px;padding:10px;text-align:center;">
+                            <label style="font-weight:600;font-size:0.85rem;color:#333;display:block;margin-bottom:6px;">Photo 2 (Detail)</label>
+                            <div id="editPreviewImg2Wrapper" style="margin-bottom:8px;display:none;">
+                                <img id="editPreviewImg2" src="" style="width:100%;height:90px;object-fit:cover;border-radius:8px;">
+                            </div>
+                            <input type="file" accept="image/*" onchange="handleAdminFileUpload(this, 'editImage2', 'editPreviewImg2', 'editPreviewImg2Wrapper')" style="width:100%;font-size:0.78rem;">
+                            <input type="hidden" id="editImage2">
+                        </div>
+
+                        <!-- Edit Photo 3 Upload -->
+                        <div style="background:#fff;border:1px solid #dcdcdc;border-radius:12px;padding:10px;text-align:center;">
+                            <label style="font-weight:600;font-size:0.85rem;color:#333;display:block;margin-bottom:6px;">Photo 3 (Angle)</label>
+                            <div id="editPreviewImg3Wrapper" style="margin-bottom:8px;display:none;">
+                                <img id="editPreviewImg3" src="" style="width:100%;height:90px;object-fit:cover;border-radius:8px;">
+                            </div>
+                            <input type="file" accept="image/*" onchange="handleAdminFileUpload(this, 'editImage3', 'editPreviewImg3', 'editPreviewImg3Wrapper')" style="width:100%;font-size:0.78rem;">
+                            <input type="hidden" id="editImage3">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="editDescription" rows="3"></textarea>
+                </div>
+
+                <div id="editPlantDetailsSec">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Plant Age</label>
+                            <input type="text" id="editAge">
+                        </div>
+                        <div class="form-group">
+                            <label>Max Height</label>
+                            <input type="text" id="editHeight">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Light Needs</label>
+                            <input type="text" id="editLight">
+                        </div>
+                        <div class="form-group">
+                            <label>Water Needs</label>
+                            <input type="text" id="editWater">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit 4-Week Care Plan Builder -->
+                <div id="editCarePlanSec" style="background:#faf8f3;border:1px solid #e7e2d3;border-radius:14px;padding:18px;margin:18px 0;">
+                    <h3 style="font-family:'Playfair Display',serif;color:#17482f;margin-bottom:12px;font-size:1.1rem;">
+                        📅 Edit 4-Week Botanical Care Plan
+                    </h3>
+                    <div class="form-group" style="margin-bottom:10px;">
+                        <label style="font-weight:600;font-size:0.85rem;">Week 1 Tasks</label>
+                        <textarea id="editCareWeek1" rows="2"></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom:10px;">
+                        <label style="font-weight:600;font-size:0.85rem;">Week 2 Tasks</label>
+                        <textarea id="editCareWeek2" rows="2"></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom:10px;">
+                        <label style="font-weight:600;font-size:0.85rem;">Week 3 Tasks</label>
+                        <textarea id="editCareWeek3" rows="2"></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label style="font-weight:600;font-size:0.85rem;">Week 4 Tasks</label>
+                        <textarea id="editCareWeek4" rows="2"></textarea>
+                    </div>
+                </div>
+
+            <div style="display:flex;gap:10px;margin-top:15px;">
+                <button type="submit" class="auth-btn" style="max-width:200px;">Save Changes</button>
+                <button type="button" class="btn-ghost" onclick="closeEditModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="script.js?v=43.0"></script>
+<script>
+    let currentUser = null;
+    let allProducts = [];
+
+    function showAdminSection(section) {
+        document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
+        const targetSection = document.getElementById('section-' + section);
+        if (targetSection) targetSection.style.display = 'block';
+
+        document.querySelectorAll('.admin-nav a').forEach(a => a.classList.remove('active'));
+        const navItem = document.getElementById('nav-' + section);
+        if (navItem) navItem.classList.add('active');
+
+        if (section === 'addProduct') {
+            const catSel = document.getElementById('productCategory');
+            if (catSel) onAdminCategorySelectChange(catSel.value || 1, 'add');
+        }
+        if (section === 'customers') loadAdminCustomers();
+        if (section === 'cancelled') loadAdminCancelledOrders();
+    }
+
+    async function loadAdminData() {
+        try {
+            const res = await apiFetch('auth/me.php');
+            const me = (res && res.user) ? res.user : res;
+            if (!me || me.role !== 'admin') throw new Error('Admin access required');
+            currentUser = me; 
+            document.getElementById('adminName').textContent = me.name || 'Admin';
+
+            const [stats, products, orders] = await Promise.all([
+                apiFetch('admin/stats.php'),
+                apiFetch('products/list.php?limit=100'),
+                apiFetch('admin/orders.php')
+            ]);
+
+            allProducts = products || [];
+
+            document.getElementById('statProducts').textContent = stats.products;
+            document.getElementById('statOrders').textContent = stats.orders;
+            document.getElementById('statUsers').textContent = stats.users;
+            document.getElementById('statRevenue').textContent = formatINR(stats.revenue);
+
+            renderProductsTable(allProducts);
+            
+            const statusOptions = ['confirmed', 'packed', 'shipped', 'out_for_delivery', 'delivered', 'cancelled'];
+            const statusColors = { confirmed: '#2e7d4f', packed: '#c9a227', shipped: '#c9a227', out_for_delivery: '#c9a227', delivered: '#2e7d4f', cancelled: '#c0392b' };
+
+            document.getElementById('adminOrdersTable').innerHTML = (orders || []).map(o => {
+                const itemList = (o.items && Array.isArray(o.items) && o.items.length) ? o.items.map(it => `
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                        <img src="${esc(it.image || 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400')}" style="width:34px;height:34px;object-fit:cover;border-radius:6px;border:1px solid #e0e0e0;">
+                        <div>
+                            <b style="color:#17482f;font-size:0.85rem;display:block;">${esc(it.product_name || 'Plant Item')}</b>
+                            <span style="font-size:0.78rem;color:#555;">Qty: <b>${it.quantity}</b> • ${formatINR(it.price_at_purchase || 0)}</span>
+                        </div>
+                    </div>
+                `).join('') : `<span style="color:#777;font-style:italic;">No items recorded</span>`;
+
+                const fullAddr = o.shipping_address || (o.city ? `${o.customer_name || ''}, ${o.city} ${o.pincode || ''}` : 'No delivery address stored');
+                const phoneStr = o.phone ? `📞 ${esc(o.phone)}` : '';
+
+                return `
+                    <tr>
+                        <td><b>#${o.order_id || o.id}</b></td>
+                        <td>
+                            <strong style="color:#17482f;font-size:0.95rem;">${esc(o.customer || o.customer_name || 'Customer')}</strong><br>
+                            <small style="color:#555;">📧 ${esc(o.email || 'No email')}</small><br>
+                            <small style="color:#2e7d4f;font-weight:700;">${phoneStr}</small>
+                        </td>
+                        <td style="max-width:260px;">
+                            <div style="background:#f9f8f4;border:1px solid #e7e2d3;border-radius:8px;padding:8px 10px;font-size:0.82rem;line-height:1.4;color:#222;margin-bottom:4px;">
+                                📍 ${esc(fullAddr)}
+                            </div>
+                            <button type="button" onclick="navigator.clipboard.writeText('${esc(fullAddr).replace(/'/g, "\\'")}');showToast('Address copied to clipboard! 📋');" style="background:#e8f5e9;border:1px solid #a8d5b5;color:#2e7d4f;font-size:0.72rem;font-weight:700;cursor:pointer;padding:3px 8px;border-radius:6px;">
+                                📋 Copy Address
+                            </button>
+                        </td>
+                        <td>
+                            <div style="max-height:130px;overflow-y:auto;padding-right:4px;">
+                                ${itemList}
+                            </div>
+                        </td>
+                        <td><strong style="color:#17482f;font-size:0.98rem;">${formatINR(o.total)}</strong></td>
+                        <td><span class="status-badge" style="background:${statusColors[o.status] || '#7c8878'};color:#fff;padding:4px 10px;border-radius:12px;font-size:0.72rem;font-weight:bold;text-transform:uppercase;">${esc(o.status || 'confirmed')}</span></td>
+                        <td><small style="color:#555;">${esc(o.created_at)}</small></td>
+                        <td>
+                            <select onchange="updateOrderStatus(${o.order_id || o.id}, this.value)" style="padding:6px 10px;border-radius:8px;border:1px solid #17482f;font-size:0.82rem;cursor:pointer;background:#fff;font-weight:700;color:#17482f;">
+                                ${statusOptions.map(opt => `<option value="${opt}" ${o.status === opt ? 'selected' : ''}>${opt.replace(/_/g,' ')}</option>`).join('')}
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            loadAdminCustomers();
+            loadAdminCancelledOrders();
+            loadAdminAnalytics();
+            loadAdminCoupons();
+        } catch (err) {
+            alert(err.message || 'Could not load admin dashboard');
+            location.href = 'login.html';
+        }
+    }
+
+    async function loadAdminAnalytics() {
+        try {
+            const res = await apiFetch('admin/analytics.php');
+            if (!res) return;
+            const analytics = res.data || res;
+
+            const alertCountEl = document.getElementById('lowStockAlertCount');
+            if (alertCountEl) alertCountEl.textContent = analytics.low_stock_count;
+
+            const lowStockGrid = document.getElementById('lowStockItemsGrid');
+            if (lowStockGrid) {
+                if (analytics.low_stock_items && analytics.low_stock_items.length) {
+                    lowStockGrid.innerHTML = analytics.low_stock_items.map(p => `
+                        <div style="background:#fff;border:1px solid #f5c6cb;border-radius:12px;padding:12px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 12px rgba(192,57,43,0.06);">
+                            <img src="${esc(p.image || 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400')}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;">
+                            <div style="flex-grow:1;">
+                                <b style="color:#17482f;font-size:0.95rem;display:block;">${esc(p.name)}</b>
+                                <span style="color:#c0392b;font-size:0.8rem;font-weight:700;">⚠️ Only ${p.stock} left in stock</span>
+                            </div>
+                            <button onclick="openEditModal(${p.id})" style="background:#17482f;color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">Restock ➔</button>
+                        </div>
+                    `).join('');
+                } else {
+                    lowStockGrid.innerHTML = '<p style="color:#2e7d4f;font-weight:600;grid-column:1/-1;margin:0;">✅ All plant stock levels are healthy! (No items under 3 remaining)</p>';
+                }
+            }
+
+            const chartContainer = document.getElementById('categoryRevenueChart');
+            if (chartContainer && analytics.category_revenue) {
+                const maxRev = Math.max(...analytics.category_revenue.map(c => Number(c.total_revenue) || 1), 1);
+                chartContainer.innerHTML = analytics.category_revenue.map(c => {
+                    const rev = Number(c.total_revenue);
+                    const pct = Math.round((rev / maxRev) * 100);
+                    return `
+                        <div>
+                            <div style="display:flex;justify-content:space-between;font-size:0.92rem;margin-bottom:6px;font-weight:600;color:#17482f;">
+                                <span>🌱 ${esc(c.category)} (${c.items_sold} sold)</span>
+                                <span>${formatINR(rev)}</span>
+                            </div>
+                            <div style="background:#f0eae1;height:14px;border-radius:999px;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,0.05);">
+                                <div style="width:${pct}%;height:100%;background:linear-gradient(90deg, #17482f 0%, #52B788 100%);border-radius:999px;transition:width 0.8s ease;"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        } catch(e) { console.warn('Analytics loading error:', e); }
+    }
+
+    function filterLowStockProducts() {
+        showAdminSection('products');
+        const lowStock = allProducts.filter(p => p.stock < 3);
+        renderProductsTable(lowStock);
+        showToast('Filtered inventory to items low in stock (< 3 items)', 'info');
+    }
+
+    window.allCouponsCache = [];
+
+    async function loadAdminCoupons() {
+        const container = document.getElementById('adminCouponsGrid');
+        if (!container) return;
+
+        try {
+            const res = await apiFetch('admin/coupons/list.php');
+            const coupons = (res && res.data && res.data.coupons) ? res.data.coupons : (res.coupons || []);
+            window.allCouponsCache = coupons;
+
+            if (!coupons.length) {
+                container.innerHTML = '<p style="color:#777;grid-column:1/-1;">No promo coupons found. Click <b>+ Add New Coupon</b> above to create one!</p>';
+                return;
+            }
+
+            container.innerHTML = coupons.map(c => {
+                const discountText = c.discount_percent > 0 
+                    ? `${parseFloat(c.discount_percent)}% Off All Orders` 
+                    : `${formatINR(c.discount_amount)} Flat Discount`;
+                
+                const minSpendText = c.min_spend > 0 ? `Min Spend: ${formatINR(c.min_spend)}` : 'No Minimum Spend';
+                const expiryText = c.expiry_date ? ` • ⏳ Expires: ${c.expiry_date}` : '';
+                const isActive = Number(c.is_active) === 1;
+
+                return `
+                    <div style="background:#faf8f3;border:1px dashed ${isActive ? '#c9a227' : '#ccc'};border-radius:14px;padding:16px;position:relative;box-shadow:0 4px 12px rgba(0,0,0,0.03);opacity:${isActive ? '1' : '0.65'};">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+                            <b style="color:#17482f;font-size:1.15rem;letter-spacing:0.5px;">${esc(c.code)}</b>
+                            <span onclick="toggleCouponStatus(${c.id})" style="background:${isActive ? '#e8f5e9' : '#ffebee'};color:${isActive ? '#2e7d4f' : '#c0392b'};border:1px solid ${isActive ? '#a8d5b5' : '#f5c6cb'};padding:2px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;cursor:pointer;" title="Click to toggle active status">
+                                ${isActive ? '🟢 Active' : '🔴 Disabled'}
+                            </span>
+                        </div>
+                        <span style="color:#2e7d4f;font-size:0.88rem;font-weight:700;display:block;">${discountText}</span>
+                        <small style="color:#666;display:block;margin:4px 0 10px;">${minSpendText}${expiryText}</small>
+                        
+                        <div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid #e7e2d3;">
+                            <button onclick="editCoupon(${c.id})" style="flex:1;background:#fff;border:1px solid #17482f;color:#17482f;padding:5px 8px;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;">
+                                ✏️ Edit
+                            </button>
+                            <button onclick="deleteCoupon(${c.id})" style="background:#ffebee;border:1px solid #f5c6cb;color:#c0392b;padding:5px 10px;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;" title="Delete Coupon">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (err) {
+            container.innerHTML = `<p style="color:#c0392b;grid-column:1/-1;">Could not load coupons: ${esc(err.message)}</p>`;
+        }
+    }
+
+    function openAddCouponModal() {
+        document.getElementById('couponFormId').value = '0';
+        document.getElementById('couponFormCode').value = '';
+        document.getElementById('couponFormType').value = 'percent';
+        document.getElementById('couponFormVal').value = '';
+        document.getElementById('couponFormMin').value = '0';
+        document.getElementById('couponFormExpiry').value = '';
+        document.getElementById('couponFormActive').checked = true;
+        document.getElementById('couponModalTitle').textContent = '➕ Add New Promo Coupon';
+        document.getElementById('couponModal').style.display = 'flex';
+    }
+
+    function editCoupon(id) {
+        const c = window.allCouponsCache.find(item => Number(item.id) === Number(id));
+        if (!c) return;
+
+        document.getElementById('couponFormId').value = c.id;
+        document.getElementById('couponFormCode').value = c.code;
+        
+        if (c.discount_percent > 0) {
+            document.getElementById('couponFormType').value = 'percent';
+            document.getElementById('couponFormVal').value = parseFloat(c.discount_percent);
+        } else {
+            document.getElementById('couponFormType').value = 'amount';
+            document.getElementById('couponFormVal').value = parseFloat(c.discount_amount);
+        }
+
+        document.getElementById('couponFormMin').value = parseFloat(c.min_spend || 0);
+        document.getElementById('couponFormExpiry').value = c.expiry_date || '';
+        document.getElementById('couponFormActive').checked = Number(c.is_active) === 1;
+        document.getElementById('couponModalTitle').textContent = '✏️ Edit Promo Coupon';
+        document.getElementById('couponModal').style.display = 'flex';
+    }
+
+    function closeCouponModal() {
+        document.getElementById('couponModal').style.display = 'none';
+    }
+
+    async function saveCouponForm(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        
+        const id = Number(document.getElementById('couponFormId').value);
+        const code = document.getElementById('couponFormCode').value.trim();
+        const discount_type = document.getElementById('couponFormType').value;
+        const discount_value = Number(document.getElementById('couponFormVal').value);
+        const min_spend = Number(document.getElementById('couponFormMin').value);
+        const expiry_date = document.getElementById('couponFormExpiry').value || null;
+        const is_active = document.getElementById('couponFormActive').checked ? 1 : 0;
+
+        if (!code || discount_value <= 0) {
+            alert('Please provide a valid coupon code and discount value.');
+            return;
+        }
+
+        try {
+            const res = await apiFetch('admin/coupons/save.php', {
+                method: 'POST',
+                body: JSON.stringify({ id, code, discount_type, discount_value, min_spend, expiry_date, is_active })
+            });
+            showToast((res && res.message) || 'Coupon saved successfully! 🎉');
+            closeCouponModal();
+            loadAdminCoupons();
+        } catch (err) {
+            alert(err.message || 'Could not save coupon.');
+        }
+    }
+
+    async function toggleCouponStatus(id) {
+        try {
+            const res = await apiFetch('admin/coupons/toggle.php', {
+                method: 'POST',
+                body: JSON.stringify({ id })
+            });
+            showToast((res && res.message) || 'Coupon status updated!');
+            loadAdminCoupons();
+        } catch (err) {
+            alert(err.message || 'Could not update coupon status.');
+        }
+    }
+
+    async function deleteCoupon(id) {
+        if (!confirm('Are you sure you want to delete this promo coupon?')) return;
+
+        try {
+            const res = await apiFetch('admin/coupons/delete.php?id=' + id, { method: 'DELETE' });
+            showToast((res && res.message) || 'Coupon deleted.');
+            loadAdminCoupons();
+        } catch (err) {
+            alert(err.message || 'Could not delete coupon.');
+        }
+    }
+
+    async function updateOrderStatus(orderId, status) {
+        try {
+            await apiFetch('admin/orders.php', {
+                method: 'PUT',
+                body: JSON.stringify({ order_id: Number(orderId), status: status })
+            });
+            showToast('Order #' + orderId + ' updated to ' + status.replace(/_/g,' ') + '! 🚚');
+            loadAdminData();
+        } catch (err) {
+            alert(err.message || 'Could not update order status');
+        }
+    }
+
+    let currentCategoryFilter = 'all';
+
+    function renderProductsTable(products) {
+        const tabsContainer = document.getElementById('adminCategoryTabs');
+        const contentContainer = document.getElementById('adminProductsCategoryContainer');
+
+        if (!contentContainer) return;
+
+        // Group products by category name
+        const grouped = {};
+        const categoryMap = {
+            'Flowers': { icon: '🌸', badgeColor: '#fce4ec', textColor: '#c2185b' },
+            'Bonsai': { icon: '🌲', badgeColor: '#e8f5e9', textColor: '#2e7d4f' },
+            'Bonsai Trees': { icon: '🌲', badgeColor: '#e8f5e9', textColor: '#2e7d4f' },
+            'Accessories': { icon: '🪴', badgeColor: '#fff8e1', textColor: '#f57f17' }
+        };
+
+        products.forEach(p => {
+            const cat = p.category || 'Other Plants';
+            if (!grouped[cat]) grouped[cat] = [];
+            grouped[cat].push(p);
+        });
+
+        const categoryNames = Object.keys(grouped);
+
+        // 1. Render Category Filter Tabs
+        if (tabsContainer) {
+            tabsContainer.innerHTML = `
+                <button type="button" onclick="setCategoryFilter('all')" class="cat-filter-btn" style="background:${currentCategoryFilter === 'all' ? '#17482f' : '#fff'};color:${currentCategoryFilter === 'all' ? '#fff' : '#17482f'};border:1.5px solid #17482f;padding:8px 16px;border-radius:999px;font-weight:700;font-size:0.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:0.2s;box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+                    🏷️ All Categories (${products.length})
+                </button>
+                ${categoryNames.map(cat => {
+                    const info = categoryMap[cat] || { icon: '🌱', badgeColor: '#e8f5e9', textColor: '#2e7d4f' };
+                    const isSelected = currentCategoryFilter.toLowerCase() === cat.toLowerCase();
+                    return `
+                        <button type="button" onclick="setCategoryFilter('${esc(cat)}')" class="cat-filter-btn" style="background:${isSelected ? '#17482f' : '#fff'};color:${isSelected ? '#fff' : '#17482f'};border:1.5px solid #17482f;padding:8px 16px;border-radius:999px;font-weight:700;font-size:0.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:0.2s;box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+                            ${info.icon} ${esc(cat)} (${grouped[cat].length})
+                        </button>
+                    `;
+                }).join('')}
+            `;
+        }
+
+        // 2. Render Category-Divided Table Sections
+        if (!products.length) {
+            contentContainer.innerHTML = '<p style="color:#777;padding:20px;text-align:center;">No products found.</p>';
+            return;
+        }
+
+        const categoriesToRender = (currentCategoryFilter === 'all') 
+            ? categoryNames 
+            : categoryNames.filter(c => c.toLowerCase() === currentCategoryFilter.toLowerCase());
+
+        if (!categoriesToRender.length) {
+            contentContainer.innerHTML = `<p style="color:#777;padding:20px;text-align:center;">No products found in '${esc(currentCategoryFilter)}' category.</p>`;
+            return;
+        }
+
+        contentContainer.innerHTML = categoriesToRender.map(cat => {
+            const catProducts = grouped[cat];
+            const info = categoryMap[cat] || { icon: '🌱', badgeColor: '#e8f5e9', textColor: '#2e7d4f' };
+
+            return `
+                <div style="background:#fff;border:1px solid #e2eae4;border-radius:18px;padding:20px;margin-bottom:24px;box-shadow:0 6px 18px rgba(0,0,0,0.03);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #f0f4f1;">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:1.4rem;">${info.icon}</span>
+                            <h3 style="font-family:'Playfair Display',serif;color:#17482f;margin:0;font-size:1.25rem;">
+                                ${esc(cat)} Category
+                            </h3>
+                            <span style="background:${info.badgeColor};color:${info.textColor};padding:3px 12px;border-radius:999px;font-size:0.75rem;font-weight:800;">
+                                ${catProducts.length} Product${catProducts.length === 1 ? '' : 's'}
+                            </span>
+                        </div>
+                        <small style="color:#777;font-weight:600;">Category ID: ${catProducts[0]?.category_id || '—'}</small>
+                    </div>
+
+                    <div class="admin-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Image</th>
+                                    <th>Plant Name</th>
+                                    <th>Scientific Name</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${catProducts.map(p => `
+                                    <tr>
+                                        <td><b>#${p.id}</b></td>
+                                        <td><img src="${esc(p.image || FALLBACK_IMG)}" width="44" height="44" style="object-fit:cover;border-radius:8px;"></td>
+                                        <td>
+                                            <b>${esc(p.name)}</b>
+                                            ${p.badge ? `<span style="background:#fff3cd;color:#856404;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:700;margin-left:4px;">${esc(p.badge)}</span>` : ''}
+                                        </td>
+                                        <td><i>${esc(p.scientific_name || '—')}</i></td>
+                                        <td><b>${formatINR(p.price)}</b> ${p.old_price ? `<small style="text-decoration:line-through;color:#888;">${formatINR(p.old_price)}</small>` : ''}</td>
+                                        <td>
+                                            <span style="font-weight:700;color:${p.stock < 3 ? '#c0392b' : '#2e7d4f'};">
+                                                ${p.stock < 3 ? '⚠️ ' : ''}${p.stock} pcs
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="admin-action-btn btn-edit" onclick="openEditModal(${p.id})"><i class="fas fa-edit"></i> Edit</button>
+                                            <button type="button" class="admin-action-btn btn-delete" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function setCategoryFilter(category) {
+        currentCategoryFilter = category;
+        renderProductsTable(allProducts);
+    }
+
+    async function addProduct(e) {
+        e.preventDefault();
+
+        const w1 = document.getElementById('productCareWeek1').value.trim();
+        const w2 = document.getElementById('productCareWeek2').value.trim();
+        const w3 = document.getElementById('productCareWeek3').value.trim();
+        const w4 = document.getElementById('productCareWeek4').value.trim();
+
+        const carePlanArray = [
+            { week: "Week 1", title: "Acclimation & Hydration", tasks: w1 || "Keep in bright indirect sunlight. Water thoroughly until water drains." },
+            { week: "Week 2", title: "Root & Moisture Check", tasks: w2 || "Check soil moisture 2 inches deep. Mist foliage 3 times per week." },
+            { week: "Week 3", title: "Nutrient Boosting & Pruning", tasks: w3 || "Apply organic liquid fertilizer diluted to half-strength. Prune yellow leaves." },
+            { week: "Week 4", title: "Full Maintenance Schedule", tasks: w4 || "Establish regular weekly watering schedule. Inspect leaf undersides for pests." }
+        ];
+
+        const catId = Number(document.getElementById('productCategory').value);
+        const catMap = { 1: 'Flowers', 2: 'Bonsai Trees', 3: 'Accessories' };
+
+        const body = {
+            name: document.getElementById('productName').value,
+            scientific_name: document.getElementById('productScientific').value,
+            category_id: catId,
+            badge: document.getElementById('productBadge').value,
+            price: Number(document.getElementById('productPrice').value),
+            old_price: document.getElementById('productOldPrice').value ? Number(document.getElementById('productOldPrice').value) : null,
+            stock: Number(document.getElementById('productStock').value),
+            care_level: document.getElementById('productCareLevel').value,
+            image: document.getElementById('productImage').value,
+            image2: document.getElementById('productImage2') ? document.getElementById('productImage2').value : '',
+            image3: document.getElementById('productImage3') ? document.getElementById('productImage3').value : '',
+            description: document.getElementById('productDescription').value,
+            plant_age: document.getElementById('productAge').value,
+            max_height: document.getElementById('productHeight').value,
+            light_needs: document.getElementById('productLight').value,
+            water_needs: document.getElementById('productWater').value,
+            care_plan: carePlanArray
+        };
+
+        try {
+            await apiFetch('products/admin.php', { method: 'POST', body: JSON.stringify(body) });
+            showToast('New product added to ' + (catMap[catId] || 'Category') + ' section! 🌱');
+            e.target.reset();
+            
+            // Set current category filter to newly added product's category
+            currentCategoryFilter = catMap[catId] || 'all';
+            
+            await loadAdminData();
+            showAdminSection('products');
+        } catch (err) { alert(err.message); }
+    }
+
+    function onAdminCategorySelectChange(catId, mode) {
+        const isAccessory = Number(catId) === 3;
+        const catMap = { 1: 'Flower Plant', 2: 'Bonsai Tree', 3: 'Accessory Item' };
+
+        toggleCategoryPlantFields(catId, mode);
+
+        if (mode === 'add') {
+            const heading = document.getElementById('addProductHeading');
+            const nameLabel = document.getElementById('productNameLabel');
+
+            if (heading) heading.textContent = '➕ Add New ' + (catMap[catId] || 'Product');
+            if (nameLabel) nameLabel.textContent = isAccessory ? 'Accessory / Tool Name *' : 'Plant Name *';
+        }
+    }
+
+    function toggleCategoryPlantFields(catId, mode) {
+        const isAccessory = Number(catId) === 3;
+        const prefix = mode === 'add' ? 'product' : 'edit';
+
+        const scientificGroup = document.getElementById(prefix + 'ScientificGroup');
+        const careLevelGroup  = document.getElementById(prefix + 'CareLevelGroup');
+        const plantDetailsSec = document.getElementById(prefix + 'PlantDetailsSec');
+        const carePlanSec     = document.getElementById(prefix + 'CarePlanSec');
+
+        if (scientificGroup) scientificGroup.style.display = isAccessory ? 'none' : 'block';
+        if (careLevelGroup)  careLevelGroup.style.display  = isAccessory ? 'none' : 'block';
+        if (plantDetailsSec) plantDetailsSec.style.display = isAccessory ? 'none' : 'block';
+        if (carePlanSec)     carePlanSec.style.display     = isAccessory ? 'none' : 'block';
+    }
+
+    function openEditModal(productId) {
+        const p = allProducts.find(x => x.id === productId);
+        if (!p) return;
+        document.getElementById('editId').value = p.id;
+        document.getElementById('editName').value = p.name || '';
+        document.getElementById('editScientific').value = p.scientific_name || '';
+        document.getElementById('editCategory').value = p.category_id || 1;
+        document.getElementById('editBadge').value = p.badge || '';
+        document.getElementById('editPrice').value = p.price || '';
+        document.getElementById('editOldPrice').value = p.old_price || '';
+        document.getElementById('editStock').value = p.stock || 10;
+        document.getElementById('editCareLevel').value = p.care_level || 'Moderate';
+        document.getElementById('editImage').value = p.image || '';
+        if (document.getElementById('editImage2')) document.getElementById('editImage2').value = p.image2 || '';
+        if (document.getElementById('editImage3')) document.getElementById('editImage3').value = p.image3 || '';
+        document.getElementById('editDescription').value = p.description || '';
+        document.getElementById('editAge').value = p.plant_age || '';
+        document.getElementById('editHeight').value = p.max_height || '';
+        document.getElementById('editLight').value = p.light_needs || '';
+        document.getElementById('editWater').value = p.water_needs || '';
+
+        toggleCategoryPlantFields(p.category_id || 1, 'edit');
+
+        // Pre-fill 4-Week Care Plan if available
+        let cp = [];
+        try {
+            cp = (typeof p.care_plan === 'string') ? JSON.parse(p.care_plan) : (p.care_plan || []);
+        } catch(e){}
+
+        if (document.getElementById('editCareWeek1')) document.getElementById('editCareWeek1').value = cp[0] ? (cp[0].tasks || cp[0].description || '') : '';
+        if (document.getElementById('editCareWeek2')) document.getElementById('editCareWeek2').value = cp[1] ? (cp[1].tasks || cp[1].description || '') : '';
+        if (document.getElementById('editCareWeek3')) document.getElementById('editCareWeek3').value = cp[2] ? (cp[2].tasks || cp[2].description || '') : '';
+        if (document.getElementById('editCareWeek4')) document.getElementById('editCareWeek4').value = cp[3] ? (cp[3].tasks || cp[3].description || '') : '';
+
+        const setPrev = (imgId, wrapId, url) => {
+            const img = document.getElementById(imgId);
+            const wrap = document.getElementById(wrapId);
+            if (img && wrap) {
+                if (url) { img.src = url; wrap.style.display = 'block'; }
+                else { img.src = ''; wrap.style.display = 'none'; }
+            }
+        };
+        setPrev('editPreviewMain', 'editPreviewMainWrapper', p.image);
+        setPrev('editPreviewImg2', 'editPreviewImg2Wrapper', p.image2);
+        setPrev('editPreviewImg3', 'editPreviewImg3Wrapper', p.image3);
+
+        document.getElementById('editModalOverlay').style.display = 'flex';
+    }
+
+    let isUploadingImage = false;
+
+    async function handleAdminFileUpload(fileInput, targetInputId, previewImgId, previewWrapperId) {
+        if (!fileInput.files || !fileInput.files[0]) return;
+        const file = fileInput.files[0];
+        
+        isUploadingImage = true;
+        const submitBtns = document.querySelectorAll('form button[type="submit"]');
+        submitBtns.forEach(btn => {
+            btn.disabled = true;
+            if (!btn.dataset.origText) btn.dataset.origText = btn.textContent;
+            btn.textContent = 'Uploading Photo... ⏳';
+        });
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById(previewImgId);
+            const wrapper = document.getElementById(previewWrapperId);
+            if (img) img.src = e.target.result;
+            if (wrapper) wrapper.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            showToast('Uploading photo from device... ⏳');
+            const data = await apiFetch('admin/upload_image.php', {
+                method: 'POST',
+                body: formData,
+                formdata: true
+            });
+
+            const uploadedPath = (typeof data === 'string') ? data : (data.url || data.path || '');
+            if (!uploadedPath) throw new Error('Server did not return image path');
+
+            document.getElementById(targetInputId).value = uploadedPath;
+            showToast('Photo uploaded & attached successfully! 📷');
+        } catch (err) {
+            alert('Upload Error: ' + (err.message || err.error || 'Upload failed'));
+            document.getElementById(targetInputId).value = '';
+            const img = document.getElementById(previewImgId);
+            const wrapper = document.getElementById(previewWrapperId);
+            if (img) img.src = '';
+            if (wrapper) wrapper.style.display = 'none';
+        } finally {
+            isUploadingImage = false;
+            submitBtns.forEach(btn => {
+                btn.disabled = false;
+                if (btn.dataset.origText) btn.textContent = btn.dataset.origText;
+            });
+        }
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModalOverlay').style.display = 'none';
+        document.querySelectorAll('#editModalOverlay input[type="file"]').forEach(inp => inp.value = '');
+    }
+
+    async function saveProductEdit(e) {
+        e.preventDefault();
+
+        if (isUploadingImage) {
+            alert('Please wait for the photo to finish uploading before saving.');
+            return;
+        }
+
+        const w1 = document.getElementById('editCareWeek1') ? document.getElementById('editCareWeek1').value.trim() : '';
+        const w2 = document.getElementById('editCareWeek2') ? document.getElementById('editCareWeek2').value.trim() : '';
+        const w3 = document.getElementById('editCareWeek3') ? document.getElementById('editCareWeek3').value.trim() : '';
+        const w4 = document.getElementById('editCareWeek4') ? document.getElementById('editCareWeek4').value.trim() : '';
+
+        const carePlanArray = [
+            { week: "Week 1", title: "Acclimation & Hydration", tasks: w1 || "Keep in bright indirect sunlight. Water thoroughly until water drains." },
+            { week: "Week 2", title: "Root & Moisture Check", tasks: w2 || "Check soil moisture 2 inches deep. Mist foliage 3 times per week." },
+            { week: "Week 3", title: "Nutrient Boosting & Pruning", tasks: w3 || "Apply organic liquid fertilizer diluted to half-strength. Prune yellow leaves." },
+            { week: "Week 4", title: "Full Maintenance Schedule", tasks: w4 || "Establish regular weekly watering schedule. Inspect leaf undersides for pests." }
+        ];
+
+        const body = {
+            id: Number(document.getElementById('editId').value),
+            name: document.getElementById('editName').value,
+            scientific_name: document.getElementById('editScientific').value,
+            category_id: Number(document.getElementById('editCategory').value),
+            badge: document.getElementById('editBadge').value,
+            price: Number(document.getElementById('editPrice').value),
+            old_price: document.getElementById('editOldPrice').value ? Number(document.getElementById('editOldPrice').value) : null,
+            stock: Number(document.getElementById('editStock').value),
+            care_level: document.getElementById('editCareLevel').value,
+            image: document.getElementById('editImage').value,
+            image2: document.getElementById('editImage2') ? document.getElementById('editImage2').value : '',
+            image3: document.getElementById('editImage3') ? document.getElementById('editImage3').value : '',
+            description: document.getElementById('editDescription').value,
+            plant_age: document.getElementById('editAge').value,
+            max_height: document.getElementById('editHeight').value,
+            light_needs: document.getElementById('editLight').value,
+            water_needs: document.getElementById('editWater').value,
+            care_plan: carePlanArray
+        };
+
+        try {
+            await apiFetch('products/admin.php', { method: 'PUT', body: JSON.stringify(body) });
+            showToast('Product & Care Plan updated successfully! ✨');
+            closeEditModal();
+
+            const catMap = { 1: 'Flowers', 2: 'Bonsai Trees', 3: 'Accessories' };
+            currentCategoryFilter = catMap[body.category_id] || 'all';
+
+            await loadAdminData();
+            showAdminSection('products');
+        } catch (err) { alert(err.message); }
+    }
+
+    async function deleteProduct(productId) {
+        if (!confirm('Are you sure you want to delete this product?')) return;
+        try {
+            await apiFetch('products/admin.php?id=' + productId, { method: 'DELETE' });
+            showToast('Product deleted');
+            loadAdminData();
+        } catch (err) { alert(err.message); }
+    }
+
+    function showAdminCategory(catName) {
+        showAdminSection('products');
+        setCategoryFilter(catName);
+    }
+
+    async function loadAdminCustomers() {
+        const tbody = document.getElementById('adminCustomersTable');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">Loading customer accounts... ⏳</td></tr>';
+        try {
+            const res = await apiFetch('admin/users.php');
+            const users = Array.isArray(res) ? res : (res && res.data ? res.data : []);
+            if (!users.length) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:#777;">No registered customers found.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = users.map(u => `
+                <tr>
+                    <td><b>#${u.id}</b></td>
+                    <td><strong>${esc(u.name)}</strong></td>
+                    <td>${esc(u.email)}</td>
+                    <td>${esc(u.phone || '—')}</td>
+                    <td>
+                        <span style="background:${u.role === 'admin' ? '#17482f' : '#e0eae3'};color:${u.role === 'admin' ? '#fff' : '#17482f'};padding:3px 10px;border-radius:999px;font-size:0.78rem;font-weight:700;">
+                            ${u.role === 'admin' ? '👑 Admin' : '👤 Customer'}
+                        </span>
+                    </td>
+                    <td>${esc(String(u.created_at || '').slice(0, 10))}</td>
+                    <td><b>${u.total_orders || 0} orders</b> (${formatINR(u.total_spent || 0)})</td>
+                    <td>
+                        ${u.role === 'admin' 
+                            ? `<button class="admin-action-btn btn-edit" onclick="updateUserRole(${u.id}, 'customer')">Set Customer</button>` 
+                            : `<button class="admin-action-btn btn-edit" style="background:#c9a227;" onclick="updateUserRole(${u.id}, 'admin')">Make Admin</button>`}
+                        <button class="admin-action-btn btn-delete" onclick="deleteUserAccount(${u.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (err) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#c0392b;padding:20px;">${esc(err.message)}</td></tr>`;
+        }
+    }
+
+    async function updateUserRole(userId, newRole) {
+        if (!confirm(`Change user #${userId} role to ${newRole}?`)) return;
+        try {
+            await apiFetch('admin/users.php', {
+                method: 'PUT',
+                body: JSON.stringify({ id: userId, role: newRole })
+            });
+            showToast(`User #${userId} role updated to ${newRole}`);
+            loadAdminCustomers();
+            loadAdminData();
+        } catch (err) {
+            showToast(err.message, 'error');
+        }
+    }
+
+    async function deleteUserAccount(userId) {
+        if (!confirm(`Are you sure you want to delete user account #${userId}?\nThis cannot be undone.`)) return;
+        try {
+            await apiFetch(`admin/users.php?id=${userId}`, { method: 'DELETE' });
+            showToast(`User account #${userId} deleted`);
+            loadAdminCustomers();
+            loadAdminData();
+        } catch (err) {
+            showToast(err.message, 'error');
+        }
+    }
+
+    async function loadAdminCancelledOrders() {
+        const tbody = document.getElementById('adminCancelledOrdersTable');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;">Loading cancelled orders...</td></tr>';
+        try {
+            const res = await apiFetch('admin/orders.php');
+            const ordersList = Array.isArray(res) ? res : (res && res.data ? res.data : []);
+            const cancelled = ordersList.filter(o => o.status === 'cancelled');
+            if (!cancelled.length) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:#7c8878;">No cancelled orders found.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = cancelled.map(o => {
+                const itemList = (o.items && Array.isArray(o.items) && o.items.length) ? o.items.map(it => `
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                        <img src="${esc(it.image || 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400')}" style="width:28px;height:28px;object-fit:cover;border-radius:4px;">
+                        <span style="font-size:0.82rem;color:#555;">${esc(it.product_name || 'Item')} × ${it.quantity}</span>
+                    </div>
+                `).join('') : `<span style="color:#777;font-style:italic;">No items recorded</span>`;
+
+                return `
+                    <tr>
+                        <td><b>#${o.order_id || o.id}</b></td>
+                        <td><strong>${esc(o.customer || o.customer_name || 'Customer')}</strong><br><small style="color:#777;">${esc(o.email || o.phone || '')}</small></td>
+                        <td>${itemList}</td>
+                        <td><strong style="color:#c0392b;">${formatINR(o.total)}</strong></td>
+                        <td><span style="background:#ffebee;color:#c0392b;padding:3px 10px;border-radius:999px;font-size:0.75rem;font-weight:700;">🚫 Cancelled</span></td>
+                        <td>${esc(String(o.created_at || '').slice(0, 16))}</td>
+                        <td>
+                            <span style="color:#888;font-size:0.82rem;font-style:italic;">Cancelled Order</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        } catch (err) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#c0392b;padding:20px;">${esc(err.message)}</td></tr>`;
+        }
+    }
+
+    function handleLogout() { logout(); }
+
+    function startRealtimeClock() {
+        function updateClock() {
+            const el = document.getElementById('clockDateTimeText');
+            if (!el) return;
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit', 
+                hour12: true 
+            };
+            el.textContent = '📅 ' + now.toLocaleString('en-US', options) + ' (Real-time Live)';
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        startRealtimeClock();
+        loadAdminData();
+    });
+</script>
+<!-- Promo Coupon Edit / Add Modal -->
+<div class="modal-overlay" id="couponModal" onclick="if(event.target===this) closeCouponModal();" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:20px;padding:26px;max-width:460px;width:90%;box-shadow:0 12px 35px rgba(0,0,0,0.2);position:relative;">
+    <button onclick="closeCouponModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.2rem;cursor:pointer;color:#777;">✕</button>
+    <h3 id="couponModalTitle" style="font-family:'Playfair Display',serif;color:#17482f;margin-bottom:16px;">🎟️ Manage Promo Coupon</h3>
+    
+    <form onsubmit="saveCouponForm(event)">
+      <input type="hidden" id="couponFormId" value="0">
+      
+      <div class="form-group" style="margin-bottom:12px;">
+        <label style="font-weight:600;font-size:0.85rem;color:#17482f;display:block;margin-bottom:4px;">Coupon Code *</label>
+        <input type="text" id="couponFormCode" required placeholder="e.g. FESTIVE20" style="width:100%;padding:10px;border-radius:10px;border:1px solid #d4e4d6;font-weight:700;text-transform:uppercase;">
+      </div>
+
+      <div class="form-row" style="display:flex;gap:10px;margin-bottom:12px;">
+        <div style="flex:1;">
+          <label style="font-weight:600;font-size:0.85rem;color:#17482f;display:block;margin-bottom:4px;">Discount Type</label>
+          <select id="couponFormType" style="width:100%;padding:10px;border-radius:10px;border:1px solid #d4e4d6;">
+            <option value="percent">Percentage (%)</option>
+            <option value="amount">Flat Amount (Rs.)</option>
+          </select>
+        </div>
+        <div style="flex:1;">
+          <label style="font-weight:600;font-size:0.85rem;color:#17482f;display:block;margin-bottom:4px;">Discount Value *</label>
+          <input type="number" id="couponFormVal" required step="0.01" placeholder="e.g. 15" style="width:100%;padding:10px;border-radius:10px;border:1px solid #d4e4d6;">
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:14px;">
+        <label style="font-weight:600;font-size:0.85rem;color:#17482f;display:block;margin-bottom:4px;">Minimum Spend (Rs.)</label>
+        <input type="number" id="couponFormMin" step="1" value="0" placeholder="e.g. 1000" style="width:100%;padding:10px;border-radius:10px;border:1px solid #d4e4d6;">
+      </div>
+
+      <div class="form-group" style="margin-bottom:14px;">
+        <label style="font-weight:600;font-size:0.85rem;color:#17482f;display:block;margin-bottom:4px;">Expiry / Validation End Date (Optional)</label>
+        <input type="date" id="couponFormExpiry" style="width:100%;padding:10px;border-radius:10px;border:1px solid #d4e4d6;">
+      </div>
+
+      <div class="form-group" style="margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="couponFormActive" checked style="width:18px;height:18px;cursor:pointer;">
+        <label for="couponFormActive" style="font-weight:600;font-size:0.88rem;color:#17482f;cursor:pointer;">Active and available for checkout</label>
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button type="submit" style="flex:1;background:#17482f;color:#fff;border:none;padding:12px;border-radius:12px;font-weight:700;cursor:pointer;">Save Coupon 💾</button>
+        <button type="button" onclick="closeCouponModal()" style="background:#f4f8f5;color:#555;border:1px solid #ccc;padding:12px 18px;border-radius:12px;font-weight:600;cursor:pointer;">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>

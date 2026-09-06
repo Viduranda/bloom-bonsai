@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Cart · Bloom & Bonsai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=44.0">
+<style>
+@keyframes bannerGlow {
+  0% { box-shadow: 0 8px 25px rgba(23,72,47,0.08); border-color: #e7e2d3; }
+  50% { box-shadow: 0 12px 35px rgba(201,162,39,0.25); border-color: #c9a227; }
+  100% { box-shadow: 0 8px 25px rgba(23,72,47,0.08); border-color: #e7e2d3; }
+}
+
+@keyframes truckDrive {
+  0%, 100% { transform: translateY(0) scaleX(1); }
+  50% { transform: translateY(-4px) scaleX(1.05); }
+}
+
+@keyframes radarPulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.7); opacity: 0.3; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shimmerProgress {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.free-ship-banner {
+  background: linear-gradient(135deg, #ffffff 0%, #faf8f2 100%);
+  border: 2px solid #e7e2d3;
+  border-radius: 20px;
+  padding: 20px 24px;
+  margin-bottom: 1.8rem;
+  animation: bannerGlow 4s infinite ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.free-ship-banner::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, #17482f, #c9a227, #52B788);
+}
+
+.free-ship-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.free-ship-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #17482f;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.truck-icon {
+  display: inline-block;
+  font-size: 1.4rem;
+  animation: truckDrive 1.8s infinite ease-in-out;
+}
+
+.radius-badge {
+  background: rgba(23, 72, 47, 0.08);
+  border: 1px solid rgba(23, 72, 47, 0.25);
+  color: #17482f;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.radar-dot {
+  width: 9px;
+  height: 9px;
+  background: #2e7d4f;
+  border-radius: 50%;
+  position: relative;
+  display: inline-block;
+}
+
+.radar-dot::after {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  border: 2px solid #2e7d4f;
+  border-radius: 50%;
+  animation: radarPulse 1.8s infinite ease-out;
+}
+
+.progress-bar-track {
+  background: #e0eae3;
+  height: 12px;
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #17482f 0%, #2e7d4f 50%, #c9a227 100%);
+  background-size: 200% 200%;
+  animation: shimmerProgress 3s infinite ease-in-out;
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.free-ship-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #5c6b58;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══ -->
+<header class="navbar premium">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Bloom <span>&amp;</span> Bonsai</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="mygarden.html">My Garden</a></li>
+      <li><a href="gardendesigner.html">Garden AI</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="wishlist.html" class="cart-link" style="margin-right:10px;">Wishlist <span class="cart-badge wishlist-count-badge" id="wishlistCount" style="background:#e74c3c;">0</span></a>
+      <a href="cart.html" class="cart-link">Cart <span class="cart-badge" id="cartCount">0</span></a>
+      <a href="login.html" class="btn-login" id="loginBtn">Login</a>
+      <a href="register.html" class="btn-signup" id="signupBtn">Sign Up</a>
+      <div class="user-menu" id="userMenu" style="display:none;align-items:center;gap:10px;">
+        <i class="fas fa-user-circle"></i>
+        <span id="userName">User</span>
+        <a href="#" id="logoutBtn" class="btn-mini" style="font-size:0.8rem;">Logout</a>
+      </div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<main class="cart-page">
+  <div class="page-head">
+    <h1>Your Cart</h1>
+    <p>Hand-picked plants, carefully packed and delivered.</p>
+  </div>
+
+  <div class="cart-layout">
+    <section id="cartItems"></section>
+    <aside class="summary premium-card" id="orderSummary"></aside>
+  </div>
+
+  <div class="empty-cart premium-card" id="emptyCart" hidden>
+    <div class="icon">🪴</div>
+    <h2>Your cart is empty</h2>
+    <p>Explore our bonsai collection — every tree tells a story.</p>
+    <a href="shop.html" class="btn-line btn-block" style="max-width:280px;margin:0 auto;">Continue Shopping</a>
+  </div>
+</main>
+
+<script src="script.js?v=43.0"></script>
+<script>
+const FB_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="#e8f5e9"/><text x="200" y="160" font-size="70" text-anchor="middle">🌿</text></svg>');
+
+document.addEventListener('DOMContentLoaded', () => {
+    const logout = document.getElementById('logoutBtn');
+    if (logout) {
+        logout.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            sessionStorage.removeItem('token');
+            location.href = 'login.html';
+        });
+    }
+    loadCart();
+});
+
+// Re-fetch fresh cart data when restored from Browser Back/Forward Cache (bfcache)
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+        console.log('[BF Cache Restoration] Re-fetching fresh cart data...');
+        loadCart();
+    }
+});
+
+async function loadCart() {
+    const emptyEl = document.getElementById('emptyCart');
+    try {
+        const data = await apiFetch('cart/list.php', { method: 'GET' });
+        renderCart(data);
+        emptyEl.hidden = data && data.items && data.items.length > 0;
+    } catch (err) {
+        if (err && (err.error === 'AUTH_REQUIRED' || err.status === 401 || (err.message && err.message.toLowerCase().includes('unauthorized')))) {
+            location.href = 'login.html';
+            return;
+        }
+        document.getElementById('cartItems').innerHTML = '';
+        document.getElementById('orderSummary').innerHTML = '';
+        emptyEl.hidden = false;
+        if (err && err.message) console.warn('Cart load:', err.message);
+    }
+}
+
+async function loadCartCoupons() {
+    const container = document.getElementById('cartAvailableCoupons');
+    if (!container) return;
+
+    try {
+        const res = await apiFetch('coupons/active.php');
+        const coupons = Array.isArray(res) ? res : ((res && res.coupons) ? res.coupons : (res && res.data && res.data.coupons ? res.data.coupons : []));
+
+        if (!coupons.length) {
+            container.innerHTML = '<span style="font-size:0.8rem;color:#777;grid-column:1/-1;">No active promo codes right now.</span>';
+            return;
+        }
+
+        container.innerHTML = coupons.map(c => {
+            const discountText = c.discount_percent > 0 ? `${parseFloat(c.discount_percent)}% OFF` : `Rs. ${parseFloat(c.discount_amount)} OFF`;
+            const minText = c.min_spend > 0 ? `Min Spend: ${formatINR(c.min_spend)}` : 'No Minimum Spend';
+            return `
+                <div style="background:#fff;border:1px dashed #17482f;border-radius:10px;padding:10px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+                    <div>
+                        <b style="color:#17482f;font-size:0.95rem;display:block;">${esc(c.code)}</b>
+                        <span style="color:#2e7d4f;font-size:0.82rem;font-weight:700;">${discountText}</span>
+                        <small style="color:#777;display:block;font-size:0.75rem;margin-top:2px;">${minText}</small>
+                    </div>
+                    <a href="checkout.html?coupon=${encodeURIComponent(c.code)}" style="margin-top:8px;background:#17482f;color:#fff;text-align:center;padding:5px;border-radius:6px;font-size:0.75rem;font-weight:700;text-decoration:none;">Apply at Checkout ➔</a>
+                </div>
+            `;
+        }).join('');
+    } catch {
+        container.innerHTML = '<span style="font-size:0.8rem;color:#777;">Store discounts available</span>';
+    }
+}
+
+function renderCart(data) {
+    const items = (data && data.items) || [];
+    const subtotal = (data && data.subtotal) || 0;
+    const shipping = (data && data.shipping) || 0;
+    const total = (data && data.total) || 0;
+
+    const countEl = document.getElementById('cartCount');
+    if (countEl) {
+        countEl.textContent = items.reduce((s, i) => s + i.quantity, 0);
+        countEl.style.animation = 'none';
+        countEl.offsetHeight; // trigger reflow
+        countEl.style.animation = 'pulseBadge 0.4s ease';
+    }
+
+    // Free Shipping Progress Calculation (Threshold: Rs. 10,000 within 50 KM)
+    const freeShipThreshold = 10000;
+    const progressPercent = Math.min(100, Math.round((subtotal / freeShipThreshold) * 100));
+    const amountNeeded = Math.max(0, freeShipThreshold - subtotal);
+    const isUnlocked = subtotal >= freeShipThreshold;
+
+    const shipProgressHtml = `
+      <div class="free-ship-banner">
+        <div class="free-ship-header">
+          <div class="free-ship-title">
+            <span class="truck-icon">${isUnlocked ? '🚚💨' : '🚚'}</span>
+            <span>${isUnlocked ? '🎉 Congratulations! FREE Delivery Unlocked!' : 'Add ' + formatINR(amountNeeded) + ' more for FREE Delivery!'}</span>
+          </div>
+          <div class="radius-badge">
+            <span class="radar-dot"></span>
+            <span>📍 Within 50 KM Radius Guaranteed</span>
+          </div>
+        </div>
+
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" style="width:${progressPercent}%;"></div>
+        </div>
+
+        <div class="free-ship-footer">
+          <span>${isUnlocked ? '✨ Qualified for Free Express Shipping over Rs. 10,000' : 'Spend Rs. 10,000 for FREE Local Delivery'}</span>
+          <span style="color:${isUnlocked ? '#17482f' : '#c9a227'};font-weight:700;font-size:0.9rem;">${progressPercent}% Complete</span>
+        </div>
+      </div>
+
+      <div style="background:#faf8f3;border:1px dashed #c9a227;border-radius:16px;padding:16px;margin-bottom:1.5rem;box-shadow:0 4px 14px rgba(0,0,0,0.03);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.05rem;color:#17482f;display:flex;align-items:center;gap:8px;">
+            🎟️ Available Store Coupons & Discounts
+          </div>
+          <a href="checkout.html" style="font-size:0.8rem;color:#17482f;font-weight:700;text-decoration:none;">Apply at Checkout ➔</a>
+        </div>
+        <div id="cartAvailableCoupons" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
+          <small style="color:#777;">Loading available store discounts...</small>
+        </div>
+      </div>
+    `;
+
+    setTimeout(loadCartCoupons, 50);
+
+    const wrap = document.getElementById('cartItems');
+    if (!items.length) {
+        wrap.innerHTML = shipProgressHtml;
+        document.getElementById('orderSummary').innerHTML = '';
+        document.getElementById('emptyCart').hidden = false;
+        return;
+    }
+
+    wrap.innerHTML = shipProgressHtml + items.map((it, idx) => `
+        <article class="cart-item premium-card" id="cart-item-${it.id}" style="animation-delay: ${idx * 0.08}s;">
+            <img src="${it.image || FB_IMG}" alt="${esc(it.name)}" style="width:80px;height:80px;border-radius:12px;object-fit:cover;border:1px solid #e7e2d3;">
+            <div style="flex:1;">
+                <div class="ci-name" style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.1rem;color:#17482f;">${esc(it.name)}</div>
+                <div class="ci-price" style="color:#7c8878;font-size:0.88rem;margin-top:2px;">${formatINR(it.price)} each</div>
+            </div>
+            <div class="ci-qty">
+                <button onclick="changeQty(${it.id}, ${it.quantity - 1})" aria-label="Decrease quantity">−</button>
+                <span style="font-weight:700;min-width:24px;text-align:center;font-size:1rem;color:#17482f;">${it.quantity}</span>
+                <button onclick="changeQty(${it.id}, ${it.quantity + 1})" aria-label="Increase quantity">+</button>
+            </div>
+            <div class="ci-total" style="font-weight:700;font-size:1.1rem;color:#17482f;min-width:90px;text-align:right;">${formatINR(it.price * it.quantity)}</div>
+            <button class="ci-remove" onclick="animateRemoveItem(${it.id})" title="Remove Item">✕</button>
+        </article>`).join('');
+
+    document.getElementById('orderSummary').innerHTML = `
+        <h2 style="font-family:'Playfair Display',serif;color:#17482f;margin-bottom:18px;font-size:1.4rem;">Order Summary</h2>
+        <div class="os-row" style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:0.95rem;color:#555;"><span>Subtotal</span><span>${formatINR(subtotal)}</span></div>
+        <div class="os-row" style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:0.95rem;color:#555;"><span>Shipping</span><span>${shipping === 0 ? '<b style="color:#2e7d32;">FREE 🚚</b>' : formatINR(shipping)}</span></div>
+        <div class="os-row total" style="display:flex;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:2px solid #17482f;font-weight:700;font-size:1.2rem;color:#17482f;"><span>Total</span><span>${formatINR(total)}</span></div>
+        <a href="checkout.html" class="btn-gold btn-block" style="margin-top:20px;">Proceed to Checkout 🌿</a>
+        <a href="shop.html" class="btn-line btn-block" style="margin-top:10px;text-align:center;display:block;padding:10px;color:#17482f;font-weight:600;text-decoration:none;">Continue Shopping</a>
+        ${shipping === 0 ? '<div class="free-ship" style="margin-top:14px;text-align:center;color:#2e7d32;font-size:0.85rem;font-weight:600;">🌿 Free insured delivery included</div>' : ''}`;
+}
+
+async function animateRemoveItem(itemId) {
+    const el = document.getElementById('cart-item-' + itemId);
+    if (el) {
+        el.classList.add('removing');
+        await new Promise(r => setTimeout(r, 350));
+    }
+    await removeItem(itemId);
+}
+
+async function changeQty(itemId, qty) {
+    if (qty < 1) return animateRemoveItem(itemId);
+    try {
+        await apiFetch('cart/update.php', { method: 'PUT', body: JSON.stringify({ item_id: itemId, quantity: qty }) });
+        await loadCart();
+    } catch (err) { alert(err && err.message ? err.message : 'Could not update'); }
+}
+
+async function removeItem(itemId) {
+    try {
+        await apiFetch('cart/remove.php', { method: 'DELETE', body: JSON.stringify({ item_id: itemId }) });
+        await loadCart();
+    } catch (err) { alert(err && err.message ? err.message : 'Could not remove'); }
+}
+</script>
+<script src="script.js?v=44.0"></script>
+</body>
+</html>
